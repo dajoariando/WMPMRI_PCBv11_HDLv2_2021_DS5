@@ -3,9 +3,34 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <time.h>
+#include <alt_generalpurpose_io.h>
+#include <hwlib.h>
+#include <socal/alt_gpio.h>
+#include <socal/hps.h>
+#include <socal/socal.h>
 
-#include "socal/hps.h"
-#include "./soc_variables/soc_system.h"
+// #include "socal/hps.h"
+
+#include "./soc_variables/hps_soc_system.h"
+#include "./soc_variables/general.h"
+// #include "./soc_variables/lm96570_vars.h"
+#include "./soc_variables/hps_soc_system.h"
+#include "./functions/AlteraIP/altera_avalon_fifo_regs.h"
+#include "./functions/reconfig_functions.h"
+#include "./functions/pll_param_generator.h"
+#include "./functions/gnrl_calc.h"
+#include "./functions/common_functions.h"
+#include "./functions/avalon_spi.h"
+#include "./functions/ad9276_driver.h"
 
 // |=============|==========|==============|==========|
 // | Signal Name | HPS GPIO | Register/bit | Function |
@@ -31,11 +56,11 @@
 int fd_dev_mem = 0;
 
 // memory-mapped peripherals
-void   *hps_gpio     = NULL;
+void *hps_gpio = NULL;
 size_t hps_gpio_span = ALT_GPIO1_UB_ADDR - ALT_GPIO1_LB_ADDR + 1;
 size_t hps_gpio_ofst = ALT_GPIO1_OFST;
 
-void   *h2f_lw_axi_master     = NULL;
+void *h2f_lw_axi_master = NULL;
 size_t h2f_lw_axi_master_span = ALT_LWFPGASLVS_UB_ADDR - ALT_LWFPGASLVS_LB_ADDR + 1;
 size_t h2f_lw_axi_master_ofst = ALT_LWFPGASLVS_OFST;
 
@@ -48,51 +73,36 @@ void *h2p_fifo_sink_ch_f_data_addr = NULL;
 void *h2p_fifo_sink_ch_g_data_addr = NULL;
 void *h2p_fifo_sink_ch_h_data_addr = NULL;
 
-void *h2p_led_addr= NULL;
-void *h2p_sw_addr= NULL;
-void *h2p_button_addr= NULL;
+void *h2p_led_addr = NULL;
+void *h2p_sw_addr = NULL;
+void *h2p_button_addr = NULL;
 
+// volatile unsigned int *h2p_muxspi_addr = NULL;   // gpio for dac (spi)
+volatile unsigned int *h2p_adcspi_addr;   // gpio for dac (spi)
+volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_b_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_c_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_d_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_e_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_f_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_g_csr_addr = NULL;   // ADC streaming FIFO status address
+volatile unsigned int *h2p_fifo_sink_ch_h_csr_addr = NULL;   // ADC streaming FIFO status address
 
-// void *h2p_adcspi_addr = NULL;
+volatile unsigned int *h2p_adc_samples_addr = NULL;
+volatile unsigned int *h2p_init_delay_addr = NULL;
+// volatile unsigned int *h2p_spi_num_of_bits_addr = NULL;
+volatile unsigned int *h2p_general_cnt_int_addr = NULL;
+volatile unsigned int *h2p_general_cnt_out_addr = NULL;
 
-volatile unsigned int *h2p_adcspi_addr 					= NULL; // gpio for dac (spi)
-volatile unsigned int *h2p_muxspi_addr 					= NULL; // gpio for dac (spi)
+//volatile unsigned int *h2p_lm96570_spi_out2_addr = NULL;
+//volatile unsigned int *h2p_lm96570_spi_out1_addr = NULL;
+//volatile unsigned int *h2p_lm96570_spi_out0_addr = NULL;
+//volatile unsigned int *h2p_lm96570_spi_in2_addr = NULL;
+//volatile unsigned int *h2p_lm96570_spi_in1_addr = NULL;
+//volatile unsigned int *h2p_lm96570_spi_in0_addr = NULL;
+volatile unsigned int *h2p_adc_start_pulselength_addr = NULL;
 
-volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_b_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_c_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_d_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_e_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_f_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_g_csr_addr			= NULL; // ADC streaming FIFO status address
-volatile unsigned int *h2p_fifo_sink_ch_h_csr_addr			= NULL; // ADC streaming FIFO status address
-
-volatile unsigned int *h2p_adc_samples_per_echo_addr	= NULL;
-volatile unsigned int *h2p_init_delay_addr				= NULL;
-volatile unsigned int *h2p_spi_num_of_bits_addr			= NULL;
-volatile unsigned int *h2p_general_cnt_int_addr			= NULL;
-volatile unsigned int *h2p_general_cnt_out_addr			= NULL;
-
-volatile unsigned int *h2p_lm96570_spi_out2_addr		= NULL;
-volatile unsigned int *h2p_lm96570_spi_out1_addr		= NULL;
-volatile unsigned int *h2p_lm96570_spi_out0_addr		= NULL;
-
-volatile unsigned int *h2p_lm96570_spi_in2_addr			= NULL;
-volatile unsigned int *h2p_lm96570_spi_in1_addr			= NULL;
-volatile unsigned int *h2p_lm96570_spi_in0_addr			= NULL;
-
-volatile unsigned int *h2p_adc_start_pulselength_addr 	= NULL;
-
-volatile unsigned int *h2p_pulse_damp_len				= NULL;
-void *h2p_pulse_pll_reconfig			= NULL;
-volatile unsigned int *h2p_pulse_tx_len					= NULL;
-volatile unsigned int *h2p_pulse_init_delay				= NULL;
-
-volatile unsigned int *h2p_clksync_plen					= NULL;
-volatile unsigned int *h2p_mux_delay					= NULL;
-void *h2p_pll_sync_reconfig			= NULL;
-
-
+void *h2p_pulse_adc_reconfig = NULL;
 
 void open_physical_memory_device();
 void close_physical_memory_device();
@@ -106,21 +116,20 @@ void setup_hps_gpio();
 void setup_fpga_leds();
 void handle_hps_led();
 void handle_fpga_leds();
-void write_beamformer_spi (unsigned char spi_reg_length, unsigned char read, unsigned char spi_addr, unsigned long spi_data_out, unsigned int *spi_in0, unsigned int *spi_in1, unsigned int *spi_in2);
+void write_beamformer_spi(unsigned char spi_reg_length, unsigned char read, unsigned char spi_addr, unsigned long spi_data_out, unsigned int *spi_in0, unsigned int *spi_in1, unsigned int *spi_in2);
 
 // FUNCTIONS
-void create_measurement_folder();								// create a folder in the system for the measurement data
+// void create_measurement_folder();								// create a folder in the system for the measurement data
 void leave();												// terminate the program
 void init();													// initialize the system with tuned default parameter
 
-
 // global variables
-FILE	*fptr;
+FILE *fptr;
 long i;
 long j;
-unsigned int rddata [10000];
-unsigned int rddata_16[10000];
-char foldername[50]; // variable to store folder name of the measurement data
+// unsigned int rddata[10000];
+// unsigned int rddata_16[10000];
+char foldername[50];   // variable to store folder name of the measurement data
 char pathname[60];
 
 #endif

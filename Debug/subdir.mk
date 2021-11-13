@@ -5,15 +5,18 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../alt_generalpurpose_io.c \
-../hps_linux.c 
+../exec_adc_readSingleChannel.c \
+../exec_adc_testpattern.c 
 
 OBJS += \
 ./alt_generalpurpose_io.o \
-./hps_linux.o 
+./exec_adc_readSingleChannel.o \
+./exec_adc_testpattern.o 
 
 C_DEPS += \
 ./alt_generalpurpose_io.d \
-./hps_linux.d 
+./exec_adc_readSingleChannel.d \
+./exec_adc_testpattern.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
