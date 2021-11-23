@@ -4,19 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../alt_generalpurpose_io.c \
 ../exec_adc_readSingleChannel.c \
-../exec_adc_testpattern.c 
+../exec_adc_testPattern.c 
 
 OBJS += \
-./alt_generalpurpose_io.o \
 ./exec_adc_readSingleChannel.o \
-./exec_adc_testpattern.o 
+./exec_adc_testPattern.o 
 
 C_DEPS += \
-./alt_generalpurpose_io.d \
 ./exec_adc_readSingleChannel.d \
-./exec_adc_testpattern.d 
+./exec_adc_testPattern.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

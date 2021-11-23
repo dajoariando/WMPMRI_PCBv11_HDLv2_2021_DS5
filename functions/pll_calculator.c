@@ -7,8 +7,9 @@
 	4. Set minimum and maximum MFRAC
 */
 
+#include "../functions/pll_calculator.h"
+
 #include <stdio.h>
-#include "pll_calculator.h"
 
 // the principal of operation:
 // the highest priority is highest VCO (means we can have higher duty cycle resolution)

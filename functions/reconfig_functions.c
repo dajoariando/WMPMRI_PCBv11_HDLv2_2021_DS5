@@ -1,3 +1,5 @@
+#include "../functions/reconfig_functions.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -6,8 +8,7 @@
 #include "socal/socal.h"
 #include "socal/hps.h"
 #include "socal/alt_gpio.h"
-#include "reconfig_functions.h"
-#include "../soc_variables/hps_soc_system.h"
+#include "../variables/hps_soc_system.h"
 
 // counter C read address (write address is different from read address)
 uint32_t COUNTER_READ_ADDR[18] = { 0x28,	// address C00

@@ -1,5 +1,7 @@
 // this pll param generator is designed for output frequency of 1MHz to 10MHz
 
+#include "../functions/pll_param_generator.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -8,11 +10,10 @@
 #include "socal/socal.h"
 #include "socal/hps.h"
 #include "socal/alt_gpio.h"
-#include "pll_param_generator.h"
 
-#include "../soc_variables/hps_soc_system.h"
-#include "reconfig_functions.h"
-#include "pll_calculator.h"
+#include "../functions/pll_calculator.h"
+#include "../functions/reconfig_functions.h"
+#include "../variables/hps_soc_system.h"
 
 // counter C read address (write address is different from read address)
 uint32_t CNT_READ_ADDR[18] = { 0x28,	// address C00

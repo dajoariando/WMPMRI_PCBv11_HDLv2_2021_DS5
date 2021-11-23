@@ -1,4 +1,20 @@
-#include "ad9276_driver.h"
+#include "../functions/adc_ad9276_driver.h"
+
+#include <socal/socal.h>
+#include <unistd.h>
+#include <socal/hps.h>
+#include <stdio.h>
+
+#include "../variables/adc_ad9276_vars.h"
+#include "../variables/altera_avalon_fifo_regs.h"
+#include "../variables/avalon_spi.h"
+#include "../variables/hps_soc_system.h"
+
+// offset for axi bus address
+extern volatile unsigned int *h2p_adcspi_addr;   // gpio for dac (spi)
+
+// general variables
+extern long i;
 
 unsigned int write_adc_spi(unsigned int comm) {
 	unsigned int data;

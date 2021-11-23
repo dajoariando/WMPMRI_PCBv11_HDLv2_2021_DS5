@@ -24,11 +24,15 @@
  */
 
 // OUTPUT
+#define DAC_GRAD_LDAC_ofst			(5)
+#define DAC_GRAD_CLR_ofst			(4)
 #define ADC_AD9276_PWDN_ofst		(3)
 #define ADC_AD9276_STBY_ofst		(2)
 #define FSM_RESET_ofst				(1)
 #define BF_TX_EN_ofst				(0)
 
+#define DAC_GRAD_LDAC_msk			(1<<DAC_GRAD_LDAC_ofst)
+#define DAC_GRAD_CLR_msk			(1<<DAC_GRAD_CLR_ofst)
 #define ADC_AD9276_PWDN_msk         (1<<ADC_AD9276_PWDN_ofst     ) // (CAREFUL! SOMETIMES PUTTING THE ADC TO STANDBY WOULD CAUSE IT TO CRASH)
 #define ADC_AD9276_STBY_msk         (1<<ADC_AD9276_STBY_ofst     )
 #define FSM_RESET_msk               (1<<FSM_RESET_ofst           )

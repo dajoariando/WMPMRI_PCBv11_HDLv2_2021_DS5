@@ -1,23 +1,8 @@
-#include <alt_generalpurpose_io.h>
-#include <assert.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <hwlib.h>
-#include <math.h>
-#include <socal/alt_gpio.h>
-#include <socal/hps.h>
 #include <socal/socal.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
 
-#include "AlteraIP/altera_avalon_fifo_regs.h"
+#include "../variables/altera_avalon_fifo_regs.h"
 
 unsigned int rd_FIFO(volatile unsigned int *FIFO_status_addr, void *FIFO_data_addr, int * buf32) {
 
@@ -45,7 +30,7 @@ unsigned int rd_FIFO(volatile unsigned int *FIFO_status_addr, void *FIFO_data_ad
 	return i;
 }
 
-void buf32_to_buf16(int * buf32, unsigned int * buf16, unsigned int length) {
+void buf32_to_buf16(uint32_t * buf32, uint16_t * buf16, unsigned int length) {
 	unsigned int i, j;
 
 	j = 0;

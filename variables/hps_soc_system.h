@@ -115,7 +115,7 @@
 #define AD9276_SPI_NUMSLAVES 1
 #define AD9276_SPI_PREFIX "spi_"
 #define AD9276_SPI_SYNC_REG_DEPTH 2
-#define AD9276_SPI_TARGETCLOCK 4200000
+#define AD9276_SPI_TARGETCLOCK 128000
 #define AD9276_SPI_TARGETSSDELAY "2000.0"
 
 /*
@@ -788,6 +788,35 @@
 #define FIFO_SINK_CH_B_IN_CSR_USE_WRITE_CONTROL 1
 
 /*
+ * Macros for device 'ad5724_grad_spi', class 'altera_avalon_spi'
+ * The macros are prefixed with 'AD5724_GRAD_SPI_'.
+ * The prefix is the slave descriptor.
+ */
+#define AD5724_GRAD_SPI_COMPONENT_TYPE altera_avalon_spi
+#define AD5724_GRAD_SPI_COMPONENT_NAME ad5724_grad_spi
+#define AD5724_GRAD_SPI_BASE 0x4c0
+#define AD5724_GRAD_SPI_SPAN 32
+#define AD5724_GRAD_SPI_END 0x4df
+#define AD5724_GRAD_SPI_IRQ 1
+#define AD5724_GRAD_SPI_CLOCKMULT 1
+#define AD5724_GRAD_SPI_CLOCKPHASE 0
+#define AD5724_GRAD_SPI_CLOCKPOLARITY 1
+#define AD5724_GRAD_SPI_CLOCKUNITS "Hz"
+#define AD5724_GRAD_SPI_DATABITS 24
+#define AD5724_GRAD_SPI_DATAWIDTH 32
+#define AD5724_GRAD_SPI_DELAYMULT "1.0E-9"
+#define AD5724_GRAD_SPI_DELAYUNITS "ns"
+#define AD5724_GRAD_SPI_EXTRADELAY 0
+#define AD5724_GRAD_SPI_INSERT_SYNC 0
+#define AD5724_GRAD_SPI_ISMASTER 1
+#define AD5724_GRAD_SPI_LSBFIRST 0
+#define AD5724_GRAD_SPI_NUMSLAVES 1
+#define AD5724_GRAD_SPI_PREFIX "spi_"
+#define AD5724_GRAD_SPI_SYNC_REG_DEPTH 2
+#define AD5724_GRAD_SPI_TARGETCLOCK 128000
+#define AD5724_GRAD_SPI_TARGETSSDELAY "2000.0"
+
+/*
  * Macros for device 'fifo_sink_CH_G_out', class 'altera_avalon_fifo'
  * The macros are prefixed with 'FIFO_SINK_CH_G_OUT_'.
  * The prefix is the slave descriptor.
@@ -972,7 +1001,7 @@
 #define SYSID_QSYS_SPAN 8
 #define SYSID_QSYS_END 0x517
 #define SYSID_QSYS_ID 2899645186
-#define SYSID_QSYS_TIMESTAMP 1636416862
+#define SYSID_QSYS_TIMESTAMP 1637612391
 
 /*
  * Macros for device 'jtag_uart', class 'altera_avalon_jtag_uart'
