@@ -2,7 +2,7 @@
  * dac_ad5724_vars.h
  *
  *  Created on: Nov 22, 2021
- *      Author: dave
+ *      Author: David Ariando
  */
 
 #ifndef VARIABLES_DAC_AD5724R_VARS_H_

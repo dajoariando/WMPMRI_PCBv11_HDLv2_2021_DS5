@@ -8,15 +8,19 @@
 #include <unistd.h>
 
 #include "functions/adc_ad9276_driver.h"
+#include "functions/dac_ad5724r_driver.h"
 #include "functions/common_functions.h"
 #include "functions/gnrl_calc.h"
 #include "functions/pll_param_generator.h"
 #include "functions/reconfig_functions.h"
 #include "functions/soc_global.h"
+#include "functions/bstream.h"
+
 #include "variables/adc_ad9276_vars.h"
+#include "variables/dac_ad5724r_vars.h"
 #include "variables/general.h"
 
-// SOC HPS ADDRESSES (COPY TO THE SOC_GLOBAL.H)
+// SOC HPS ADDRESSES (COPY TO THE SOC_GLOBAL.C)
 void *h2p_fifo_sink_ch_a_data_addr = NULL;
 void *h2p_fifo_sink_ch_b_data_addr = NULL;
 void *h2p_fifo_sink_ch_c_data_addr = NULL;
@@ -43,6 +47,20 @@ volatile unsigned int *h2p_general_cnt_int_addr = NULL;
 volatile unsigned int *h2p_general_cnt_out_addr = NULL;
 volatile unsigned int *h2p_adc_start_pulselength_addr = NULL;
 void *h2p_pulse_adc_reconfig = NULL;
+volatile unsigned int *h2p_dac_grad_spi_addr = NULL;
+// memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
+volatile unsigned int *axi_ram_tx_h1 = NULL;
+volatile unsigned int *axi_ram_tx_l1 = NULL;
+volatile unsigned int *axi_ram_tx_aux = NULL;
+volatile unsigned int *axi_ram_tx_h2 = NULL;
+volatile unsigned int *axi_ram_tx_l2 = NULL;
+volatile unsigned int *axi_ram_tx_charge = NULL;
+volatile unsigned int *axi_ram_tx_damp = NULL;
+volatile unsigned int *axi_ram_tx_dump = NULL;
+volatile unsigned int *axi_ram_rx_inc_damp = NULL;
+volatile unsigned int *axi_ram_rx_in_short = NULL;
+// pll reconfig address for the bitstream
+volatile unsigned int *h2p_bstream_pll_addr = NULL;   // bitstream pll reconfig
 
 // FUNCTIONS
 void leave();	// terminate the program

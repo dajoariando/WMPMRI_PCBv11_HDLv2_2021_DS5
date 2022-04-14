@@ -43,6 +43,20 @@ extern volatile unsigned int *h2p_general_cnt_int_addr;
 extern volatile unsigned int *h2p_general_cnt_out_addr;
 extern volatile unsigned int *h2p_adc_start_pulselength_addr;
 extern void *h2p_pulse_adc_reconfig;
+extern volatile unsigned int *h2p_dac_grad_spi_addr;
+// memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
+extern volatile unsigned int *axi_ram_tx_h1;
+extern volatile unsigned int *axi_ram_tx_l1;
+extern volatile unsigned int *axi_ram_tx_aux;
+extern volatile unsigned int *axi_ram_tx_h2;
+extern volatile unsigned int *axi_ram_tx_l2;
+extern volatile unsigned int *axi_ram_tx_charge;
+extern volatile unsigned int *axi_ram_tx_damp;
+extern volatile unsigned int *axi_ram_tx_dump;
+extern volatile unsigned int *axi_ram_rx_inc_damp;
+extern volatile unsigned int *axi_ram_rx_in_short;
+// pll reconfig address for the bitstream
+extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
 
 // physical memory file descriptor
 int fd_dev_mem = 0;
@@ -55,6 +69,11 @@ size_t hps_gpio_ofst = ALT_GPIO1_OFST;
 void *h2f_lw_axi_master = NULL;
 size_t h2f_lw_axi_master_span = ALT_LWFPGASLVS_UB_ADDR - ALT_LWFPGASLVS_LB_ADDR + 1;
 size_t h2f_lw_axi_master_ofst = ALT_LWFPGASLVS_OFST;
+
+void *axi_base = NULL;   // the AXI bus mm base address
+#define ALT_AXI_FPGASLVS_OFST (0xC0000000) // axi_master
+#define HW_FPGA_AXI_SPAN (0x40000000) // Bridge span
+#define HW_FPGA_AXI_MASK ( HW_FPGA_AXI_SPAN - 1 )
 
 void soc_init() {
 
@@ -79,6 +98,14 @@ void soc_init() {
 	h2f_lw_axi_master = mmap(NULL, h2f_lw_axi_master_span, PROT_READ | PROT_WRITE, MAP_SHARED, fd_dev_mem, h2f_lw_axi_master_ofst);
 	if (h2f_lw_axi_master == MAP_FAILED) {
 		printf("Error: h2f_lw_axi_master mmap() failed.\n");
+		printf("    errno = %s\n", strerror(errno));
+		close(fd_dev_mem);
+		exit (EXIT_FAILURE);
+	}
+
+	axi_base = mmap(NULL, HW_FPGA_AXI_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd_dev_mem, ALT_AXI_FPGASLVS_OFST);
+	if (axi_base == MAP_FAILED) {
+		printf("Error: h2f_axi_master mmap() failed.\n");
 		printf("    errno = %s\n", strerror(errno));
 		close(fd_dev_mem);
 		exit (EXIT_FAILURE);
@@ -110,6 +137,20 @@ void soc_init() {
 	h2p_general_cnt_out_addr = h2f_lw_axi_master + GENERAL_CNT_OUT_BASE;
 	h2p_adc_start_pulselength_addr = h2f_lw_axi_master + ADC_START_PULSELENGTH_BASE;
 	h2p_pulse_adc_reconfig = h2f_lw_axi_master + ADC_PLL_RECONFIG_BASE;
+	h2p_dac_grad_spi_addr = h2f_lw_axi_master + AD5724_GRAD_SPI_BASE;
+	h2p_bstream_pll_addr = axi_base + BSTREAM_PLL_RECONFIG_BASE;
+
+	// bitstream ram
+	axi_ram_tx_h1 = axi_base + TX_H1_BASE;
+	axi_ram_tx_l1 = axi_base + TX_L1_BASE;
+	axi_ram_tx_h2 = axi_base + TX_H2_BASE;
+	axi_ram_tx_l2 = axi_base + TX_L2_BASE;
+	axi_ram_tx_charge = axi_base + TX_CHRG_BASE;
+	axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
+	axi_ram_tx_dump = axi_base + TX_DUMP_BASE;
+	axi_ram_tx_aux = axi_base + TX_AUX_BASE;
+	axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
+	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
 
 }
 
@@ -160,4 +201,6 @@ void soc_exit() {
 	h2p_general_cnt_int_addr = NULL;
 	h2p_general_cnt_out_addr = NULL;
 	h2p_adcspi_addr = NULL;
+	h2p_dac_grad_spi_addr = NULL;
+	h2p_bstream_pll_addr = NULL;
 }

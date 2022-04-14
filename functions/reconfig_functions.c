@@ -1,4 +1,4 @@
-#include "../functions/reconfig_functions.h"
+#include "reconfig_functions.h"
 
 #include <stdio.h>
 #include <unistd.h>

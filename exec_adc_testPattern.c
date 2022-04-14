@@ -84,9 +84,9 @@ int main(int argc, char * argv[]) {
 	alt_write_word(h2p_init_delay_addr, us_to_clk_cycles(adc_init_delay_us, adc_freq));// the ADC init delay
 
 // tx_enable fire
-	cnt_out_val |= BF_TX_EN_msk;
+	cnt_out_val |= FSM_START_msk;
 	alt_write_word(h2p_general_cnt_out_addr, cnt_out_val);// start the sequence
-	cnt_out_val &= ( ~BF_TX_EN_msk );
+	cnt_out_val &= ( ~FSM_START_msk );
 	alt_write_word(h2p_general_cnt_out_addr, cnt_out_val);// stop the sequence
 
 	while (! ( alt_read_word(h2p_general_cnt_int_addr) & FSM_DONE_msk ))

@@ -21,6 +21,17 @@
  */
 
 /*
+ * Macros for device 'rx_in_short', class 'bstream'
+ * The macros are prefixed with 'RX_IN_SHORT_'.
+ * The prefix is the slave descriptor.
+ */
+#define RX_IN_SHORT_COMPONENT_TYPE bstream
+#define RX_IN_SHORT_COMPONENT_NAME rx_in_short
+#define RX_IN_SHORT_BASE 0x0
+#define RX_IN_SHORT_SPAN 4096
+#define RX_IN_SHORT_END 0xfff
+
+/*
  * Macros for device 'ILC', class 'interrupt_latency_counter'
  * The macros are prefixed with 'ILC_'.
  * The prefix is the slave descriptor.
@@ -1001,7 +1012,117 @@
 #define SYSID_QSYS_SPAN 8
 #define SYSID_QSYS_END 0x517
 #define SYSID_QSYS_ID 2899645186
-#define SYSID_QSYS_TIMESTAMP 1637612391
+#define SYSID_QSYS_TIMESTAMP 1642733024
+
+/*
+ * Macros for device 'rx_inc_damp', class 'bstream'
+ * The macros are prefixed with 'RX_INC_DAMP_'.
+ * The prefix is the slave descriptor.
+ */
+#define RX_INC_DAMP_COMPONENT_TYPE bstream
+#define RX_INC_DAMP_COMPONENT_NAME rx_inc_damp
+#define RX_INC_DAMP_BASE 0x1000
+#define RX_INC_DAMP_SPAN 4096
+#define RX_INC_DAMP_END 0x1fff
+
+/*
+ * Macros for device 'tx_aux', class 'bstream'
+ * The macros are prefixed with 'TX_AUX_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_AUX_COMPONENT_TYPE bstream
+#define TX_AUX_COMPONENT_NAME tx_aux
+#define TX_AUX_BASE 0x2000
+#define TX_AUX_SPAN 4096
+#define TX_AUX_END 0x2fff
+
+/*
+ * Macros for device 'tx_DUMP', class 'bstream'
+ * The macros are prefixed with 'TX_DUMP_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_DUMP_COMPONENT_TYPE bstream
+#define TX_DUMP_COMPONENT_NAME tx_DUMP
+#define TX_DUMP_BASE 0x3000
+#define TX_DUMP_SPAN 4096
+#define TX_DUMP_END 0x3fff
+
+/*
+ * Macros for device 'tx_DAMP', class 'bstream'
+ * The macros are prefixed with 'TX_DAMP_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_DAMP_COMPONENT_TYPE bstream
+#define TX_DAMP_COMPONENT_NAME tx_DAMP
+#define TX_DAMP_BASE 0x4000
+#define TX_DAMP_SPAN 4096
+#define TX_DAMP_END 0x4fff
+
+/*
+ * Macros for device 'tx_CHRG', class 'bstream'
+ * The macros are prefixed with 'TX_CHRG_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_CHRG_COMPONENT_TYPE bstream
+#define TX_CHRG_COMPONENT_NAME tx_CHRG
+#define TX_CHRG_BASE 0x5000
+#define TX_CHRG_SPAN 4096
+#define TX_CHRG_END 0x5fff
+
+/*
+ * Macros for device 'tx_L2', class 'bstream'
+ * The macros are prefixed with 'TX_L2_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_L2_COMPONENT_TYPE bstream
+#define TX_L2_COMPONENT_NAME tx_L2
+#define TX_L2_BASE 0x6000
+#define TX_L2_SPAN 4096
+#define TX_L2_END 0x6fff
+
+/*
+ * Macros for device 'tx_L1', class 'bstream'
+ * The macros are prefixed with 'TX_L1_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_L1_COMPONENT_TYPE bstream
+#define TX_L1_COMPONENT_NAME tx_L1
+#define TX_L1_BASE 0x7000
+#define TX_L1_SPAN 4096
+#define TX_L1_END 0x7fff
+
+/*
+ * Macros for device 'tx_H2', class 'bstream'
+ * The macros are prefixed with 'TX_H2_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_H2_COMPONENT_TYPE bstream
+#define TX_H2_COMPONENT_NAME tx_H2
+#define TX_H2_BASE 0x8000
+#define TX_H2_SPAN 4096
+#define TX_H2_END 0x8fff
+
+/*
+ * Macros for device 'tx_H1', class 'bstream'
+ * The macros are prefixed with 'TX_H1_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_H1_COMPONENT_TYPE bstream
+#define TX_H1_COMPONENT_NAME tx_H1
+#define TX_H1_BASE 0x9000
+#define TX_H1_SPAN 4096
+#define TX_H1_END 0x9fff
+
+/*
+ * Macros for device 'bstream_pll_reconfig', class 'altera_pll_reconfig'
+ * The macros are prefixed with 'BSTREAM_PLL_RECONFIG_'.
+ * The prefix is the slave descriptor.
+ */
+#define BSTREAM_PLL_RECONFIG_COMPONENT_TYPE altera_pll_reconfig
+#define BSTREAM_PLL_RECONFIG_COMPONENT_NAME bstream_pll_reconfig
+#define BSTREAM_PLL_RECONFIG_BASE 0xa000
+#define BSTREAM_PLL_RECONFIG_SPAN 256
+#define BSTREAM_PLL_RECONFIG_END 0xa0ff
 
 /*
  * Macros for device 'jtag_uart', class 'altera_avalon_jtag_uart'
