@@ -58,6 +58,25 @@ extern volatile unsigned int *axi_ram_rx_in_short;
 // pll reconfig address for the bitstream
 extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
 
+// nco
+extern volatile unsigned int *h2p_ph_overlap_addr;   // the nco phase overlap address
+extern volatile unsigned int *h2p_ph_inc_addr;   // the nco phase increment address
+extern volatile unsigned int *h2p_ph0_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph1_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph2_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph3_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph4_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph5_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph6_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph7_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph8_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph9_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph10_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph11_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph12_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph13_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph14_addr;   // the nco phase modulator
+
 // physical memory file descriptor
 int fd_dev_mem = 0;
 
@@ -111,34 +130,38 @@ void soc_init() {
 		exit (EXIT_FAILURE);
 	}
 
-	h2p_adcspi_addr = h2f_lw_axi_master + AD9276_SPI_BASE;
-	h2p_fifo_sink_ch_a_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_a_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_BASE;
-	h2p_fifo_sink_ch_b_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_b_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_BASE;
-	h2p_fifo_sink_ch_c_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_C_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_c_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_C_OUT_BASE;
-	h2p_fifo_sink_ch_d_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_D_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_d_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_D_OUT_BASE;
-	h2p_fifo_sink_ch_e_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_E_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_e_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_E_OUT_BASE;
-	h2p_fifo_sink_ch_f_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_F_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_f_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_F_OUT_BASE;
-	h2p_fifo_sink_ch_g_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_G_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_g_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_G_OUT_BASE;
-	h2p_fifo_sink_ch_h_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_H_OUT_CSR_BASE;
-	h2p_fifo_sink_ch_h_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_H_OUT_BASE;
-	h2p_led_addr = h2f_lw_axi_master + LED_PIO_BASE;
-	h2p_sw_addr = h2f_lw_axi_master + DIPSW_PIO_BASE;
-	h2p_button_addr = h2f_lw_axi_master + BUTTON_PIO_BASE;
-	h2p_adc_samples_addr = h2f_lw_axi_master + ADC_SAMPLES_BASE;
-	h2p_init_delay_addr = h2f_lw_axi_master + ADC_INIT_DELAY_BASE;
+	/*
+	 h2p_adcspi_addr = h2f_lw_axi_master + AD9276_SPI_BASE;
+	 h2p_fifo_sink_ch_a_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_a_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_BASE;
+	 h2p_fifo_sink_ch_b_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_b_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_BASE;
+	 h2p_fifo_sink_ch_c_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_C_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_c_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_C_OUT_BASE;
+	 h2p_fifo_sink_ch_d_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_D_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_d_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_D_OUT_BASE;
+	 h2p_fifo_sink_ch_e_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_E_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_e_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_E_OUT_BASE;
+	 h2p_fifo_sink_ch_f_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_F_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_f_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_F_OUT_BASE;
+	 h2p_fifo_sink_ch_g_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_G_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_g_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_G_OUT_BASE;
+	 h2p_fifo_sink_ch_h_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_H_OUT_CSR_BASE;
+	 h2p_fifo_sink_ch_h_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_H_OUT_BASE;
+	 h2p_led_addr = h2f_lw_axi_master + LED_PIO_BASE;
+	 h2p_sw_addr = h2f_lw_axi_master + DIPSW_PIO_BASE;
+	 h2p_button_addr = h2f_lw_axi_master + BUTTON_PIO_BASE;
+	 h2p_adc_samples_addr = h2f_lw_axi_master + ADC_SAMPLES_BASE;
+	 h2p_init_delay_addr = h2f_lw_axi_master + ADC_INIT_DELAY_BASE;
+	 */
 	h2p_general_cnt_int_addr = h2f_lw_axi_master + GENERAL_CNT_IN_BASE;
 	h2p_general_cnt_out_addr = h2f_lw_axi_master + GENERAL_CNT_OUT_BASE;
-	h2p_adc_start_pulselength_addr = h2f_lw_axi_master + ADC_START_PULSELENGTH_BASE;
-	h2p_pulse_adc_reconfig = h2f_lw_axi_master + ADC_PLL_RECONFIG_BASE;
-	h2p_dac_grad_spi_addr = h2f_lw_axi_master + AD5724_GRAD_SPI_BASE;
-	h2p_bstream_pll_addr = axi_base + BSTREAM_PLL_RECONFIG_BASE;
+	/*
+	 h2p_adc_start_pulselength_addr = h2f_lw_axi_master + ADC_START_PULSELENGTH_BASE;
+	 h2p_pulse_adc_reconfig = h2f_lw_axi_master + ADC_PLL_RECONFIG_BASE;
+	 h2p_dac_grad_spi_addr = h2f_lw_axi_master + AD5724_GRAD_SPI_BASE;
+	 h2p_bstream_pll_addr = axi_base + BSTREAM_PLL_RECONFIG_BASE;
+	 */
 
 	// bitstream ram
 	axi_ram_tx_h1 = axi_base + TX_H1_BASE;
@@ -149,8 +172,30 @@ void soc_init() {
 	axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
 	axi_ram_tx_dump = axi_base + TX_DUMP_BASE;
 	axi_ram_tx_aux = axi_base + TX_AUX_BASE;
-	axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
-	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
+
+	/*
+	 axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
+	 axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
+	 */
+
+	// nco
+	h2p_ph_overlap_addr = h2f_lw_axi_master + NCO_PHASE_PH_OVERLAP_BASE;
+	h2p_ph_inc_addr = h2f_lw_axi_master + NCO_PHASE_PH_INC_BASE;
+	h2p_ph0_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_0_BASE;
+	h2p_ph1_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_1_BASE;
+	h2p_ph2_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_2_BASE;
+	h2p_ph3_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_3_BASE;
+	h2p_ph4_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_4_BASE;
+	h2p_ph5_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_5_BASE;
+	h2p_ph6_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_6_BASE;
+	h2p_ph7_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_7_BASE;
+	h2p_ph8_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_8_BASE;
+	h2p_ph9_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_9_BASE;
+	h2p_ph10_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_10_BASE;
+	h2p_ph11_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_11_BASE;
+	h2p_ph12_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_12_BASE;
+	h2p_ph13_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_13_BASE;
+	h2p_ph14_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_14_BASE;
 
 }
 
@@ -203,4 +248,5 @@ void soc_exit() {
 	h2p_adcspi_addr = NULL;
 	h2p_dac_grad_spi_addr = NULL;
 	h2p_bstream_pll_addr = NULL;
+	h2p_ph_inc_addr = NULL;   // the nco phase increment address
 }

@@ -6,28 +6,19 @@
 C_SRCS += \
 ../exec_adc_readSingleChannel.c \
 ../exec_adc_testPattern.c \
-../exec_bstream_example.c \
 ../exec_bstream_pcharge_n_dump.c \
-../exec_bstream_prechrg_n_rf_n_dump.c \
-../exec_bstream_prechrg_n_rf_n_dump_180.c \
 ../exec_dac_gradWrite.c 
 
 OBJS += \
 ./exec_adc_readSingleChannel.o \
 ./exec_adc_testPattern.o \
-./exec_bstream_example.o \
 ./exec_bstream_pcharge_n_dump.o \
-./exec_bstream_prechrg_n_rf_n_dump.o \
-./exec_bstream_prechrg_n_rf_n_dump_180.o \
 ./exec_dac_gradWrite.o 
 
 C_DEPS += \
 ./exec_adc_readSingleChannel.d \
 ./exec_adc_testPattern.d \
-./exec_bstream_example.d \
 ./exec_bstream_pcharge_n_dump.d \
-./exec_bstream_prechrg_n_rf_n_dump.d \
-./exec_bstream_prechrg_n_rf_n_dump_180.d \
 ./exec_dac_gradWrite.d 
 
 
