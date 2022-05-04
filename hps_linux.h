@@ -63,11 +63,13 @@ volatile unsigned int *h2p_fifo_sink_ch_g_csr_addr = NULL;   // ADC streaming FI
 volatile unsigned int *h2p_fifo_sink_ch_h_csr_addr = NULL;   // ADC streaming FIFO status address
 volatile unsigned int *h2p_adc_samples_addr = NULL;
 volatile unsigned int *h2p_init_delay_addr = NULL;
-volatile unsigned int *h2p_general_cnt_int_addr = NULL;
+volatile unsigned int *h2p_general_cnt_in_addr = NULL;
 volatile unsigned int *h2p_general_cnt_out_addr = NULL;
-volatile unsigned int *h2p_adc_start_pulselength_addr = NULL;
-void *h2p_pulse_adc_reconfig = NULL;
+
+// volatile unsigned int *h2p_adc_start_pulselength_addr = NULL;
+// void *h2p_pulse_adc_reconfig = NULL;
 volatile unsigned int *h2p_dac_grad_spi_addr = NULL;
+
 // memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
 volatile unsigned int *axi_ram_tx_h1 = NULL;
 volatile unsigned int *axi_ram_tx_l1 = NULL;
@@ -79,8 +81,9 @@ volatile unsigned int *axi_ram_tx_damp = NULL;
 volatile unsigned int *axi_ram_tx_dump = NULL;
 volatile unsigned int *axi_ram_rx_inc_damp = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
-// pll reconfig address for the bitstream
-volatile unsigned int *h2p_bstream_pll_addr = NULL;   // bitstream pll reconfig
+
+// pll reconfig address for the system clock
+volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reconfig
 
 // FUNCTIONS
 void leave();	// terminate the program

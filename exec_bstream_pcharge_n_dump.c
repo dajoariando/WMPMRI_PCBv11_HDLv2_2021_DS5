@@ -15,6 +15,8 @@ void init() {
 	soc_init();
 	bstream__init_all_sram();
 
+	Reconfig_Mode(h2p_sys_pll_reconfig_addr, 1);   // polling mode for main pll
+
 	// write default value for cnt_out
 	cnt_out_val = CNT_OUT_DEFAULT;
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
@@ -55,44 +57,34 @@ int main(int argc, char * argv[]) {
 
 	init();
 
-	/*
-	 *  set pll for CPMG
-	 *
-	 *  double clk_freq = 12;
-	 Set_PLL(lwaxi_sys_pll, 0, clk_freq, 0.5, DISABLE_MESSAGE);
-	 Reset_PLL(lwaxi_cnt_out, SYS_PLL_RST_ofst, ctrl_out);
-	 Set_DPS(lwaxi_sys_pll, 0, 0, DISABLE_MESSAGE);
-	 Wait_PLL_To_Lock(lwaxi_cnt_in, PLL_SYS_lock_ofst);
-	 */
-
-	// standard parameters
-	float CLK_50 = 50.00;
-
 	// reset
 	bstream_rst();
 
 	// set phase increment
 	alt_write_word( ( h2p_ph_inc_addr ), 4096);
-	alt_write_word( ( h2p_ph_overlap_addr ), (uint16_t) 32);
+
+	// set phase overlap
+	alt_write_word( ( h2p_ph_overlap_addr ), (uint16_t) 128);
 
 	// set phase base
-	alt_write_word( ( h2p_ph0_addr ), 1);
-	alt_write_word( ( h2p_ph1_addr ), 1);
-	alt_write_word( ( h2p_ph2_addr ), 1);
-	alt_write_word( ( h2p_ph3_addr ), 1);
-	alt_write_word( ( h2p_ph4_addr ), 1);
-	alt_write_word( ( h2p_ph5_addr ), 1);
-	alt_write_word( ( h2p_ph6_addr ), 1);
-	alt_write_word( ( h2p_ph7_addr ), 1);
-	alt_write_word( ( h2p_ph8_addr ), 1);
-	alt_write_word( ( h2p_ph9_addr ), 1);
-	alt_write_word( ( h2p_ph10_addr ), 1);
-	alt_write_word( ( h2p_ph11_addr ), 1);
-	alt_write_word( ( h2p_ph12_addr ), 1);
-	alt_write_word( ( h2p_ph13_addr ), 1);
-	alt_write_word( ( h2p_ph14_addr ), 1);
+	unsigned int ph_base_num = 32;
+	alt_write_word( ( h2p_ph0_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph1_addr ), 16384 + ph_base_num);
+	alt_write_word( ( h2p_ph2_addr ), 32768 + ph_base_num);
+	alt_write_word( ( h2p_ph3_addr ), 49152 + ph_base_num);
+	alt_write_word( ( h2p_ph4_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph5_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph6_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph7_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph8_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph9_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph10_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph11_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph12_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph13_addr ), ph_base_num);
+	alt_write_word( ( h2p_ph14_addr ), ph_base_num);
 
-	double f_larmor = 50 / 16;
+	double f_larmor = 4;
 	double lcs_pchg_us = 20;
 	double lcs_dump_us = 10;
 	double p90_pchg_us = 5;
@@ -100,7 +92,7 @@ int main(int argc, char * argv[]) {
 	double p90_dchg_us = 10;
 	double p90_dtcl = 0.5;
 	double p180_pchg_us = 10;
-	double p180_us = 10;
+	double p180_us = 5;
 	double p180_dchg_us = 20;
 	double p180_dtcl = 0.5;
 	double echoshift_us = 6;
@@ -114,8 +106,15 @@ int main(int argc, char * argv[]) {
 	unsigned int echoskip = 1;
 	unsigned int echodrop = 0;
 
+	Set_PLL(h2p_sys_pll_reconfig_addr, 0, f_larmor * 16, 0.5, DISABLE_MESSAGE);
+	Reset_PLL(h2p_general_cnt_out_addr, SYS_PLL_RST_ofst, cnt_out_val);
+	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
+	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
+
 	// start
-	// sbstream__test(CLK_50);
+	// float CLK_50 = 50.00;
+	// bstream__test(CLK_50);
+
 	bstream__cpmg(f_larmor,
 	        lcs_pchg_us,   // precharging of vpc
 	        lcs_dump_us,   // dumping the lcs to the vpc
@@ -125,9 +124,9 @@ int main(int argc, char * argv[]) {
 	        p90_dtcl,
 	        p180_pchg_us,
 	        p180_us,
-	        p180_dchg_us,	// the discharging length of the current source inductor
+	        p180_dchg_us,   // the discharging length of the current source inductor
 	        p180_dtcl,
-	        echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+	        echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
 	        echotime_us,
 	        scanspacing_us,
 	        samples_per_echo,

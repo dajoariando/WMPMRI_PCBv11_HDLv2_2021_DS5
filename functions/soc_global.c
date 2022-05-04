@@ -39,11 +39,12 @@ extern volatile unsigned int *h2p_fifo_sink_ch_g_csr_addr;   // ADC streaming FI
 extern volatile unsigned int *h2p_fifo_sink_ch_h_csr_addr;   // ADC streaming FIFO status address
 extern volatile unsigned int *h2p_adc_samples_addr;
 extern volatile unsigned int *h2p_init_delay_addr;
-extern volatile unsigned int *h2p_general_cnt_int_addr;
+extern volatile unsigned int *h2p_general_cnt_in_addr;
 extern volatile unsigned int *h2p_general_cnt_out_addr;
-extern volatile unsigned int *h2p_adc_start_pulselength_addr;
-extern void *h2p_pulse_adc_reconfig;
+// extern volatile unsigned int *h2p_adc_start_pulselength_addr;
+// extern void *h2p_pulse_adc_reconfig;
 extern volatile unsigned int *h2p_dac_grad_spi_addr;
+
 // memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
 extern volatile unsigned int *axi_ram_tx_h1;
 extern volatile unsigned int *axi_ram_tx_l1;
@@ -55,8 +56,12 @@ extern volatile unsigned int *axi_ram_tx_damp;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
+
 // pll reconfig address for the bitstream
-extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
+// extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
+
+// pll reconfig address for the system clock
+extern volatile unsigned int *h2p_sys_pll_reconfig_addr;
 
 // nco
 extern volatile unsigned int *h2p_ph_overlap_addr;   // the nco phase overlap address
@@ -154,7 +159,7 @@ void soc_init() {
 	 h2p_adc_samples_addr = h2f_lw_axi_master + ADC_SAMPLES_BASE;
 	 h2p_init_delay_addr = h2f_lw_axi_master + ADC_INIT_DELAY_BASE;
 	 */
-	h2p_general_cnt_int_addr = h2f_lw_axi_master + GENERAL_CNT_IN_BASE;
+	h2p_general_cnt_in_addr = h2f_lw_axi_master + GENERAL_CNT_IN_BASE;
 	h2p_general_cnt_out_addr = h2f_lw_axi_master + GENERAL_CNT_OUT_BASE;
 	/*
 	 h2p_adc_start_pulselength_addr = h2f_lw_axi_master + ADC_START_PULSELENGTH_BASE;
@@ -162,6 +167,8 @@ void soc_init() {
 	 h2p_dac_grad_spi_addr = h2f_lw_axi_master + AD5724_GRAD_SPI_BASE;
 	 h2p_bstream_pll_addr = axi_base + BSTREAM_PLL_RECONFIG_BASE;
 	 */
+
+	h2p_sys_pll_reconfig_addr = h2f_lw_axi_master + SYS_PLL_RECONFIG_BASE;
 
 	// bitstream ram
 	axi_ram_tx_h1 = axi_base + TX_H1_BASE;
@@ -227,6 +234,7 @@ void soc_exit() {
 	h2p_fifo_sink_ch_b_csr_addr = NULL;
 	h2p_fifo_sink_ch_b_data_addr = NULL;
 	h2p_fifo_sink_ch_c_csr_addr = NULL;
+	h2p_fifo_sink_ch_c_data_addr = NULL;
 	h2p_fifo_sink_ch_d_data_addr = NULL;
 	h2p_fifo_sink_ch_d_csr_addr = NULL;
 	h2p_fifo_sink_ch_d_data_addr = NULL;
@@ -243,10 +251,10 @@ void soc_exit() {
 	h2p_button_addr = NULL;
 	h2p_adc_samples_addr = NULL;
 	h2p_init_delay_addr = NULL;
-	h2p_general_cnt_int_addr = NULL;
+	h2p_general_cnt_in_addr = NULL;
 	h2p_general_cnt_out_addr = NULL;
 	h2p_adcspi_addr = NULL;
 	h2p_dac_grad_spi_addr = NULL;
-	h2p_bstream_pll_addr = NULL;
+	// h2p_bstream_pll_addr = NULL;
 	h2p_ph_inc_addr = NULL;   // the nco phase increment address
 }

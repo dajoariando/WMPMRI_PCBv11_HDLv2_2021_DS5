@@ -24,6 +24,7 @@
  */
 
 // OUTPUT
+#define SYS_PLL_RST_ofst			(8)
 #define BITSTR_ADV_RST_ofst			(7)
 #define BITSTR_ADV_START_ofst		(6)
 #define DAC_GRAD_LDAC_ofst			(5)
@@ -33,27 +34,26 @@
 #define FSM_RESET_ofst				(1)
 #define FSM_START_ofst				(0)
 
+#define SYS_PLL_RST					(1<<SYS_PLL_RST_ofst)
 #define BITSTR_ADV_RST				(1<<BITSTR_ADV_RST_ofst)
 #define BITSTR_ADV_START			(1<<BITSTR_ADV_START_ofst)
 #define DAC_GRAD_LDAC_msk			(1<<DAC_GRAD_LDAC_ofst)
 #define DAC_GRAD_CLR_msk			(1<<DAC_GRAD_CLR_ofst)
-#define ADC_AD9276_PWDN_msk         (1<<ADC_AD9276_PWDN_ofst     ) // (CAREFUL! SOMETIMES PUTTING THE ADC TO STANDBY WOULD CAUSE IT TO CRASH)
-#define ADC_AD9276_STBY_msk         (1<<ADC_AD9276_STBY_ofst     )
-#define FSM_RESET_msk               (1<<FSM_RESET_ofst           )
-#define FSM_START_msk                (1<<FSM_START_ofst            )
+#define ADC_AD9276_PWDN_msk         (1<<ADC_AD9276_PWDN_ofst) // (CAREFUL! SOMETIMES PUTTING THE ADC TO STANDBY WOULD CAUSE IT TO CRASH)
+#define ADC_AD9276_STBY_msk         (1<<ADC_AD9276_STBY_ofst)
+#define FSM_RESET_msk               (1<<FSM_RESET_ofst)
+#define FSM_START_msk				(1<<FSM_START_ofst)
 
 // INPUT
-#define bstream_pll_locked_ofst (4)
 #define bitstr_adv_done_ofst	(3)
 #define tx_h1_done_ofst			(2)
-#define adc_pll_locked_ofst		(1)
+#define sys_pll_locked_ofst		(1)
 #define FSM_DONE_ofst			(0)
 
-#define bstream_pll_locked		(1<<bstream_pll_locked_ofst)
 #define bitstr_adv_done			(1<<bitstr_adv_done_ofst)
 #define tx_h1_done				(1<<tx_h1_done_ofst)
-#define adc_pll_locked_msk		(1<< pulse_pll_locked_msk)
-#define FSM_DONE_msk			(1<<FSM_DONE_ofst        )
+#define sys_pll_locked			(1<<sys_pll_locked_ofst)
+#define FSM_DONE_msk			(1<<FSM_DONE_ofst)
 
 // default for output control signal
 #define CNT_OUT_DEFAULT (DAC_GRAD_CLR_msk | DAC_GRAD_LDAC_msk | ADC_AD9276_PWDN_msk | ADC_AD9276_STBY_msk)
