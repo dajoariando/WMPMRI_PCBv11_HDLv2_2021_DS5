@@ -24,6 +24,9 @@
  */
 
 // OUTPUT
+#define CHG_HBRIDGE_ofst			(11)
+#define CHG_BS_ofst					(10)
+#define DCHG_BS_ofst				(9)
 #define SYS_PLL_RST_ofst			(8)
 #define BITSTR_ADV_RST_ofst			(7)
 #define BITSTR_ADV_START_ofst		(6)
@@ -34,6 +37,9 @@
 #define FSM_RESET_ofst				(1)
 #define FSM_START_ofst				(0)
 
+#define CHG_HBRIDGE					(1<<CHG_HBRIDGE_ofst)
+#define CHG_BS						(1<<CHG_BS_ofst)
+#define DCHG_BS						(1<<DCHG_BS_ofst)
 #define SYS_PLL_RST					(1<<SYS_PLL_RST_ofst)
 #define BITSTR_ADV_RST				(1<<BITSTR_ADV_RST_ofst)
 #define BITSTR_ADV_START			(1<<BITSTR_ADV_START_ofst)

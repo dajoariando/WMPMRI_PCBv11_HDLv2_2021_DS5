@@ -37,23 +37,9 @@ void leave() {
 
 int main(int argc, char * argv[]) {
 
-	// default param for test : 500 100 50 0 30 1
-	// to completely show the waveform in SignalTap, change the first parameter from 500 to 100, but this is not enough for precharging the high-side FETs
+	// default params:
 
-	/*
-	 double bstrap_pchg_us = atof(argv[1]);   // bootstrap circuit precharge by enabling both lower side FETs. Has to be done at the beginning to make sure the high-side circuit is charged
-	 double ind_pchg_us = atof(argv[2]);   // precharging the current source inductor
-	 double tail_us = atof(argv[3]);   // tx_l1 and tx_l2 length after dump
-	 double dump_dly_us = atof(argv[4]);   // added delay before dump all the current after precharging
-	 double dump_len_us = atof(argv[5]);   // current dump length
-	 unsigned int en_pchrg = atoi(argv[6]);   // enable precharging via higher voltage VPC
-
-	 double max_plen = 3000;   // set the maximum plen
-	 if (ind_pchg_us > max_plen) {
-	 printf("\t ERROR! Pulse is too long.\n");
-	 return 0;
-	 }
-	 */
+	double f_larmor = atof(argv[1]);
 
 	init();
 
@@ -84,14 +70,17 @@ int main(int argc, char * argv[]) {
 	alt_write_word( ( h2p_ph13_addr ), ph_base_num);
 	alt_write_word( ( h2p_ph14_addr ), ph_base_num);
 
-	double f_larmor = 4;
-	double lcs_pchg_us = 20;
-	double lcs_dump_us = 10;
+	// double f_larmor = 4;
+	double bstrap_pchg_us = 2000.00;   // bootstrap circuit precharge by enabling both lower side FETs. Has to be done at the beginning to make sure the high-side circuit is charged
+	double lcs_pchg_us = 80;
+	double lcs_dump_us = 200;
 	double p90_pchg_us = 5;
+	double p90_pchg_refill_us = 2;
 	double p90_us = 5;
 	double p90_dchg_us = 10;
 	double p90_dtcl = 0.5;
 	double p180_pchg_us = 10;
+	double p180_pchg_refill_us = 2;
 	double p180_us = 5;
 	double p180_dchg_us = 20;
 	double p180_dtcl = 0.5;
@@ -99,7 +88,7 @@ int main(int argc, char * argv[]) {
 	double echotime_us = 100;
 	long unsigned scanspacing_us = 10000;
 	unsigned int samples_per_echo = 64;
-	unsigned int echoes_per_scan = 3;
+	unsigned int echoes_per_scan = 2;
 	unsigned int n_iterate = 2;
 	uint8_t ph_cycl_en = 1;
 	unsigned int dconv_fact = 1;
@@ -111,18 +100,56 @@ int main(int argc, char * argv[]) {
 	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
 	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
 
-	// start
-	// float CLK_50 = 50.00;
-	// bstream__test(CLK_50);
+	/*
+	 bstream__vpc_chg(
+	 bstrap_pchg_us,
+	 50.00,   // precharging of vpc
+	 1000.00,   // dumping the lcs to the vpc
+	 80
+	 );
+	 */
 
-	bstream__cpmg(f_larmor,
+	usleep(100000);
+
+	/*
+	 bstream__cpmg(f_larmor,
+	 bstrap_pchg_us,
+	 lcs_pchg_us,   // precharging of vpc
+	 lcs_dump_us,   // dumping the lcs to the vpc
+	 p90_pchg_us,
+	 // p90_pchg_refill_us,
+	 p90_us,
+	 p90_dchg_us,   // the discharging length of the current source inductor
+	 p90_dtcl,
+	 p180_pchg_us,
+	 // p180_pchg_refill_us,
+	 p180_us,
+	 p180_dchg_us,   // the discharging length of the current source inductor
+	 p180_dtcl,
+	 echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+	 echotime_us,
+	 scanspacing_us,
+	 samples_per_echo,
+	 echoes_per_scan,
+	 n_iterate,
+	 ph_cycl_en,
+	 dconv_fact,
+	 echoskip,
+	 echodrop
+	 );
+	 */
+
+	bstream__cpmg_refill(f_larmor,
+	        bstrap_pchg_us,
 	        lcs_pchg_us,   // precharging of vpc
 	        lcs_dump_us,   // dumping the lcs to the vpc
 	        p90_pchg_us,
+	        p90_pchg_refill_us,
 	        p90_us,
 	        p90_dchg_us,   // the discharging length of the current source inductor
 	        p90_dtcl,
 	        p180_pchg_us,
+	        p180_pchg_refill_us,
 	        p180_us,
 	        p180_dchg_us,   // the discharging length of the current source inductor
 	        p180_dtcl,
@@ -137,12 +164,7 @@ int main(int argc, char * argv[]) {
 	        echoskip,
 	        echodrop
 	        );
-
-	// test nulling
-	// bstream__null_everything();
-
-	// test precharging and dump
-	// bstream__prechrg_n_dump(CLK_50, bstrap_pchg_us, ind_pchg_us, tail_us, dump_dly_us, dump_len_us, en_pchrg);
+	//
 
 	leave();
 

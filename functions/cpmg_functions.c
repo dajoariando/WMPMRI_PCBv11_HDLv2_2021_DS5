@@ -20,9 +20,11 @@ cpmg_obj cpmg_param_calc(
         double lcs_pchg_us,		// precharging of vpc
         double lcs_dump_us,		// dumping the lcs to the vpc
         double p90_pchg_us,		// the precharging length for the current source inductor
+        double p90_pchg_refill_us,   // restore the charge loss from p90 RF
         double p90_us,			// the length of cpmg 90 deg pulse
         double p90_dchg_us,		// the discharging length of the current source inductor
         double p180_pchg_us,		// the precharging length for the current source inductor
+        double p180_pchg_refill_us,   // restore the charge loss from p180 RF
         double p180_us,			// the length of cpmg 180 deg pulse
         double p180_dchg_us,	// the discharging length of the current source inductor
         double echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
@@ -35,10 +37,12 @@ cpmg_obj cpmg_param_calc(
 	int lcs_pchg_int;
 	int lcs_dump_int;
 	int p90_pchg_int;
+	int p90_pchg_refill_int;
 	int p90_int;
 	int p90_dchg_int;
 	int d90_int;
 	int p180_pchg_int;
+	int p180_pchg_refill_int;
 	int p180_int;
 	int p180_dchg_int;
 	int d180_int;
@@ -52,10 +56,12 @@ cpmg_obj cpmg_param_calc(
 	echotime_int = us_to_digit_synced(echotime_us, 0.5 * f_larmor, SYSCLK_MHz);   // 0.5 * f_larmor is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor)
 
 	p90_pchg_int = us_to_digit_synced(p90_pchg_us, f_larmor, SYSCLK_MHz);
+	p90_pchg_refill_int = us_to_digit_synced(p90_pchg_refill_us, f_larmor, SYSCLK_MHz);
 	p90_int = us_to_digit_synced(p90_us, f_larmor, SYSCLK_MHz);
 	p90_dchg_int = us_to_digit_synced(p90_dchg_us, f_larmor, SYSCLK_MHz);
 
 	p180_pchg_int = us_to_digit_synced(p180_pchg_us, f_larmor, SYSCLK_MHz);
+	p180_pchg_refill_int = us_to_digit_synced(p180_pchg_refill_us, f_larmor, SYSCLK_MHz);
 	p180_int = us_to_digit_synced(p180_us, f_larmor, SYSCLK_MHz);
 	p180_dchg_int = us_to_digit_synced(p180_dchg_us, f_larmor, SYSCLK_MHz);
 
@@ -69,10 +75,12 @@ cpmg_obj cpmg_param_calc(
 	output.lcs_pchg_int = lcs_pchg_int;
 	output.lcs_dump_int = lcs_dump_int;
 	output.p90_pchg_int = p90_pchg_int;
+	output.p90_pchg_refill_int = p90_pchg_refill_int;
 	output.p90_int = p90_int;
 	output.p90_dchg_int = p90_dchg_int;
 	output.d90_int = d90_int;
 	output.p180_pchg_int = p180_pchg_int;
+	output.p180_pchg_refill_int = p180_pchg_refill_int;
 	output.p180_int = p180_int;
 	output.p180_dchg_int = p180_dchg_int;
 	output.d180_int = d180_int;
