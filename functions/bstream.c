@@ -22,7 +22,8 @@ extern volatile unsigned int *axi_ram_tx_aux;
 extern volatile unsigned int *axi_ram_tx_h2;
 extern volatile unsigned int *axi_ram_tx_l2;
 extern volatile unsigned int *axi_ram_tx_charge;
-extern volatile unsigned int *axi_ram_tx_damp;
+extern volatile unsigned int *axi_ram_tx_charge_bs;
+// extern volatile unsigned int *axi_ram_tx_damp;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
@@ -52,9 +53,10 @@ void bstream__init_all_sram() {
 	bstream_objs[tx_l1].sram_addr = axi_ram_tx_l1;
 	bstream_objs[tx_h2].sram_addr = axi_ram_tx_h2;
 	bstream_objs[tx_l2].sram_addr = axi_ram_tx_l2;
-	bstream_objs[tx_damp].sram_addr = axi_ram_tx_damp;
+	// bstream_objs[tx_damp].sram_addr = axi_ram_tx_damp;
 	bstream_objs[tx_dump].sram_addr = axi_ram_tx_dump;
 	bstream_objs[tx_charge].sram_addr = axi_ram_tx_charge;
+	bstream_objs[tx_charge_bs].sram_addr = axi_ram_tx_charge_bs;
 	bstream_objs[tx_aux].sram_addr = axi_ram_tx_aux;
 	bstream_objs[rx_inc_damp].sram_addr = axi_ram_rx_inc_damp;
 	bstream_objs[rx_in_short].sram_addr = axi_ram_rx_in_short;
@@ -92,7 +94,7 @@ void bstream_start() {
 		// printf("bitstream %d : ", ii);
 		stop = bstream_check(&bstream_objs[ii]);
 		if (stop == SEQ_ERROR) {
-			printf("\tERROR! Bitstream sequence has an error.\n");
+			printf("\tERROR! Bitstream sequence %d has an error.\n", ii);
 			return;
 		};
 	}
@@ -231,9 +233,9 @@ void bstream__vpc_chg(
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l2], SYSCLK_MHz);
-	bstream__init(&bstream_objs[tx_damp], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_dump], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_charge], SYSCLK_MHz);
+	bstream__init(&bstream_objs[tx_charge_bs], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_aux], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_inc_damp], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_in_short], SYSCLK_MHz);
@@ -302,6 +304,11 @@ void bstream__vpc_chg(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
+	// tx_charge_bs
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
 	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
@@ -333,9 +340,9 @@ void bstream__vpc_wastedump(
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l2], SYSCLK_MHz);
-	bstream__init(&bstream_objs[tx_damp], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_dump], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_charge], SYSCLK_MHz);
+	bstream__init(&bstream_objs[tx_charge_bs], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_aux], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_inc_damp], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_in_short], SYSCLK_MHz);
@@ -406,6 +413,11 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
+	// tx_charge_bs
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
 	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
@@ -417,7 +429,8 @@ void bstream__vpc_wastedump(
 
 }
 
-void bstream__cpmg(
+void OBSOLETE_bstream__cpmg(
+        // do not use this simple CPMG sequence. it doesn't deal with re-charging the CHG bootstrap circuit and doesn't deal with the recharging the loss of VPC voltage due to RF.
         double f_larmor,
         double bstrap_pchg_us,
         double lcs_pchg_us,		// precharging of vpc
@@ -454,9 +467,9 @@ void bstream__cpmg(
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l2], SYSCLK_MHz);
-	bstream__init(&bstream_objs[tx_damp], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_dump], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_charge], SYSCLK_MHz);
+	bstream__init(&bstream_objs[tx_charge_bs], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_aux], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_inc_damp], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_in_short], SYSCLK_MHz);
@@ -586,6 +599,11 @@ void bstream__cpmg(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
+	// tx_charge_bs
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
 	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
@@ -636,9 +654,9 @@ void bstream__cpmg_refill(
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l2], SYSCLK_MHz);
-	bstream__init(&bstream_objs[tx_damp], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_dump], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_charge], SYSCLK_MHz);
+	bstream__init(&bstream_objs[tx_charge_bs], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_aux], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_inc_damp], SYSCLK_MHz);
 	// bstream__init(&bstream_objs[rx_in_short], SYSCLK_MHz);
@@ -675,9 +693,25 @@ void bstream__cpmg_refill(
 	        ( echoes_per_scan - 1 ) * ( cpmg_params.p180_int + cpmg_params.d180_int + cpmg_params.p180_pchg_int + cpmg_params.p180_pchg_refill_int ) +
 	        cpmg_params.p180_int + cpmg_params.d180_int;
 	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, alltime/*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d90_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, echoes_per_scan - 1 /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.d180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.p180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, cpmg_params.d180_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, alltime/*dataval*/);
 
 	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
@@ -781,10 +815,30 @@ void bstream__cpmg_refill(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, echoes_per_scan - 1 /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_int + cpmg_params.d180_int /*dataval*/);
-	bstream__push(&bstream_objs[tx_charge], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
+	// tx_charge_bs
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d90_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, echoes_per_scan - 1 /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d180_int /*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );

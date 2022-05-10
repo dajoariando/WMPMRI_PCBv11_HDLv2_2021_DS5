@@ -488,17 +488,6 @@
 #define GENERAL_CNT_OUT_RESET_VALUE 0
 
 /*
- * Macros for device 'tx_AUX', class 'bstream_new'
- * The macros are prefixed with 'TX_AUX_'.
- * The prefix is the slave descriptor.
- */
-#define TX_AUX_COMPONENT_TYPE bstream_new
-#define TX_AUX_COMPONENT_NAME tx_AUX
-#define TX_AUX_BASE 0x200
-#define TX_AUX_SPAN 512
-#define TX_AUX_END 0x3ff
-
-/*
  * Macros for device 'sys_pll_reconfig', class 'altera_pll_reconfig'
  * The macros are prefixed with 'SYS_PLL_RECONFIG_'.
  * The prefix is the slave descriptor.
@@ -510,6 +499,28 @@
 #define SYS_PLL_RECONFIG_END 0x3ff
 
 /*
+ * Macros for device 'tx_CHRG_BS', class 'bstream_new'
+ * The macros are prefixed with 'TX_CHRG_BS_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_CHRG_BS_COMPONENT_TYPE bstream_new
+#define TX_CHRG_BS_COMPONENT_NAME tx_CHRG_BS
+#define TX_CHRG_BS_BASE 0x400
+#define TX_CHRG_BS_SPAN 512
+#define TX_CHRG_BS_END 0x5ff
+
+/*
+ * Macros for device 'tx_AUX', class 'bstream_new'
+ * The macros are prefixed with 'TX_AUX_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_AUX_COMPONENT_TYPE bstream_new
+#define TX_AUX_COMPONENT_NAME tx_AUX
+#define TX_AUX_BASE 0x600
+#define TX_AUX_SPAN 512
+#define TX_AUX_END 0x7ff
+
+/*
  * Macros for device 'tx_DUMP', class 'bstream_new'
  * The macros are prefixed with 'TX_DUMP_'.
  * The prefix is the slave descriptor.
@@ -519,17 +530,6 @@
 #define TX_DUMP_BASE 0x3000
 #define TX_DUMP_SPAN 512
 #define TX_DUMP_END 0x31ff
-
-/*
- * Macros for device 'tx_DAMP', class 'bstream_new'
- * The macros are prefixed with 'TX_DAMP_'.
- * The prefix is the slave descriptor.
- */
-#define TX_DAMP_COMPONENT_TYPE bstream_new
-#define TX_DAMP_COMPONENT_NAME tx_DAMP
-#define TX_DAMP_BASE 0x4000
-#define TX_DAMP_SPAN 512
-#define TX_DAMP_END 0x41ff
 
 /*
  * Macros for device 'tx_CHRG', class 'bstream_new'

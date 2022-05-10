@@ -72,23 +72,23 @@ int main(int argc, char * argv[]) {
 
 	// double f_larmor = 4;
 	double bstrap_pchg_us = 2000.00;   // bootstrap circuit precharge by enabling both lower side FETs. Has to be done at the beginning to make sure the high-side circuit is charged
-	double lcs_pchg_us = 80;
+	double lcs_pchg_us = 25;
 	double lcs_dump_us = 200;
 	double p90_pchg_us = 5;
-	double p90_pchg_refill_us = 2;
+	double p90_pchg_refill_us = 5;
 	double p90_us = 5;
 	double p90_dchg_us = 10;
 	double p90_dtcl = 0.5;
 	double p180_pchg_us = 10;
-	double p180_pchg_refill_us = 2;
+	double p180_pchg_refill_us = 20;
 	double p180_us = 5;
 	double p180_dchg_us = 20;
 	double p180_dtcl = 0.5;
 	double echoshift_us = 6;
-	double echotime_us = 100;
+	double echotime_us = 200;
 	long unsigned scanspacing_us = 10000;
 	unsigned int samples_per_echo = 64;
-	unsigned int echoes_per_scan = 2;
+	unsigned int echoes_per_scan = 1024;
 	unsigned int n_iterate = 2;
 	uint8_t ph_cycl_en = 1;
 	unsigned int dconv_fact = 1;
@@ -100,14 +100,14 @@ int main(int argc, char * argv[]) {
 	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
 	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
 
-	/*
-	 bstream__vpc_chg(
-	 bstrap_pchg_us,
-	 50.00,   // precharging of vpc
-	 1000.00,   // dumping the lcs to the vpc
-	 80
-	 );
-	 */
+	//
+	bstream__vpc_chg(
+	        bstrap_pchg_us,
+	        50.00,   // precharging of vpc
+	        1000.00,   // dumping the lcs to the vpc
+	        80
+	        );
+	//
 
 	usleep(100000);
 

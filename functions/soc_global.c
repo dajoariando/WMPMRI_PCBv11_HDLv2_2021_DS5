@@ -52,7 +52,8 @@ extern volatile unsigned int *axi_ram_tx_aux;
 extern volatile unsigned int *axi_ram_tx_h2;
 extern volatile unsigned int *axi_ram_tx_l2;
 extern volatile unsigned int *axi_ram_tx_charge;
-extern volatile unsigned int *axi_ram_tx_damp;
+extern volatile unsigned int *axi_ram_tx_charge_bs;
+// extern volatile unsigned int *axi_ram_tx_damp;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
@@ -176,7 +177,8 @@ void soc_init() {
 	axi_ram_tx_h2 = axi_base + TX_H2_BASE;
 	axi_ram_tx_l2 = axi_base + TX_L2_BASE;
 	axi_ram_tx_charge = axi_base + TX_CHRG_BASE;
-	axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
+	axi_ram_tx_charge_bs = axi_base + TX_CHRG_BS_BASE;
+	// axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
 	axi_ram_tx_dump = axi_base + TX_DUMP_BASE;
 	axi_ram_tx_aux = axi_base + TX_AUX_BASE;
 
