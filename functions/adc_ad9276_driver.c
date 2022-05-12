@@ -42,7 +42,13 @@ unsigned int write_ad9276_spi(unsigned char rw, unsigned int addr, unsigned int 
 	return data;
 }
 
-void init_adc(uint8_t lvds_z, uint8_t lvds_phase) {
+void init_adc(uint8_t lvds_z, uint8_t lvds_phase, uint32_t adc_mode, uint16_t val1, uint16_t val2) {
+
+	// set default to:
+	// lvds_z -> AD9276_OUT_ADJ_TERM_100OHM_VAL
+	// lvds_phase -> AD9276_OUT_PHS_000DEG_VAL
+	// adc_mode -> AD9276_OUT_TEST_OFF_VAL
+
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_CHIP_PORT_CONF_REG, 0b00111100);   // reset
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_CHIP_PORT_CONF_REG, 0b00011000);   // reset
@@ -54,7 +60,7 @@ void init_adc(uint8_t lvds_z, uint8_t lvds_phase) {
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_PHS_REG, lvds_phase);   // set phase
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 
-// filter setup.
+	// filter setup.
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_FLEX_FILT_REG, AD9276_FLEX_FILT_HPF_04PCTG_FLP_VAL);   // set high-pass filter
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 
@@ -69,15 +75,16 @@ void init_adc(uint8_t lvds_z, uint8_t lvds_phase) {
 	//write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_MODE_REG, AD9276_OUT_MODE_INVERT_EN_MSK);   // invert all selected channel
 	//write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 
-	write_ad9276_spi(AD9276_SPI_WR, AD9276_TESTIO_REG, 0x00);   // disable test I/O
-
-	// write pattern (comment these 2 lines to disable)
-	// write_ad9276_spi(AD9276_SPI_WR, AD9276_TESTIO_REG, AD9276_OUT_TEST_CHCKBOARD_VAL);   // select testpattern
-	// write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
+	write_ad9276_spi(AD9276_SPI_WR, AD9276_TESTIO_REG, adc_mode);	// set the ADC mode
+	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 
 	// write_ad9276_spi(AD9276_SPI_RD, AD9276_OUT_ADJ_REG, 0x00);		// check output driver termination of selected channel
 	// write_ad9276_spi(AD9276_SPI_RD, AD9276_FLEX_GAIN_REG, 0x00);		// check flex_gain of selected channel
 	// write_ad9276_spi(AD9276_SPI_RD, AD9276_OUT_PHS_REG, 0x00);		// check output_phase
+
+	if (adc_mode == AD9276_OUT_TEST_USR_INPUT_VAL) {
+		adc_wr_testval(val1, val2);
+	}
 
 	usleep(10000);
 }
@@ -118,16 +125,16 @@ void read_adc_id() {
 	switch (data >> 4 & 0x03) {
 		case 0x00:
 			printf(" (ok. Mode 1 is activated -- 40MSPS)\n");
-		break;
+			break;
 		case 0x01:
 			printf(" (ok. Mode 2 is activated -- 65MSPS)\n");
-		break;
+			break;
 		case 0x02:
 			printf(" (ok. Mode 3 is activated -- 80MSPS)\n");
-		break;
+			break;
 		default:
 			printf(" (error. Mode is incorrect)\n");
-		break;
+			break;
 	}
 
 }

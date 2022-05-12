@@ -55,6 +55,7 @@ extern volatile unsigned int *axi_ram_tx_charge;
 extern volatile unsigned int *axi_ram_tx_charge_bs;
 // extern volatile unsigned int *axi_ram_tx_damp;
 extern volatile unsigned int *axi_ram_tx_dump;
+extern volatile unsigned int *axi_ram_rx_adc_en;
 extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
 
@@ -136,10 +137,10 @@ void soc_init() {
 		exit (EXIT_FAILURE);
 	}
 
+	h2p_adcspi_addr = h2f_lw_axi_master + AD9276_SPI_BASE;
+	h2p_fifo_sink_ch_a_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_CSR_BASE;
+	h2p_fifo_sink_ch_a_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_BASE;
 	/*
-	 h2p_adcspi_addr = h2f_lw_axi_master + AD9276_SPI_BASE;
-	 h2p_fifo_sink_ch_a_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_CSR_BASE;
-	 h2p_fifo_sink_ch_a_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_A_OUT_BASE;
 	 h2p_fifo_sink_ch_b_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_CSR_BASE;
 	 h2p_fifo_sink_ch_b_data_addr = h2f_lw_axi_master + FIFO_SINK_CH_B_OUT_BASE;
 	 h2p_fifo_sink_ch_c_csr_addr = h2f_lw_axi_master + FIFO_SINK_CH_C_OUT_CSR_BASE;
@@ -181,11 +182,9 @@ void soc_init() {
 	// axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
 	axi_ram_tx_dump = axi_base + TX_DUMP_BASE;
 	axi_ram_tx_aux = axi_base + TX_AUX_BASE;
-
-	/*
-	 axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
-	 axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
-	 */
+	axi_ram_rx_adc_en = axi_base + RX_ADC_EN_BASE;
+	axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
+	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
 
 	// nco
 	h2p_ph_overlap_addr = h2f_lw_axi_master + NCO_PHASE_PH_OVERLAP_BASE;

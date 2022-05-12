@@ -32,15 +32,44 @@
 #define TX_H1_END 0x1ff
 
 /*
+ * Macros for device 'ad5724_pamp_spi', class 'altera_avalon_spi'
+ * The macros are prefixed with 'AD5724_PAMP_SPI_'.
+ * The prefix is the slave descriptor.
+ */
+#define AD5724_PAMP_SPI_COMPONENT_TYPE altera_avalon_spi
+#define AD5724_PAMP_SPI_COMPONENT_NAME ad5724_pamp_spi
+#define AD5724_PAMP_SPI_BASE 0x0
+#define AD5724_PAMP_SPI_SPAN 32
+#define AD5724_PAMP_SPI_END 0x1f
+#define AD5724_PAMP_SPI_IRQ 2
+#define AD5724_PAMP_SPI_CLOCKMULT 1
+#define AD5724_PAMP_SPI_CLOCKPHASE 0
+#define AD5724_PAMP_SPI_CLOCKPOLARITY 1
+#define AD5724_PAMP_SPI_CLOCKUNITS "Hz"
+#define AD5724_PAMP_SPI_DATABITS 24
+#define AD5724_PAMP_SPI_DATAWIDTH 32
+#define AD5724_PAMP_SPI_DELAYMULT "1.0E-9"
+#define AD5724_PAMP_SPI_DELAYUNITS "ns"
+#define AD5724_PAMP_SPI_EXTRADELAY 0
+#define AD5724_PAMP_SPI_INSERT_SYNC 0
+#define AD5724_PAMP_SPI_ISMASTER 1
+#define AD5724_PAMP_SPI_LSBFIRST 0
+#define AD5724_PAMP_SPI_NUMSLAVES 1
+#define AD5724_PAMP_SPI_PREFIX "spi_"
+#define AD5724_PAMP_SPI_SYNC_REG_DEPTH 2
+#define AD5724_PAMP_SPI_TARGETCLOCK 128000
+#define AD5724_PAMP_SPI_TARGETSSDELAY "2000.0"
+
+/*
  * Macros for device 'nco_phase_phase_9', class 'altera_avalon_pio'
  * The macros are prefixed with 'NCO_PHASE_PHASE_9_'.
  * The prefix is the slave descriptor.
  */
 #define NCO_PHASE_PHASE_9_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_9_COMPONENT_NAME nco_phase_phase_9
-#define NCO_PHASE_PHASE_9_BASE 0x0
+#define NCO_PHASE_PHASE_9_BASE 0x20
 #define NCO_PHASE_PHASE_9_SPAN 16
-#define NCO_PHASE_PHASE_9_END 0xf
+#define NCO_PHASE_PHASE_9_END 0x2f
 #define NCO_PHASE_PHASE_9_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_9_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_9_CAPTURE 0
@@ -62,9 +91,9 @@
  */
 #define NCO_PHASE_PHASE_8_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_8_COMPONENT_NAME nco_phase_phase_8
-#define NCO_PHASE_PHASE_8_BASE 0x10
+#define NCO_PHASE_PHASE_8_BASE 0x30
 #define NCO_PHASE_PHASE_8_SPAN 16
-#define NCO_PHASE_PHASE_8_END 0x1f
+#define NCO_PHASE_PHASE_8_END 0x3f
 #define NCO_PHASE_PHASE_8_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_8_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_8_CAPTURE 0
@@ -86,9 +115,9 @@
  */
 #define NCO_PHASE_PHASE_7_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_7_COMPONENT_NAME nco_phase_phase_7
-#define NCO_PHASE_PHASE_7_BASE 0x20
+#define NCO_PHASE_PHASE_7_BASE 0x40
 #define NCO_PHASE_PHASE_7_SPAN 16
-#define NCO_PHASE_PHASE_7_END 0x2f
+#define NCO_PHASE_PHASE_7_END 0x4f
 #define NCO_PHASE_PHASE_7_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_7_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_7_CAPTURE 0
@@ -110,9 +139,9 @@
  */
 #define NCO_PHASE_PHASE_6_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_6_COMPONENT_NAME nco_phase_phase_6
-#define NCO_PHASE_PHASE_6_BASE 0x30
+#define NCO_PHASE_PHASE_6_BASE 0x50
 #define NCO_PHASE_PHASE_6_SPAN 16
-#define NCO_PHASE_PHASE_6_END 0x3f
+#define NCO_PHASE_PHASE_6_END 0x5f
 #define NCO_PHASE_PHASE_6_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_6_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_6_CAPTURE 0
@@ -134,9 +163,9 @@
  */
 #define NCO_PHASE_PHASE_5_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_5_COMPONENT_NAME nco_phase_phase_5
-#define NCO_PHASE_PHASE_5_BASE 0x40
+#define NCO_PHASE_PHASE_5_BASE 0x60
 #define NCO_PHASE_PHASE_5_SPAN 16
-#define NCO_PHASE_PHASE_5_END 0x4f
+#define NCO_PHASE_PHASE_5_END 0x6f
 #define NCO_PHASE_PHASE_5_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_5_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_5_CAPTURE 0
@@ -158,9 +187,9 @@
  */
 #define NCO_PHASE_PHASE_4_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_4_COMPONENT_NAME nco_phase_phase_4
-#define NCO_PHASE_PHASE_4_BASE 0x50
+#define NCO_PHASE_PHASE_4_BASE 0x70
 #define NCO_PHASE_PHASE_4_SPAN 16
-#define NCO_PHASE_PHASE_4_END 0x5f
+#define NCO_PHASE_PHASE_4_END 0x7f
 #define NCO_PHASE_PHASE_4_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_4_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_4_CAPTURE 0
@@ -182,9 +211,9 @@
  */
 #define NCO_PHASE_PHASE_3_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_3_COMPONENT_NAME nco_phase_phase_3
-#define NCO_PHASE_PHASE_3_BASE 0x60
+#define NCO_PHASE_PHASE_3_BASE 0x80
 #define NCO_PHASE_PHASE_3_SPAN 16
-#define NCO_PHASE_PHASE_3_END 0x6f
+#define NCO_PHASE_PHASE_3_END 0x8f
 #define NCO_PHASE_PHASE_3_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_3_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_3_CAPTURE 0
@@ -206,9 +235,9 @@
  */
 #define NCO_PHASE_PHASE_2_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_2_COMPONENT_NAME nco_phase_phase_2
-#define NCO_PHASE_PHASE_2_BASE 0x70
+#define NCO_PHASE_PHASE_2_BASE 0x90
 #define NCO_PHASE_PHASE_2_SPAN 16
-#define NCO_PHASE_PHASE_2_END 0x7f
+#define NCO_PHASE_PHASE_2_END 0x9f
 #define NCO_PHASE_PHASE_2_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_2_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_2_CAPTURE 0
@@ -230,9 +259,9 @@
  */
 #define NCO_PHASE_PHASE_1_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_1_COMPONENT_NAME nco_phase_phase_1
-#define NCO_PHASE_PHASE_1_BASE 0x80
+#define NCO_PHASE_PHASE_1_BASE 0xa0
 #define NCO_PHASE_PHASE_1_SPAN 16
-#define NCO_PHASE_PHASE_1_END 0x8f
+#define NCO_PHASE_PHASE_1_END 0xaf
 #define NCO_PHASE_PHASE_1_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_1_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_1_CAPTURE 0
@@ -254,9 +283,9 @@
  */
 #define NCO_PHASE_PHASE_14_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_14_COMPONENT_NAME nco_phase_phase_14
-#define NCO_PHASE_PHASE_14_BASE 0x90
+#define NCO_PHASE_PHASE_14_BASE 0xb0
 #define NCO_PHASE_PHASE_14_SPAN 16
-#define NCO_PHASE_PHASE_14_END 0x9f
+#define NCO_PHASE_PHASE_14_END 0xbf
 #define NCO_PHASE_PHASE_14_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_14_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_14_CAPTURE 0
@@ -278,9 +307,9 @@
  */
 #define NCO_PHASE_PHASE_13_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_13_COMPONENT_NAME nco_phase_phase_13
-#define NCO_PHASE_PHASE_13_BASE 0xa0
+#define NCO_PHASE_PHASE_13_BASE 0xc0
 #define NCO_PHASE_PHASE_13_SPAN 16
-#define NCO_PHASE_PHASE_13_END 0xaf
+#define NCO_PHASE_PHASE_13_END 0xcf
 #define NCO_PHASE_PHASE_13_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_13_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_13_CAPTURE 0
@@ -302,9 +331,9 @@
  */
 #define NCO_PHASE_PHASE_12_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_12_COMPONENT_NAME nco_phase_phase_12
-#define NCO_PHASE_PHASE_12_BASE 0xb0
+#define NCO_PHASE_PHASE_12_BASE 0xd0
 #define NCO_PHASE_PHASE_12_SPAN 16
-#define NCO_PHASE_PHASE_12_END 0xbf
+#define NCO_PHASE_PHASE_12_END 0xdf
 #define NCO_PHASE_PHASE_12_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_12_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_12_CAPTURE 0
@@ -326,9 +355,9 @@
  */
 #define NCO_PHASE_PHASE_11_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_11_COMPONENT_NAME nco_phase_phase_11
-#define NCO_PHASE_PHASE_11_BASE 0xc0
+#define NCO_PHASE_PHASE_11_BASE 0xe0
 #define NCO_PHASE_PHASE_11_SPAN 16
-#define NCO_PHASE_PHASE_11_END 0xcf
+#define NCO_PHASE_PHASE_11_END 0xef
 #define NCO_PHASE_PHASE_11_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_11_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_11_CAPTURE 0
@@ -350,9 +379,9 @@
  */
 #define NCO_PHASE_PHASE_10_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_10_COMPONENT_NAME nco_phase_phase_10
-#define NCO_PHASE_PHASE_10_BASE 0xd0
+#define NCO_PHASE_PHASE_10_BASE 0xf0
 #define NCO_PHASE_PHASE_10_SPAN 16
-#define NCO_PHASE_PHASE_10_END 0xdf
+#define NCO_PHASE_PHASE_10_END 0xff
 #define NCO_PHASE_PHASE_10_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_10_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_10_CAPTURE 0
@@ -368,15 +397,102 @@
 #define NCO_PHASE_PHASE_10_RESET_VALUE 0
 
 /*
+ * Macros for device 'fifo_sink_CH_A_in_csr', class 'altera_avalon_fifo'
+ * The macros are prefixed with 'FIFO_SINK_CH_A_IN_CSR_'.
+ * The prefix is the slave descriptor.
+ */
+#define FIFO_SINK_CH_A_IN_CSR_COMPONENT_TYPE altera_avalon_fifo
+#define FIFO_SINK_CH_A_IN_CSR_COMPONENT_NAME fifo_sink_CH_A
+#define FIFO_SINK_CH_A_IN_CSR_BASE 0x100
+#define FIFO_SINK_CH_A_IN_CSR_SPAN 32
+#define FIFO_SINK_CH_A_IN_CSR_END 0x11f
+#define FIFO_SINK_CH_A_IN_CSR_AVALONMM_AVALONMM_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_IN_CSR_AVALONMM_AVALONST_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_IN_CSR_BITS_PER_SYMBOL 16
+#define FIFO_SINK_CH_A_IN_CSR_CHANNEL_WIDTH 0
+#define FIFO_SINK_CH_A_IN_CSR_ERROR_WIDTH 0
+#define FIFO_SINK_CH_A_IN_CSR_FIFO_DEPTH 4096
+#define FIFO_SINK_CH_A_IN_CSR_SINGLE_CLOCK_MODE 0
+#define FIFO_SINK_CH_A_IN_CSR_SYMBOLS_PER_BEAT 2
+#define FIFO_SINK_CH_A_IN_CSR_USE_AVALONMM_READ_SLAVE 1
+#define FIFO_SINK_CH_A_IN_CSR_USE_AVALONMM_WRITE_SLAVE 0
+#define FIFO_SINK_CH_A_IN_CSR_USE_AVALONST_SINK 1
+#define FIFO_SINK_CH_A_IN_CSR_USE_AVALONST_SOURCE 0
+#define FIFO_SINK_CH_A_IN_CSR_USE_BACKPRESSURE 1
+#define FIFO_SINK_CH_A_IN_CSR_USE_IRQ 0
+#define FIFO_SINK_CH_A_IN_CSR_USE_PACKET 0
+#define FIFO_SINK_CH_A_IN_CSR_USE_READ_CONTROL 1
+#define FIFO_SINK_CH_A_IN_CSR_USE_REGISTER 0
+#define FIFO_SINK_CH_A_IN_CSR_USE_WRITE_CONTROL 1
+
+/*
+ * Macros for device 'fifo_sink_CH_A_out_csr', class 'altera_avalon_fifo'
+ * The macros are prefixed with 'FIFO_SINK_CH_A_OUT_CSR_'.
+ * The prefix is the slave descriptor.
+ */
+#define FIFO_SINK_CH_A_OUT_CSR_COMPONENT_TYPE altera_avalon_fifo
+#define FIFO_SINK_CH_A_OUT_CSR_COMPONENT_NAME fifo_sink_CH_A
+#define FIFO_SINK_CH_A_OUT_CSR_BASE 0x120
+#define FIFO_SINK_CH_A_OUT_CSR_SPAN 32
+#define FIFO_SINK_CH_A_OUT_CSR_END 0x13f
+#define FIFO_SINK_CH_A_OUT_CSR_AVALONMM_AVALONMM_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_OUT_CSR_AVALONMM_AVALONST_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_OUT_CSR_BITS_PER_SYMBOL 16
+#define FIFO_SINK_CH_A_OUT_CSR_CHANNEL_WIDTH 0
+#define FIFO_SINK_CH_A_OUT_CSR_ERROR_WIDTH 0
+#define FIFO_SINK_CH_A_OUT_CSR_FIFO_DEPTH 4096
+#define FIFO_SINK_CH_A_OUT_CSR_SINGLE_CLOCK_MODE 0
+#define FIFO_SINK_CH_A_OUT_CSR_SYMBOLS_PER_BEAT 2
+#define FIFO_SINK_CH_A_OUT_CSR_USE_AVALONMM_READ_SLAVE 1
+#define FIFO_SINK_CH_A_OUT_CSR_USE_AVALONMM_WRITE_SLAVE 0
+#define FIFO_SINK_CH_A_OUT_CSR_USE_AVALONST_SINK 1
+#define FIFO_SINK_CH_A_OUT_CSR_USE_AVALONST_SOURCE 0
+#define FIFO_SINK_CH_A_OUT_CSR_USE_BACKPRESSURE 1
+#define FIFO_SINK_CH_A_OUT_CSR_USE_IRQ 0
+#define FIFO_SINK_CH_A_OUT_CSR_USE_PACKET 0
+#define FIFO_SINK_CH_A_OUT_CSR_USE_READ_CONTROL 1
+#define FIFO_SINK_CH_A_OUT_CSR_USE_REGISTER 0
+#define FIFO_SINK_CH_A_OUT_CSR_USE_WRITE_CONTROL 1
+
+/*
+ * Macros for device 'ad9276_spi', class 'altera_avalon_spi'
+ * The macros are prefixed with 'AD9276_SPI_'.
+ * The prefix is the slave descriptor.
+ */
+#define AD9276_SPI_COMPONENT_TYPE altera_avalon_spi
+#define AD9276_SPI_COMPONENT_NAME ad9276_spi
+#define AD9276_SPI_BASE 0x140
+#define AD9276_SPI_SPAN 32
+#define AD9276_SPI_END 0x15f
+#define AD9276_SPI_IRQ 0
+#define AD9276_SPI_CLOCKMULT 1
+#define AD9276_SPI_CLOCKPHASE 0
+#define AD9276_SPI_CLOCKPOLARITY 0
+#define AD9276_SPI_CLOCKUNITS "Hz"
+#define AD9276_SPI_DATABITS 24
+#define AD9276_SPI_DATAWIDTH 32
+#define AD9276_SPI_DELAYMULT "1.0E-9"
+#define AD9276_SPI_DELAYUNITS "ns"
+#define AD9276_SPI_EXTRADELAY 0
+#define AD9276_SPI_INSERT_SYNC 0
+#define AD9276_SPI_ISMASTER 1
+#define AD9276_SPI_LSBFIRST 0
+#define AD9276_SPI_NUMSLAVES 1
+#define AD9276_SPI_PREFIX "spi_"
+#define AD9276_SPI_SYNC_REG_DEPTH 2
+#define AD9276_SPI_TARGETCLOCK 128000
+#define AD9276_SPI_TARGETSSDELAY "2000.0"
+
+/*
  * Macros for device 'nco_phase_phase_0', class 'altera_avalon_pio'
  * The macros are prefixed with 'NCO_PHASE_PHASE_0_'.
  * The prefix is the slave descriptor.
  */
 #define NCO_PHASE_PHASE_0_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PHASE_0_COMPONENT_NAME nco_phase_phase_0
-#define NCO_PHASE_PHASE_0_BASE 0xe0
+#define NCO_PHASE_PHASE_0_BASE 0x160
 #define NCO_PHASE_PHASE_0_SPAN 16
-#define NCO_PHASE_PHASE_0_END 0xef
+#define NCO_PHASE_PHASE_0_END 0x16f
 #define NCO_PHASE_PHASE_0_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PHASE_0_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PHASE_0_CAPTURE 0
@@ -398,9 +514,9 @@
  */
 #define NCO_PHASE_PH_OVERLAP_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PH_OVERLAP_COMPONENT_NAME nco_phase_ph_overlap
-#define NCO_PHASE_PH_OVERLAP_BASE 0xf0
+#define NCO_PHASE_PH_OVERLAP_BASE 0x170
 #define NCO_PHASE_PH_OVERLAP_SPAN 16
-#define NCO_PHASE_PH_OVERLAP_END 0xff
+#define NCO_PHASE_PH_OVERLAP_END 0x17f
 #define NCO_PHASE_PH_OVERLAP_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PH_OVERLAP_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PH_OVERLAP_CAPTURE 0
@@ -422,9 +538,9 @@
  */
 #define NCO_PHASE_PH_INC_COMPONENT_TYPE altera_avalon_pio
 #define NCO_PHASE_PH_INC_COMPONENT_NAME nco_phase_ph_inc
-#define NCO_PHASE_PH_INC_BASE 0x100
+#define NCO_PHASE_PH_INC_BASE 0x180
 #define NCO_PHASE_PH_INC_SPAN 16
-#define NCO_PHASE_PH_INC_END 0x10f
+#define NCO_PHASE_PH_INC_END 0x18f
 #define NCO_PHASE_PH_INC_BIT_CLEARING_EDGE_REGISTER 0
 #define NCO_PHASE_PH_INC_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define NCO_PHASE_PH_INC_CAPTURE 0
@@ -488,6 +604,46 @@
 #define GENERAL_CNT_OUT_RESET_VALUE 0
 
 /*
+ * Macros for device 'tx_CHRG_BS', class 'bstream_new'
+ * The macros are prefixed with 'TX_CHRG_BS_'.
+ * The prefix is the slave descriptor.
+ */
+#define TX_CHRG_BS_COMPONENT_TYPE bstream_new
+#define TX_CHRG_BS_COMPONENT_NAME tx_CHRG_BS
+#define TX_CHRG_BS_BASE 0x200
+#define TX_CHRG_BS_SPAN 512
+#define TX_CHRG_BS_END 0x3ff
+
+/*
+ * Macros for device 'fifo_sink_CH_A_out', class 'altera_avalon_fifo'
+ * The macros are prefixed with 'FIFO_SINK_CH_A_OUT_'.
+ * The prefix is the slave descriptor.
+ */
+#define FIFO_SINK_CH_A_OUT_COMPONENT_TYPE altera_avalon_fifo
+#define FIFO_SINK_CH_A_OUT_COMPONENT_NAME fifo_sink_CH_A
+#define FIFO_SINK_CH_A_OUT_BASE 0x290
+#define FIFO_SINK_CH_A_OUT_SPAN 8
+#define FIFO_SINK_CH_A_OUT_END 0x297
+#define FIFO_SINK_CH_A_OUT_AVALONMM_AVALONMM_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_OUT_AVALONMM_AVALONST_DATA_WIDTH 32
+#define FIFO_SINK_CH_A_OUT_BITS_PER_SYMBOL 16
+#define FIFO_SINK_CH_A_OUT_CHANNEL_WIDTH 0
+#define FIFO_SINK_CH_A_OUT_ERROR_WIDTH 0
+#define FIFO_SINK_CH_A_OUT_FIFO_DEPTH 4096
+#define FIFO_SINK_CH_A_OUT_SINGLE_CLOCK_MODE 0
+#define FIFO_SINK_CH_A_OUT_SYMBOLS_PER_BEAT 2
+#define FIFO_SINK_CH_A_OUT_USE_AVALONMM_READ_SLAVE 1
+#define FIFO_SINK_CH_A_OUT_USE_AVALONMM_WRITE_SLAVE 0
+#define FIFO_SINK_CH_A_OUT_USE_AVALONST_SINK 1
+#define FIFO_SINK_CH_A_OUT_USE_AVALONST_SOURCE 0
+#define FIFO_SINK_CH_A_OUT_USE_BACKPRESSURE 1
+#define FIFO_SINK_CH_A_OUT_USE_IRQ 0
+#define FIFO_SINK_CH_A_OUT_USE_PACKET 0
+#define FIFO_SINK_CH_A_OUT_USE_READ_CONTROL 1
+#define FIFO_SINK_CH_A_OUT_USE_REGISTER 0
+#define FIFO_SINK_CH_A_OUT_USE_WRITE_CONTROL 1
+
+/*
  * Macros for device 'sys_pll_reconfig', class 'altera_pll_reconfig'
  * The macros are prefixed with 'SYS_PLL_RECONFIG_'.
  * The prefix is the slave descriptor.
@@ -499,26 +655,37 @@
 #define SYS_PLL_RECONFIG_END 0x3ff
 
 /*
- * Macros for device 'tx_CHRG_BS', class 'bstream_new'
- * The macros are prefixed with 'TX_CHRG_BS_'.
- * The prefix is the slave descriptor.
- */
-#define TX_CHRG_BS_COMPONENT_TYPE bstream_new
-#define TX_CHRG_BS_COMPONENT_NAME tx_CHRG_BS
-#define TX_CHRG_BS_BASE 0x400
-#define TX_CHRG_BS_SPAN 512
-#define TX_CHRG_BS_END 0x5ff
-
-/*
  * Macros for device 'tx_AUX', class 'bstream_new'
  * The macros are prefixed with 'TX_AUX_'.
  * The prefix is the slave descriptor.
  */
 #define TX_AUX_COMPONENT_TYPE bstream_new
 #define TX_AUX_COMPONENT_NAME tx_AUX
-#define TX_AUX_BASE 0x600
+#define TX_AUX_BASE 0x400
 #define TX_AUX_SPAN 512
-#define TX_AUX_END 0x7ff
+#define TX_AUX_END 0x5ff
+
+/*
+ * Macros for device 'rx_in_SHORT', class 'bstream_new'
+ * The macros are prefixed with 'RX_IN_SHORT_'.
+ * The prefix is the slave descriptor.
+ */
+#define RX_IN_SHORT_COMPONENT_TYPE bstream_new
+#define RX_IN_SHORT_COMPONENT_NAME rx_in_SHORT
+#define RX_IN_SHORT_BASE 0x1000
+#define RX_IN_SHORT_SPAN 512
+#define RX_IN_SHORT_END 0x11ff
+
+/*
+ * Macros for device 'rx_inc_DAMP', class 'bstream_new'
+ * The macros are prefixed with 'RX_INC_DAMP_'.
+ * The prefix is the slave descriptor.
+ */
+#define RX_INC_DAMP_COMPONENT_TYPE bstream_new
+#define RX_INC_DAMP_COMPONENT_NAME rx_inc_DAMP
+#define RX_INC_DAMP_BASE 0x2000
+#define RX_INC_DAMP_SPAN 512
+#define RX_INC_DAMP_END 0x21ff
 
 /*
  * Macros for device 'tx_DUMP', class 'bstream_new'
@@ -530,6 +697,17 @@
 #define TX_DUMP_BASE 0x3000
 #define TX_DUMP_SPAN 512
 #define TX_DUMP_END 0x31ff
+
+/*
+ * Macros for device 'rx_ADC_EN', class 'bstream_new'
+ * The macros are prefixed with 'RX_ADC_EN_'.
+ * The prefix is the slave descriptor.
+ */
+#define RX_ADC_EN_COMPONENT_TYPE bstream_new
+#define RX_ADC_EN_COMPONENT_NAME rx_ADC_EN
+#define RX_ADC_EN_BASE 0x4000
+#define RX_ADC_EN_SPAN 512
+#define RX_ADC_EN_END 0x41ff
 
 /*
  * Macros for device 'tx_CHRG', class 'bstream_new'

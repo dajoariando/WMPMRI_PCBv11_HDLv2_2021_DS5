@@ -80,6 +80,7 @@ volatile unsigned int *axi_ram_tx_charge = NULL;
 volatile unsigned int *axi_ram_tx_charge_bs = NULL;
 // volatile unsigned int *axi_ram_tx_damp = NULL;
 volatile unsigned int *axi_ram_tx_dump = NULL;
+volatile unsigned int *axi_ram_rx_adc_en = NULL;
 volatile unsigned int *axi_ram_rx_inc_damp = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
 

@@ -45,7 +45,7 @@ void init(double adc_freq) {
 
 void leave() {
 
-	// turn of the ADC
+	// turn off the ADC
 	cnt_out_val |= ADC_AD9276_STBY_msk;
 	cnt_out_val |= ADC_AD9276_PWDN_msk;// (CAREFUL! SOMETIMES THE ADC CANNOT WAKE UP AFTER PUT TO PWDN)
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
