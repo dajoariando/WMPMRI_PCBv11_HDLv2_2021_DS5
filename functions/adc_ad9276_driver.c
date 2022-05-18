@@ -60,6 +60,10 @@ void init_adc(uint8_t lvds_z, uint8_t lvds_phase, uint32_t adc_mode, uint16_t va
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_PHS_REG, lvds_phase);   // set phase
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 
+	// set adc speed
+	write_ad9276_spi(AD9276_SPI_WR, AD9276_CHIP_GRADE_REG, 2 << 4);   // set the ADC speed. 0 for 40 MSPS, 1 for 65 MSPS, and 2 for 80 MSPS
+	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
+
 	// filter setup.
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_FLEX_FILT_REG, AD9276_FLEX_FILT_HPF_04PCTG_FLP_VAL);   // set high-pass filter
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device

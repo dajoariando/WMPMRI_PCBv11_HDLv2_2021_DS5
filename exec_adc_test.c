@@ -73,6 +73,7 @@ int main(int argc, char * argv[]) {
 	read_adc_id();
 	// init_adc(AD9276_OUT_ADJ_TERM_100OHM_VAL, AD9276_OUT_PHS_600DEG_VAL, AD9276_OUT_TEST_OFF_VAL, 0, 0);
 	init_adc(lvds_z, lvds_phase, adc_mode, val1, val2);
+	read_adc_id();
 
 	bstream__en_adc(f_ADC, num_of_samples);
 
