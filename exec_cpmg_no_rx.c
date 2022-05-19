@@ -47,28 +47,23 @@ int main(int argc, char * argv[]) {
 	bstream_rst();
 
 	// set phase increment
-	alt_write_word( ( h2p_ph_inc_addr ), 4096);
+	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));
 
 	// set phase overlap
-	alt_write_word( ( h2p_ph_overlap_addr ), (uint16_t) 128);
+	alt_write_word( ( h2p_ph_overlap_addr ), (uint16_t) 4);
 
 	// set phase base
-	unsigned int ph_base_num = 32;// without the phase base, the nco output will generate more zeroes that is regarded as positive value in duty-cycle and thus creating more positive value than negative when the duty-cycle is 50%
-	alt_write_word( ( h2p_ph0_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph1_addr ), 16384 + ph_base_num);
-	alt_write_word( ( h2p_ph2_addr ), 32768 + ph_base_num);
-	alt_write_word( ( h2p_ph3_addr ), 49152 + ph_base_num);
-	alt_write_word( ( h2p_ph4_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph5_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph6_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph7_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph8_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph9_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph10_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph11_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph12_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph13_addr ), ph_base_num);
-	alt_write_word( ( h2p_ph14_addr ), ph_base_num);
+	unsigned int ph_base_num = 4;
+	unsigned int ph0, ph90, ph180, ph270;
+
+	// calculate phase from the phase resolution of the NCO
+	ph0 = ph_base_num;
+	ph90 = 1 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;
+	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;
+	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;
+
+	alt_write_word( ( h2p_ph_0_to_3_addr ), ( ph0 << 24 ) | ( ph90 << 16 ) | ( ph180 << 8 ) | ( ph270 ));// program phase 0 to phase 3
+	alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));// program phase 4 to phase 7
 
 	// double f_larmor = 4;
 	double bstrap_pchg_us = 2000.00;// bootstrap circuit precharge by enabling both lower side FETs. Has to be done at the beginning to make sure the high-side circuit is charged

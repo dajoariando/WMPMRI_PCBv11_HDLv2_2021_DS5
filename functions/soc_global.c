@@ -68,21 +68,8 @@ extern volatile unsigned int *h2p_sys_pll_reconfig_addr;
 // nco
 extern volatile unsigned int *h2p_ph_overlap_addr;   // the nco phase overlap address
 extern volatile unsigned int *h2p_ph_inc_addr;   // the nco phase increment address
-extern volatile unsigned int *h2p_ph0_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph1_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph2_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph3_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph4_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph5_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph6_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph7_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph8_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph9_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph10_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph11_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph12_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph13_addr;   // the nco phase modulator
-extern volatile unsigned int *h2p_ph14_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph_0_to_3_addr;   // the nco phase modulator
+extern volatile unsigned int *h2p_ph_4_to_7_addr;   // the nco phase modulator
 
 // physical memory file descriptor
 int fd_dev_mem = 0;
@@ -189,21 +176,8 @@ void soc_init() {
 	// nco
 	h2p_ph_overlap_addr = h2f_lw_axi_master + NCO_PHASE_PH_OVERLAP_BASE;
 	h2p_ph_inc_addr = h2f_lw_axi_master + NCO_PHASE_PH_INC_BASE;
-	h2p_ph0_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_0_BASE;
-	h2p_ph1_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_1_BASE;
-	h2p_ph2_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_2_BASE;
-	h2p_ph3_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_3_BASE;
-	h2p_ph4_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_4_BASE;
-	h2p_ph5_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_5_BASE;
-	h2p_ph6_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_6_BASE;
-	h2p_ph7_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_7_BASE;
-	h2p_ph8_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_8_BASE;
-	h2p_ph9_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_9_BASE;
-	h2p_ph10_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_10_BASE;
-	h2p_ph11_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_11_BASE;
-	h2p_ph12_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_12_BASE;
-	h2p_ph13_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_13_BASE;
-	h2p_ph14_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_14_BASE;
+	h2p_ph_0_to_3_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_0_TO_3_BASE;
+	h2p_ph_4_to_7_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_4_TO_7_BASE;
 
 }
 

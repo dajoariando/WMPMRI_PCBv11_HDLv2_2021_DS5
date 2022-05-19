@@ -20,6 +20,8 @@
 #include "variables/dac_ad5724r_vars.h"
 #include "variables/general.h"
 
+#define NCO_PH_RES 8 // the resolution for the NCO phase. Check it at the NCO platform designer
+
 // SOC HPS ADDRESSES (COPY TO THE SOC_GLOBAL.C)
 void *h2p_fifo_sink_ch_a_data_addr = NULL;
 void *h2p_fifo_sink_ch_b_data_addr = NULL;
@@ -36,21 +38,8 @@ void *h2p_button_addr = NULL;
 // nco
 volatile unsigned int *h2p_ph_overlap_addr = NULL;   // the nco phase overlap address
 volatile unsigned int *h2p_ph_inc_addr = NULL;   // the nco phase increment address
-volatile unsigned int *h2p_ph0_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph1_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph2_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph3_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph4_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph5_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph6_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph7_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph8_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph9_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph10_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph11_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph12_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph13_addr = NULL;   // the nco phase modulator
-volatile unsigned int *h2p_ph14_addr = NULL;   // the nco phase modulator
+volatile unsigned int *h2p_ph_0_to_3_addr = NULL;   // the nco phase modulator
+volatile unsigned int *h2p_ph_4_to_7_addr = NULL;   // the nco phase modulator
 
 volatile unsigned int *h2p_adcspi_addr;   // gpio for dac (spi)
 volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr = NULL;   // ADC streaming FIFO status address

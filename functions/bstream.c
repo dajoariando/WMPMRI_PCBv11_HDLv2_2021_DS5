@@ -10,7 +10,6 @@
 #include "../variables/general.h"
 
 #include <stdio.h>
-// #include <stdlib.h>
 #include <socal/socal.h>
 #include <unistd.h>
 #include <math.h>
@@ -225,8 +224,6 @@ void bstream__vpc_chg(
 	// take a look at the diagram of cpmg in the one note to understand how the values for different parameters are derived to cpmg_params.
 
 	// program the SYSCLK to 16x f_larmor. The maximum frequency for f_larmor is 16x5MHz = 80MHz and it's limited by the ADC acquisition frequency.
-	//
-	//
 	float f_larmor = 4;
 	float SYSCLK_MHz = f_larmor * 16;
 
@@ -343,6 +340,9 @@ void bstream__en_adc(
         unsigned int num_of_samples		// repeat the precharge and dump
         ) {
 
+	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
+	unsigned int adc_en_window = num_of_samples * adc_clk_fact;   // as the adc_en_window is referenced to SYSCLK_MHz, it needs to be multiplied by the
+
 	// initialize all objects
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
@@ -359,71 +359,82 @@ void bstream__en_adc(
 	bstream_rst();
 	usleep(100);
 
-	int t_blank = 100;
+	int t_blank = 10000;
 
 	// tx_aux
 	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
-	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
+	bstream__push(&bstream_objs[tx_aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_h1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_h2
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_h2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_l1
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_l1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_l2
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_l2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_dump
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_dump], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_charge
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_charge_bs
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[tx_charge_bs], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// rx_adc_en
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[rx_adc_en], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[rx_adc_en], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// rx_in_short
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[rx_in_short], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// rx_inc_damp
 	bstream__push(&bstream_objs[rx_inc_damp], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
-	bstream__push(&bstream_objs[rx_inc_damp], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, num_of_samples/*dataval*/);
+	bstream__push(&bstream_objs[rx_inc_damp], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
+	bstream__push(&bstream_objs[rx_inc_damp], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
 	bstream__push(&bstream_objs[rx_inc_damp], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[rx_inc_damp], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
@@ -570,9 +581,10 @@ void bstream__cpmg_refill(
 	// take a look at the diagram of cpmg in the one note to understand how the values for different parameters are derived to cpmg_params.
 
 	// program the SYSCLK to 16x f_larmor. The maximum frequency for f_larmor is 16x5MHz = 80MHz and it's limited by the ADC acquisition frequency.
-	//
-	//
 	float SYSCLK_MHz = f_larmor * 16;
+
+	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
+	unsigned int adc_en_window = samples_per_echo * adc_clk_fact;   // as the adc_en_window is referenced to SYSCLK_MHz, it needs to be multiplied by the
 
 	// initialize all objects
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
@@ -773,8 +785,8 @@ void bstream__cpmg_refill(
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d90_int + cpmg_params.p180_pchg_int + cpmg_params.p180_pchg_refill_int - cpmg_params.p90_dchg_int /*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, echoes_per_scan /*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.init_adc_delay_int /*dataval*/);
-	bstream__push(&bstream_objs[rx_adc_en], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, samples_per_echo/*dataval*/);
-	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d180_int + cpmg_params.p180_pchg_int + cpmg_params.p180_pchg_refill_int + cpmg_params.p180_int - cpmg_params.init_adc_delay_int - samples_per_echo /*dataval*/);
+	bstream__push(&bstream_objs[rx_adc_en], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, adc_en_window/*dataval*/);
+	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 1/*loop_sto*/, 0/*mux_sel*/, cpmg_params.d180_int + cpmg_params.p180_pchg_int + cpmg_params.p180_pchg_refill_int + cpmg_params.p180_int - cpmg_params.init_adc_delay_int - adc_en_window /*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, t_blank/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
