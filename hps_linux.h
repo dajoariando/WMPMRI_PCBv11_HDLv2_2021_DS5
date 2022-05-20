@@ -21,6 +21,7 @@
 #include "variables/general.h"
 
 #define NCO_PH_RES 8 // the resolution for the NCO phase. Check it at the NCO platform designer
+#define NCO_AMP_RES 16 // the resolution for the NCO output amplitude. Check it at the NCO platform designer
 
 // SOC HPS ADDRESSES (COPY TO THE SOC_GLOBAL.C)
 void *h2p_fifo_sink_ch_a_data_addr = NULL;
