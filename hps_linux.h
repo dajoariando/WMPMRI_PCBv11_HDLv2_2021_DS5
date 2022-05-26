@@ -8,7 +8,8 @@
 #include <unistd.h>
 
 #include "functions/adc_ad9276_driver.h"
-#include "functions/dac_ad5724r_driver.h"
+// #include "functions/dac_ad5724r_driver.h" // careful on having both ad5724 and ad5722 driver
+#include "functions/dac_ad5722r_driver.h"
 #include "functions/common_functions.h"
 #include "functions/gnrl_calc.h"
 #include "functions/pll_param_generator.h"
@@ -17,7 +18,8 @@
 #include "functions/bstream.h"
 
 #include "variables/adc_ad9276_vars.h"
-#include "variables/dac_ad5724r_vars.h"
+// #include "variables/dac_ad5724r_vars.h"
+#include "variables/dac_ad5722r_vars.h"
 #include "variables/general.h"
 
 #define NCO_PH_RES 8 // the resolution for the NCO phase. Check it at the NCO platform designer
@@ -77,8 +79,11 @@ volatile unsigned int *axi_ram_rx_in_short = NULL;
 // pll reconfig address for the system clock
 volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reconfig
 
+// preamp
+volatile unsigned int *h2p_dac_preamp_addr = NULL;
+
 // FUNCTIONS
-void leave();	// terminate the program
+void leave();   // terminate the program
 void init();	// initialize the system with tuned default parameter
 
 // global variables

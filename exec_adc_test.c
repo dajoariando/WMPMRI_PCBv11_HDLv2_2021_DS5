@@ -1,7 +1,7 @@
 // Created on: April 14th, 2022
 // Author: David Ariando
 
-//#define EXEC_ADC_TEST
+// #define EXEC_ADC_TEST
 #ifdef EXEC_ADC_TEST
 
 #include "hps_linux.h"

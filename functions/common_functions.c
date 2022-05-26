@@ -35,13 +35,20 @@ void buf32_to_buf16(uint32_t * buf32, uint16_t * buf16, unsigned int length) {
 
 	j = 0;
 	for (i = 0; i < ( length ); i++) {
-		buf16[j++] = ( (unsigned int) buf32[i] & 0x0FFF );   // 12 significant bit
-		buf16[j++] = ( (unsigned int) ( buf32[i] >> 16 ) & 0x0FFF );   // 12 significant bit
+		buf16[j++] = ( (unsigned int) buf32[i] );   // 12 significant bit
+		buf16[j++] = ( (unsigned int) ( buf32[i] >> 16 ) );   // 12 significant bit
 	}
 
 }
 
-void wr_File(char * pathname, unsigned int length, int * buf, char binary_OR_ascii) {
+void cut_2MSB_and_2LSB(uint16_t * buf16, unsigned int length) {
+	int ii;
+	for (ii = 0; ii < length; ii++) {
+		buf16[ii] = ( buf16[ii] >> 2 ) & 0xFFF;
+	}
+}
+
+void wr_File(char * pathname, unsigned int length, uint16_t * buf, char binary_OR_ascii) {
 
 	// binary_OR_ascii = 1 save binary output into the text file (1). Otherwise, it'll be ASCII output (0)
 
@@ -53,7 +60,7 @@ void wr_File(char * pathname, unsigned int length, int * buf, char binary_OR_asc
 	}
 
 	if (binary_OR_ascii) {   // binary output
-		fwrite(buf, sizeof(uint32_t), length, fptr);
+		fwrite(buf, sizeof(uint16_t), length, fptr);
 	}
 
 	else {   // ascii output

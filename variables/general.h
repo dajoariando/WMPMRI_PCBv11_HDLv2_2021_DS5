@@ -24,6 +24,8 @@
  */
 
 // OUTPUT
+#define DAC_PAMP_LDAC_ofst			(13)
+#define DAC_PAMP_CLR_ofst			(12)
 #define CHG_HBRIDGE_ofst			(11)
 #define CHG_BS_ofst					(10)
 #define DCHG_BS_ofst				(9)
@@ -37,6 +39,8 @@
 #define FSM_RESET_ofst				(1)
 #define FSM_START_ofst				(0)
 
+#define DAC_PAMP_LDAC				(1<<DAC_PAMP_LDAC_ofst)
+#define DAC_PAMP_CLR				(1<<DAC_PAMP_CLR_ofst)
 #define CHG_HBRIDGE					(1<<CHG_HBRIDGE_ofst)
 #define CHG_BS						(1<<CHG_BS_ofst)
 #define DCHG_BS						(1<<DCHG_BS_ofst)
@@ -51,11 +55,13 @@
 #define FSM_START_msk				(1<<FSM_START_ofst)
 
 // INPUT
+#define fco_locked_ofst			(4)
 #define bitstr_adv_done_ofst	(3)
 #define tx_h1_done_ofst			(2)
 #define sys_pll_locked_ofst		(1)
 #define FSM_DONE_ofst			(0)
 
+#define fco_locked				(1<<fco_locked_ofst)
 #define bitstr_adv_done			(1<<bitstr_adv_done_ofst)
 #define tx_h1_done				(1<<tx_h1_done_ofst)
 #define sys_pll_locked			(1<<sys_pll_locked_ofst)
@@ -71,6 +77,7 @@
 #define DISABLE 0
 
 // bitstream status
+typedef unsigned int error_code;
 #define SEQ_ERROR	1
 #define SEQ_OK		0
 

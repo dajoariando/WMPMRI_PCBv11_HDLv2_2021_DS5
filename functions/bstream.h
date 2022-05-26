@@ -5,6 +5,8 @@
  *      Author: David Ariando
  */
 
+#include "../variables/general.h"
+
 #ifndef FUNCTIONS_BSTREAM_H_
 #define FUNCTIONS_BSTREAM_H_
 
@@ -29,7 +31,9 @@ void bstream__init(bstream_obj *obj, float freq_MHz);
 
 void bstream_rst();
 
-void bstream_start();
+void bstream_start();   // start the bitstream
+
+void bstream_wait_for_done();   // wait for done signal from h1
 
 char bstream_check(bstream_obj *obj);
 
@@ -49,12 +53,12 @@ void bstream__vpc_chg(
 
 void bstream__vpc_wastedump(
         double bstrap_pchg_us,
-        double lcs_vpc_dchg_us,		// precharging of vpc
-        double lcs_wastedump_us,		// dumping the lcs to the vpc
-        unsigned int repeat		// repeat the precharge and dump
+        double lcs_vpc_dchg_us,		// discharging of vpc
+        double lcs_wastedump_us,	// dumping the current into RF
+        unsigned int repeat			// repeat the precharge and dump
         );
 
-void bstream__cpmg_refill(
+error_code bstream__cpmg_refill(
         double f_larmor,
         double bstrap_pchg_us,
         double lcs_pchg_us,		// precharging of vpc

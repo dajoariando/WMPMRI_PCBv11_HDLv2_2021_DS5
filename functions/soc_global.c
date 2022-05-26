@@ -71,6 +71,9 @@ extern volatile unsigned int *h2p_ph_inc_addr;   // the nco phase increment addr
 extern volatile unsigned int *h2p_ph_0_to_3_addr;   // the nco phase modulator
 extern volatile unsigned int *h2p_ph_4_to_7_addr;   // the nco phase modulator
 
+// preamplifier
+extern volatile unsigned int *h2p_dac_preamp_addr;   // the preamp dac
+
 // physical memory file descriptor
 int fd_dev_mem = 0;
 
@@ -178,6 +181,9 @@ void soc_init() {
 	h2p_ph_inc_addr = h2f_lw_axi_master + NCO_PHASE_PH_INC_BASE;
 	h2p_ph_0_to_3_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_0_TO_3_BASE;
 	h2p_ph_4_to_7_addr = h2f_lw_axi_master + NCO_PHASE_PHASE_4_TO_7_BASE;
+
+	// preamp
+	h2p_dac_preamp_addr = h2f_lw_axi_master + AD5724_PAMP_SPI_BASE;
 
 }
 
