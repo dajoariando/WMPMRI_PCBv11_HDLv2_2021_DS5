@@ -1,8 +1,8 @@
 // Created on: April 14th, 2022
 // Author: David Ariando
 
-#define EXEC_CPMG
-#ifdef EXEC_CPMG
+#define EXEC_T2
+#ifdef EXEC_T2
 
 #include "hps_linux.h"
 
@@ -157,8 +157,13 @@ int main(int argc, char * argv[]) {
 
 	usleep(1000);   // wait for the PLL FCO to lock as well
 
+	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
+	unsigned int larmor_clk_fact = 16;   // the factor of (system_clk_freq / f_larmor)
+	double SYSCLK_MHz = larmor_clk_fact * f_larmor;
+
 	//
 	bstream__vpc_chg(
+	        SYSCLK_MHz,
 	        bstrap_pchg_us,
 	        lcs_vpc_pchg_us,   // precharging of vpc
 	        lcs_recycledump_us,   // dumping the lcs to the vpc
@@ -166,9 +171,11 @@ int main(int argc, char * argv[]) {
 	        );
 	//
 
-	usleep(10000);
+	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-	error_code err = bstream__cpmg_refill(f_larmor,
+	error_code err = bstream__cpmg(f_larmor,
+	        larmor_clk_fact,
+	        adc_clk_fact,
 	        bstrap_pchg_us,
 	        lcs_pchg_us,   // precharging of vpc
 	        lcs_dump_us,   // dumping the lcs to the vpc
@@ -200,6 +207,7 @@ int main(int argc, char * argv[]) {
 	usleep(10000);
 
 	bstream__vpc_wastedump(
+	        SYSCLK_MHz,
 	        bstrap_pchg_us,
 	        lcs_vpc_dchg_us,   // discharging of vpc
 	        lcs_wastedump_us,   // dumping the current into RF

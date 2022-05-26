@@ -12,10 +12,12 @@
 
 #define SRAM_DATAWIDTH 32 // memory width of the SRAM, check in the Quartus
 
+#define T_BLANK 1000 // the amount of zero blanking period during the first and last bitstream sequence. THe length of T_BLANK
+
 typedef struct bstream_struct {
 		volatile unsigned int * sram_addr;   // the sram address
 		unsigned int curr_ofst;				// the sram current offset
-		float freq_MHz;						// frequency
+		double freq_MHz;						// frequency
 		char error_seq;						// the error flag
 } bstream_obj;
 
@@ -27,7 +29,7 @@ enum bstream_gpio {
 void bstream__push(bstream_obj * obj, char pls_pol, char seq_end, char loop_sta, char loop_sto, char mux_sel, unsigned int dataval);
 
 void bstream__init_all_sram();
-void bstream__init(bstream_obj *obj, float freq_MHz);
+void bstream__init(bstream_obj *obj, double freq_MHz);
 
 void bstream_rst();
 
@@ -40,11 +42,13 @@ char bstream_check(bstream_obj *obj);
 void bstream__test(float clk_MHz);
 
 void bstream__en_adc(
-        float SYSCLK_MHz,
+        double SYSCLK_MHz,
+        unsigned int adc_clk_fact,   // the factor of (system_clk_freq / adc_clk_freq)
         unsigned int num_of_samples		// repeat the precharge and dump
         );
 
 void bstream__vpc_chg(
+        double SYSCLK_MHz,
         double bstrap_pchg_us,
         double lcs_pchg_us,		// precharging of vpc
         double lcs_recycledump_us,		// dumping the lcs to the vpc
@@ -52,14 +56,17 @@ void bstream__vpc_chg(
         );
 
 void bstream__vpc_wastedump(
+        double SYSCLK_MHz,
         double bstrap_pchg_us,
         double lcs_vpc_dchg_us,		// discharging of vpc
         double lcs_wastedump_us,	// dumping the current into RF
         unsigned int repeat			// repeat the precharge and dump
         );
 
-error_code bstream__cpmg_refill(
+error_code bstream__cpmg(
         double f_larmor,
+        unsigned int larmor_clk_fact,
+        unsigned int adc_clk_fact,
         double bstrap_pchg_us,
         double lcs_pchg_us,		// precharging of vpc
         double lcs_dump_us,		// dumping the lcs to the vpc
