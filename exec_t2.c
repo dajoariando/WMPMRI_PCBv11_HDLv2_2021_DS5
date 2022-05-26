@@ -45,11 +45,6 @@ void leave() {
 
 int main(int argc, char * argv[]) {
 
-	// default params:
-
-	// double f_larmor = atof(argv[1]);
-	// unsigned int samples_per_echo = atoi(argv[2]);
-
 	/* DEFAULT CONFIGURATION TO EASILY SEE CPMG SEQUENCE RESULTS IN SIGNALTAP
 	 // DON'T FORGET TO COMMENT bstrm__vpc_chg
 	 // double f_larmor = 4;
@@ -77,9 +72,9 @@ int main(int argc, char * argv[]) {
 	 unsigned int echoskip = 1;
 	 unsigned int echodrop = 0;
 	 double vvarac = -2.5;
-
 	 */
 
+	// param defined by user
 	double f_larmor = atof(argv[1]);
 	double bstrap_pchg_us = atof(argv[2]);   // bootstrap circuit precharge by enabling both lower side FETs. Has to be done at the beginning to make sure the high-side circuit is charged
 	double lcs_pchg_us = atof(argv[3]);
@@ -105,19 +100,26 @@ int main(int argc, char * argv[]) {
 	unsigned int echoskip = atoi(argv[23]);
 	unsigned int echodrop = atoi(argv[24]);
 	double vvarac = atof(argv[25]);
-
+	// --- vpc precharging ---
 	double lcs_vpc_pchg_us = atof(argv[26]);
 	double lcs_recycledump_us = atof(argv[27]);
 	double lcs_vpc_pchg_repeat = atof(argv[28]);
-
+	// --- vpc discharging ---
 	double lcs_vpc_dchg_us = atof(argv[29]);
 	double lcs_wastedump_us = atof(argv[30]);
 	double lcs_vpc_dchg_repeat = atof(argv[31]);
 
+	// param defined by Quartus
+	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
+	unsigned int larmor_clk_fact = 16;   // the factor of (system_clk_freq / f_larmor)
+	double SYSCLK_MHz = larmor_clk_fact * f_larmor;
+
+	// data container
 	unsigned int num_of_samples = samples_per_echo * echoes_per_scan;
 	uint32_t adc_data_32b[num_of_samples >> 1];   // data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[num_of_samples];
 
+	// init
 	init();
 
 	// reset
@@ -128,18 +130,15 @@ int main(int argc, char * argv[]) {
 
 	// set phase overlap
 	alt_write_word( ( h2p_ph_overlap_addr ), ( uint16_t )(1 << ( NCO_AMP_RES - 4 )));
-	// alt_write_word( ( h2p_ph_overlap_addr ), overlap);
 
 	// set phase base
+	// calculate phase from the phase resolution of the NCO
 	unsigned int ph_base_num = 4;
 	unsigned int ph0, ph90, ph180, ph270;
-
-	// calculate phase from the phase resolution of the NCO
 	ph0 = ph_base_num;   // phase 0
 	ph90 = 1 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 90. 1<<(NCO_PH_RES-2) is the bit needs to be changed to get 90 degrees.
 	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 180.
 	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 270.
-
 	alt_write_word( ( h2p_ph_0_to_3_addr ), ( ph0 << 24 ) | ( ph90 << 16 ) | ( ph180 << 8 ) | ( ph270 ));   // program phase 0 to phase 3
 	alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));   // program phase 4 to phase 7
 
@@ -149,6 +148,7 @@ int main(int argc, char * argv[]) {
 	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
 	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
 
+	// initialize ADC
 	read_adc_id();
 	init_adc(AD9276_OUT_ADJ_TERM_100OHM_VAL, AD9276_OUT_PHS_180DEG_VAL, AD9276_OUT_TEST_OFF_VAL, 0, 0);
 
@@ -157,11 +157,6 @@ int main(int argc, char * argv[]) {
 
 	usleep(1000);   // wait for the PLL FCO to lock as well
 
-	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
-	unsigned int larmor_clk_fact = 16;   // the factor of (system_clk_freq / f_larmor)
-	double SYSCLK_MHz = larmor_clk_fact * f_larmor;
-
-	//
 	bstream__vpc_chg(
 	        SYSCLK_MHz,
 	        bstrap_pchg_us,
@@ -169,8 +164,6 @@ int main(int argc, char * argv[]) {
 	        lcs_recycledump_us,   // dumping the lcs to the vpc
 	        lcs_vpc_pchg_repeat   // repeat the precharge and dump
 	        );
-	//
-
 	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
 	error_code err = bstream__cpmg(f_larmor,
@@ -203,8 +196,7 @@ int main(int argc, char * argv[]) {
 	if (err == SEQ_ERROR) {
 		return 0;
 	}
-
-	usleep(10000);
+	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
 	bstream__vpc_wastedump(
 	        SYSCLK_MHz,
@@ -213,8 +205,7 @@ int main(int argc, char * argv[]) {
 	        lcs_wastedump_us,   // dumping the current into RF
 	        lcs_vpc_dchg_repeat		// repeat the precharge and dump
 	        );
-
-	usleep(10000);
+	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
 	read_adc_val(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b);
 	buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);   // convert the 32-bit data format to 16-bit.
