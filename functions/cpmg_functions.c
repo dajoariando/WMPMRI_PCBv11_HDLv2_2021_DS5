@@ -1,5 +1,4 @@
 #include "cpmg_functions.h"
-#include "../variables/general.h"
 #include <stdio.h>
 #include <math.h>
 

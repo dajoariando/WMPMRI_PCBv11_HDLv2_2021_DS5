@@ -48,7 +48,29 @@ void cut_2MSB_and_2LSB(uint16_t * buf16, unsigned int length) {
 	}
 }
 
-void wr_File(char * pathname, unsigned int length, uint16_t * buf, char binary_OR_ascii) {
+void sum_buf(int32_t * buf32, uint16_t * buf16, unsigned int length, unsigned char subtract) {
+	int ii;
+	int32_t temp;   // temporary file to convert uint16_t to int32_t
+
+	for (ii = 0; ii < length; ii++) {
+		temp = 0;
+		temp = temp | buf16[ii];
+		if (subtract)
+			buf32[ii] -= temp;
+		else
+			buf32[ii] += temp;
+	}
+}
+
+void avg_buf(int32_t * buf32, unsigned int length, unsigned char div_fact) {
+	int ii;
+
+	for (ii = 0; ii < length; ii++) {
+		buf32[ii] /= div_fact;
+	}
+}
+
+void wr_File_16b(char * pathname, unsigned int length, int16_t * buf, char binary_OR_ascii) {
 
 	// binary_OR_ascii = 1 save binary output into the text file (1). Otherwise, it'll be ASCII output (0)
 
@@ -60,7 +82,7 @@ void wr_File(char * pathname, unsigned int length, uint16_t * buf, char binary_O
 	}
 
 	if (binary_OR_ascii) {   // binary output
-		fwrite(buf, sizeof(uint16_t), length, fptr);
+		fwrite(buf, sizeof(int16_t), length, fptr);
 	}
 
 	else {   // ascii output
@@ -76,7 +98,7 @@ void wr_File(char * pathname, unsigned int length, uint16_t * buf, char binary_O
 
 }
 
-void wr_File_long(char * pathname, unsigned int length, long * buf, char binary_OR_ascii) {
+void wr_File_32b(char * pathname, unsigned int length, int32_t * buf, char binary_OR_ascii) {
 
 	// binary_OR_ascii = 1 save binary output into the text file (1). Otherwise, it'll be ASCII output (0)
 
@@ -88,7 +110,7 @@ void wr_File_long(char * pathname, unsigned int length, long * buf, char binary_
 	}
 
 	if (binary_OR_ascii) {   // binary output
-		fwrite(buf, sizeof(uint32_t), length, fptr);
+		fwrite(buf, sizeof(int32_t), length, fptr);
 	}
 
 	else {   // ascii output
@@ -104,7 +126,7 @@ void wr_File_long(char * pathname, unsigned int length, long * buf, char binary_
 
 }
 
-void wr_File_longlong(char * pathname, unsigned int length, unsigned long long * buf, char binary_OR_ascii) {
+void wr_File_64b(char * pathname, unsigned int length, long long * buf, char binary_OR_ascii) {
 
 	// binary_OR_ascii = 1 save binary output into the text file (1). Otherwise, it'll be ASCII output (0)
 
@@ -116,14 +138,14 @@ void wr_File_longlong(char * pathname, unsigned int length, unsigned long long *
 	}
 
 	if (binary_OR_ascii) {   // binary output
-		fwrite(buf, sizeof(unsigned long long), length, fptr);
+		fwrite(buf, sizeof(long long), length, fptr);
 	}
 
 	else {   // ascii output
 		long i;
 
 		for (i = 0; i < ( ( length ) ); i++) {
-			fprintf(fptr, "%llu\n", buf[i]);
+			fprintf(fptr, "%ll\n", buf[i]);
 		}
 
 	}

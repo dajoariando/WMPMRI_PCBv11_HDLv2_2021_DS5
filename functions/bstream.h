@@ -5,7 +5,7 @@
  *      Author: David Ariando
  */
 
-#include "../variables/general.h"
+#include "cpmg_functions.h"
 
 #ifndef FUNCTIONS_BSTREAM_H_
 #define FUNCTIONS_BSTREAM_H_
@@ -63,7 +63,7 @@ void bstream__vpc_wastedump(
         unsigned int repeat			// repeat the precharge and dump
         );
 
-error_code bstream__cpmg(
+cpmg_obj bstream__cpmg(
         double f_larmor,
         unsigned int larmor_clk_fact,
         unsigned int adc_clk_fact,
@@ -82,11 +82,9 @@ error_code bstream__cpmg(
         double p180_dtcl,
         double echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
         double echotime_us,
-        long unsigned scanspacing_us,
         unsigned int samples_per_echo,
         unsigned int echoes_per_scan,
-        unsigned int n_iterate,
-        unsigned char ph_cycl_en,
+        unsigned char p90_ph_sel,
         unsigned int dconv_fact,
         unsigned int echoskip,
         unsigned int echodrop

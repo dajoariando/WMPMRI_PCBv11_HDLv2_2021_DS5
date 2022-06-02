@@ -6,6 +6,7 @@
 #include <socal/socal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "functions/adc_ad9276_driver.h"
 // #include "functions/dac_ad5724r_driver.h" // careful on having both ad5724 and ad5722 driver
@@ -90,8 +91,7 @@ void init();	// initialize the system with tuned default parameter
 FILE *fptr;
 long i;
 long j;
-char foldername[50];   // variable to store folder name of the measurement data
-char pathname[60];
+char acq_file[60];
 unsigned int cnt_out_val;
 
 #endif
