@@ -90,4 +90,10 @@ cpmg_obj bstream__cpmg(
         unsigned int echodrop
         );
 
+void bstream__noise(
+        double f_adc,
+        unsigned int adc_clk_fact,
+        unsigned int samples
+        );
+
 #endif /* FUNCTIONS_BSTREAM_H_ */

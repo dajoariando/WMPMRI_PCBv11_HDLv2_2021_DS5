@@ -17,6 +17,7 @@
 #include "functions/reconfig_functions.h"
 #include "functions/soc_global.h"
 #include "functions/bstream.h"
+#include "functions/dac_dac5571_driver.h"
 
 #include "variables/adc_ad9276_vars.h"
 // #include "variables/dac_ad5724r_vars.h"
@@ -82,6 +83,9 @@ volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reco
 
 // preamp
 volatile unsigned int *h2p_dac_preamp_addr = NULL;
+
+// gradient driver
+volatile unsigned long *h2p_dac_graddrv_addr = NULL;
 
 // FUNCTIONS
 void leave();   // terminate the program

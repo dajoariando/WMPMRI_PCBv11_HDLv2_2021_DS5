@@ -24,6 +24,10 @@
  */
 
 // OUTPUT
+#define GRADDRV_CNT_N_ofst			(17)
+#define GRADDRV_CNT_P_ofst			(16)
+#define GRADDRV_3P3_N_ofst			(15)
+#define GRADDRV_3P3_P_ofst			(14)
 #define DAC_PAMP_LDAC_ofst			(13)
 #define DAC_PAMP_CLR_ofst			(12)
 #define CHG_HBRIDGE_ofst			(11)
@@ -39,6 +43,10 @@
 #define FSM_RESET_ofst				(1)
 #define FSM_START_ofst				(0)
 
+#define GRADDRV_CNT_N			(1<<GRADDRV_CNT_N_ofst)
+#define GRADDRV_CNT_P			(1<<GRADDRV_CNT_P_ofst)
+#define GRADDRV_3P3_N			(1<<GRADDRV_3P3_N_ofst)
+#define GRADDRV_3P3_P			(1<<GRADDRV_3P3_P_ofst)
 #define DAC_PAMP_LDAC				(1<<DAC_PAMP_LDAC_ofst)
 #define DAC_PAMP_CLR				(1<<DAC_PAMP_CLR_ofst)
 #define CHG_HBRIDGE					(1<<CHG_HBRIDGE_ofst)
@@ -68,7 +76,7 @@
 #define FSM_DONE_msk			(1<<FSM_DONE_ofst)
 
 // default for output control signal
-#define CNT_OUT_DEFAULT (DAC_GRAD_CLR_msk | DAC_GRAD_LDAC_msk | ADC_AD9276_PWDN_msk | ADC_AD9276_STBY_msk)
+#define CNT_OUT_DEFAULT (DAC_GRAD_CLR_msk | DAC_GRAD_LDAC_msk | ADC_AD9276_PWDN_msk | ADC_AD9276_STBY_msk | GRADDRV_3P3_P | GRADDRV_3P3_N)
 
 // general variable
 #define ENABLE_MESSAGE	1

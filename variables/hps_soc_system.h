@@ -157,6 +157,21 @@
 #define NCO_PHASE_PHASE_0_TO_3_RESET_VALUE 0
 
 /*
+ * Macros for device 'graddrv_i2c', class 'altera_avalon_i2c'
+ * The macros are prefixed with 'GRADDRV_I2C_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADDRV_I2C_COMPONENT_TYPE altera_avalon_i2c
+#define GRADDRV_I2C_COMPONENT_NAME graddrv_i2c
+#define GRADDRV_I2C_BASE 0x80
+#define GRADDRV_I2C_SPAN 64
+#define GRADDRV_I2C_END 0xbf
+#define GRADDRV_I2C_IRQ 1
+#define GRADDRV_I2C_FIFO_DEPTH 64
+#define GRADDRV_I2C_FREQ 50000000
+#define GRADDRV_I2C_USE_AV_ST 0
+
+/*
  * Macros for device 'fifo_sink_CH_A_in_csr', class 'altera_avalon_fifo'
  * The macros are prefixed with 'FIFO_SINK_CH_A_IN_CSR_'.
  * The prefix is the slave descriptor.
