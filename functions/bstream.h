@@ -96,4 +96,11 @@ void bstream__noise(
         unsigned int samples
         );
 
+void bstream__toggle(
+        double f_adc,
+        double bstrap_pchg_us,
+        unsigned int adc_clk_fact,
+        double toggle_len_us
+        );
+
 #endif /* FUNCTIONS_BSTREAM_H_ */
