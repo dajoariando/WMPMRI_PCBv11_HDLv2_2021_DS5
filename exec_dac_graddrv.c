@@ -2,7 +2,7 @@
 // It was found that the data captured by signal tap logic analyzer is delayed by 2 DCO clock cycles, therefore data needs to be shifted by two
 // This might not be the case with different FPGA implementation!
 
-// rename to "exec_dac_graddrv"
+// rename to "dac_graddrv"
 // default params: 1 2 3 4
 
 // #define EXEC_DAC_GRADDRV // uncomment this line to enable the whole code
@@ -41,6 +41,7 @@ int main(int argc, char * argv[]) {
 
 	float voltp = atof(argv[1]);
 	float voltn = atof(argv[2]);
+	float plen_us = atof(argv[3]);
 
 	// Initialize system
 	init();// make sure that all the big discharging capacitors are charged before connecting the
@@ -51,7 +52,7 @@ int main(int argc, char * argv[]) {
 	// enable output current
 	cnt_out_val = cnt_out_val | GRADDRV_CNT_P;
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
-	usleep(1);
+	usleep(plen_us);
 	// disable output current
 	cnt_out_val = cnt_out_val & ( ~GRADDRV_CNT_P );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
@@ -60,7 +61,7 @@ int main(int argc, char * argv[]) {
 	// enable output current
 	cnt_out_val = cnt_out_val | GRADDRV_CNT_N;
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
-	usleep(1);
+	usleep(plen_us);
 	// disable output current
 	cnt_out_val = cnt_out_val & ( ~GRADDRV_CNT_N );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);

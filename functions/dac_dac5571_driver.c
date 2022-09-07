@@ -64,7 +64,8 @@ void dac5571_i2c_wr(volatile unsigned long * dac_addr, float voltp, float voltn,
 
 	uint8_t i2c_addr_cntp, i2c_addr_cntn;   // the chip i2c addresses
 	uint8_t voltp_digit, voltn_digit;   // volt value in integer
-	float vmax = 3.298;
+	float vmaxp = 3.3;   // set this with the VDD of the positive regulator of the DAC
+	float vmaxn = 3.299;   // set this with the VDD of the negative regulator of the DAC
 	uint8_t vmax_digit = 255;
 
 	// fix addresses for the i2c
@@ -79,9 +80,9 @@ void dac5571_i2c_wr(volatile unsigned long * dac_addr, float voltp, float voltn,
 	alt_write_word( ( dac_addr + SDA_HOLD_OFST ), 125);   // set the SDA_HOLD_OFST to 1 as the default (datasheet requires min 0 ns hold time)
 
 	// convert voltage to digit
-	voltp_digit = ( uint8_t )( ( voltp / vmax ) * vmax_digit);
+	voltp_digit = ( uint8_t )( ( voltp / vmaxp ) * vmax_digit);
 	// printf("digit: %d\n", voltp_digit);
-	voltn_digit = ( uint8_t )( ( voltn / vmax ) * vmax_digit);
+	voltn_digit = ( uint8_t )( ( voltn / vmaxn ) * vmax_digit);
 
 	// write the voltage
 	alt_write_word( ( dac_addr + TFR_CMD_OFST ), ( 1 << STA_SHFT ) | ( 0 << STO_SHFT ) | ( i2c_addr_cntp << AD_SHFT ) | ( WR_I2C << RW_D_SHFT ));

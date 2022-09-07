@@ -53,7 +53,7 @@ void init_adc(uint8_t lvds_z, uint8_t lvds_phase, uint32_t adc_mode, uint16_t va
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_DEV_UPDT_REG, AD9276_SW_TRF_MSK);   // update the device
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_CHIP_PORT_CONF_REG, 0b00011000);   // reset
 
-	write_ad9276_spi(AD9276_SPI_WR, AD9276_FLEX_GAIN_REG, AD9276_PGA_GAIN_30dB_VAL << AD9276_PGA_GAIN_SHFT | AD9276_LNA_GAIN_21dB_VAL << AD9276_LNA_GAIN_SHFT);   // set PGA Gain to 21 dB, LNA Gain to 15.6 dB
+	write_ad9276_spi(AD9276_SPI_WR, AD9276_FLEX_GAIN_REG, AD9276_PGA_GAIN_21dB_VAL << AD9276_PGA_GAIN_SHFT | AD9276_LNA_GAIN_21dB_VAL << AD9276_LNA_GAIN_SHFT);   // set PGA Gain to 21 dB, LNA Gain to 15.6 dB
 	// write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_ADJ_REG, AD9276_OUT_ADJ_TERM_200OHM_VAL << AD9276_OUT_ADJ_TERM_SHFT);   // set output driver to 100 ohms
 	write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_ADJ_REG, lvds_z << AD9276_OUT_ADJ_TERM_SHFT);   // set output driver
 	// write_ad9276_spi(AD9276_SPI_WR, AD9276_OUT_PHS_REG, AD9276_OUT_PHS_000DEG_VAL);   // set phase to 000 degrees
