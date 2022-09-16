@@ -10,7 +10,7 @@ unsigned int us_to_digit_synced(double val_us, unsigned int round_up_int, double
 	int val_int;
 
 	val_int = us_to_digit(val_us, SYSCLK_MHz);   // conversion from us to clock cycles
-	return (int) ( lround((double) val_int / (double) round_up_int) ) * round_up_int;   // calculate closest the closest n*rf_mult to the val_int
+	return (int) ( lround((double) val_int / (double) round_up_int) ) * round_up_int;   // calculate the closest n*rf_mult to the val_int
 
 }
 

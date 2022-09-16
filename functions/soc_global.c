@@ -53,11 +53,12 @@ extern volatile unsigned int *axi_ram_tx_h2;
 extern volatile unsigned int *axi_ram_tx_l2;
 extern volatile unsigned int *axi_ram_tx_charge;
 extern volatile unsigned int *axi_ram_tx_charge_bs;
-// extern volatile unsigned int *axi_ram_tx_damp;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_adc_en;
 extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
+extern volatile unsigned int *axi_ram_gradZ_p;
+extern volatile unsigned int *axi_ram_gradZ_n;
 
 // pll reconfig address for the bitstream
 // extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
@@ -178,6 +179,8 @@ void soc_init() {
 	axi_ram_rx_adc_en = axi_base + RX_ADC_EN_BASE;
 	axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
 	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
+	axi_ram_gradZ_p = axi_base + GRADZ_P_BASE;
+	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;
 
 	// nco
 	h2p_ph_overlap_addr = h2f_lw_axi_master + NCO_PHASE_PH_OVERLAP_BASE;

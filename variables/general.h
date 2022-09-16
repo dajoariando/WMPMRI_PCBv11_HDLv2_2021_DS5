@@ -86,8 +86,8 @@
 
 // bitstream status
 typedef unsigned int error_code;
-#define SEQ_ERROR	1
-#define SEQ_OK		0
+#define SEQ_ERROR	0
+#define SEQ_OK		1
 
 // save format
 #define SAV_BINARY		1 // save data in binary format

@@ -391,6 +391,28 @@
 #define TX_AUX_END 0x9ff
 
 /*
+ * Macros for device 'gradZ_N', class 'bstream_new'
+ * The macros are prefixed with 'GRADZ_N_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADZ_N_COMPONENT_TYPE bstream_new
+#define GRADZ_N_COMPONENT_NAME gradZ_N
+#define GRADZ_N_BASE 0xa00
+#define GRADZ_N_SPAN 512
+#define GRADZ_N_END 0xbff
+
+/*
+ * Macros for device 'gradZ_P', class 'bstream_new'
+ * The macros are prefixed with 'GRADZ_P_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADZ_P_COMPONENT_TYPE bstream_new
+#define GRADZ_P_COMPONENT_NAME gradZ_P
+#define GRADZ_P_BASE 0xc00
+#define GRADZ_P_SPAN 512
+#define GRADZ_P_END 0xdff
+
+/*
  * Macros for device 'tx_DUMP', class 'bstream_new'
  * The macros are prefixed with 'TX_DUMP_'.
  * The prefix is the slave descriptor.

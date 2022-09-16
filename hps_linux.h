@@ -77,6 +77,8 @@ volatile unsigned int *axi_ram_tx_dump = NULL;
 volatile unsigned int *axi_ram_rx_adc_en = NULL;
 volatile unsigned int *axi_ram_rx_inc_damp = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
+volatile unsigned int *axi_ram_gradZ_p = NULL;
+volatile unsigned int *axi_ram_gradZ_n = NULL;
 
 // pll reconfig address for the system clock
 volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reconfig
