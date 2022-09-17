@@ -31,13 +31,13 @@ uint32_t COUNTER_READ_ADDR[18] = { 0x28,	// address C00
 0x6C    // address C17
 };
 
-void Reconfig_Mode(void * addr, uint32_t val) {
+void Reconfig_Mode(volatile unsigned int * addr, uint32_t val) {
 	//Write in Mode Register "0" for waitrequest mode, "1" for polling mode
 	alt_write_word( ( addr + MODE ), val);
 	usleep(100);
 }
 
-void Reconfig_N(void * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division) {
+void Reconfig_N(volatile unsigned int * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division) {
 	uint32_t val = ( odd_division << 17 ) + ( bypass_enable << 16 ) + ( high_count << 8 ) + ( low_count );
 
 	//change the register value to val
@@ -45,7 +45,7 @@ void Reconfig_N(void * addr, uint32_t low_count, uint32_t high_count, uint32_t b
 
 }
 
-void Reconfig_M(void * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division) {
+void Reconfig_M(volatile unsigned int * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division) {
 	uint32_t val = ( odd_division << 17 ) + ( bypass_enable << 16 ) + ( high_count << 8 ) + ( low_count );
 
 	//change the register value to val
@@ -53,7 +53,7 @@ void Reconfig_M(void * addr, uint32_t low_count, uint32_t high_count, uint32_t b
 
 }
 
-void Reconfig_C(void * addr, uint32_t counter_select, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division	// the counter number starts from 0 and ends with 17, instead of 1 to 18
+void Reconfig_C(volatile unsigned int * addr, uint32_t counter_select, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division	// the counter number starts from 0 and ends with 17, instead of 1 to 18
 
 ) {
 	// Every PLL has 18-counter. It needs to be selected before the value can be changed
@@ -67,7 +67,7 @@ void Reconfig_C(void * addr, uint32_t counter_select, uint32_t low_count, uint32
 	//printf("C_COUNTER: %x",val);
 }
 
-void Reconfig_DPS(void * addr, uint32_t DPS_select, uint32_t DPS, uint32_t DPS_direction   // 1 for positive phase shift, 0 for negative phase shift
+void Reconfig_DPS(volatile unsigned int * addr, uint32_t DPS_select, uint32_t DPS, uint32_t DPS_direction   // 1 for positive phase shift, 0 for negative phase shift
 ) {
 	uint32_t val = ( DPS_direction << 21 ) + ( DPS_select << 16 ) + ( DPS );
 	//printf("val for dps : %x\n",val);
@@ -75,26 +75,26 @@ void Reconfig_DPS(void * addr, uint32_t DPS_select, uint32_t DPS, uint32_t DPS_d
 	alt_write_word( ( addr + DPS_REG ), val);
 }
 
-void Reconfig_MFrac(void * addr, uint32_t MFrac) {
+void Reconfig_MFrac(volatile unsigned int * addr, uint32_t MFrac) {
 	//MFrac=K[X:0]/(2^X), X=6,16,24 or 32
 	//Only MFrac between 0.05 to 0.95 is allowed
 	//MTotal=M+MFrac
 	alt_write_word( ( addr + FRAC_REG ), MFrac);
 }
 
-void Reconfig_BS(void * addr, uint32_t BS) {
+void Reconfig_BS(volatile unsigned int * addr, uint32_t BS) {
 	alt_write_word( ( addr + BS_REG ), BS);
 }
 
-void Reconfig_CPS(void * addr, uint32_t CPS) {
+void Reconfig_CPS(volatile unsigned int * addr, uint32_t CPS) {
 	alt_write_word( ( addr + CPS_REG ), CPS);
 }
 
-void Reconfig_VCO_DIV(void * addr, uint32_t VCO_DIV) {
+void Reconfig_VCO_DIV(volatile unsigned int * addr, uint32_t VCO_DIV) {
 	alt_write_word( ( addr + VCO_DIV_REG ), VCO_DIV);
 }
 
-void Start_Reconfig(void * addr, uint32_t enable_message) {
+void Start_Reconfig(volatile unsigned int * addr, uint32_t enable_message) {
 	unsigned int status_reconfig;
 
 	//Write anything to Start Register to Reconfiguration
@@ -111,7 +111,7 @@ void Start_Reconfig(void * addr, uint32_t enable_message) {
 	}
 }
 
-void Read_Reconfig_Registers(void * addr) {
+void Read_Reconfig_Registers(volatile unsigned int * addr) {
 	printf("\nMode: %d\n", alt_read_word(addr + MODE));
 	printf("N_COUNTER: %x\n", alt_read_word(addr + N_COUNTER));
 	printf("M_COUNTER: %x\n", alt_read_word(addr + M_COUNTER));
@@ -125,7 +125,7 @@ void Read_Reconfig_Registers(void * addr) {
 	printf("VCO DIV Setting: %i\n", alt_read_word(addr + VCO_DIV_REG));
 }
 
-uint32_t Read_C_Counter(void * addr, uint32_t counter_select) {
+uint32_t Read_C_Counter(volatile unsigned int * addr, uint32_t counter_select) {
 	uint32_t reg_value = alt_read_word(addr + COUNTER_READ_ADDR[counter_select]);
 	return ( ( reg_value & 0xFF ) + ( ( reg_value & 0xFF00 ) >> 8 ) );
 }
@@ -133,7 +133,7 @@ uint32_t Read_C_Counter(void * addr, uint32_t counter_select) {
 // reset PLL needs control out register, which is connected to the reset input of the PLL
 // reset offset is the offset of the reset input signal in the control register (the control register is general register, so it's not just for pll)
 // ctrl_out_signal is the current value of the control register. we don't want to change everything, but only the corresponding control bit for pll reset
-void Reset_PLL(void *ctl_out_reg, uint32_t rst_ofst, uint32_t ctrl_out_signal) {
+void Reset_PLL(volatile unsigned int *ctl_out_reg, uint32_t rst_ofst, uint32_t ctrl_out_signal) {
 	alt_write_word( ( ctl_out_reg ), ( ctrl_out_signal | ( 0x01 << rst_ofst ) ));		// reset pll
 	usleep(100);
 	alt_write_word( ( ctl_out_reg ), ( ctrl_out_signal & ~ ( 0x01 << rst_ofst ) ));   // deassert reset pll

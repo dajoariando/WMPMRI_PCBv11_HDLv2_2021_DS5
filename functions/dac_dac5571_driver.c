@@ -7,10 +7,6 @@
 #include "../variables/avalon_i2c.h"
 #include "../variables/dac_dac5571_vars.h"
 
-// external variables
-extern unsigned int cnt_out_val;   // defined at the main() file
-extern volatile unsigned int *h2p_general_cnt_out_addr;
-
 void dac5571_i2c_isr_stat(volatile unsigned int * i2c_addr, uint8_t en_mesg) {
 	uint32_t isr_status;
 
@@ -62,7 +58,7 @@ void dac5571_i2c_isr_stat(volatile unsigned int * i2c_addr, uint8_t en_mesg) {
 		printf("\t --- \n");
 }
 
-void dac5571_i2c_wr(volatile unsigned long * dac_addr, float voltp, float voltn, uint8_t en_mesg) {
+void dac5571_i2c_wr(volatile unsigned int * dac_addr, float voltp, float voltn, uint8_t en_mesg) {
 
 	uint8_t i2c_addr_cntp, i2c_addr_cntn;   // the chip i2c addresses
 	uint8_t voltp_digit, voltn_digit;   // volt value in integer

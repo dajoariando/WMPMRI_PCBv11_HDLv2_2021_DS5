@@ -93,7 +93,7 @@ volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reco
 volatile unsigned int *h2p_dac_preamp_addr = NULL;
 
 // gradient driver
-volatile unsigned long *h2p_dac_graddrv_addr = NULL;
+volatile unsigned int *h2p_dac_graddrv_addr = NULL;
 
 // FUNCTIONS
 void leave();   // terminate the program

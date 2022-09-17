@@ -141,10 +141,10 @@ int main(int argc, char * argv[]) {
 	// calculate phase from the phase resolution of the NCO
 	unsigned int ph_base_num = 4;
 	unsigned int ph0, ph90, ph180, ph270;
-	ph0 = ph_base_num;   // phase 0
+	ph0 = ph_base_num;	// phase 0
 	ph90 = 1 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 90. 1<<(NCO_PH_RES-2) is the bit needs to be changed to get 90 degrees.
-	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 180.
-	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 270.
+	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 180.
+	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 270.
 	alt_write_word( ( h2p_ph_0_to_3_addr ), ( ph0 << 24 ) | ( ph90 << 16 ) | ( ph180 << 8 ) | ( ph270 ));	// program phase 0 to phase 3
 	alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));   // program phase 4 to phase 7
 
@@ -159,7 +159,7 @@ int main(int argc, char * argv[]) {
 	init_adc(AD9276_OUT_ADJ_TERM_100OHM_VAL, AD9276_OUT_PHS_180DEG_VAL, AD9276_OUT_TEST_OFF_VAL, 0, 0);
 
 	// write the preamp dac
-	wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);   // set -2.5 for 4 MHz resonant
+	wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);	// set -2.5 for 4 MHz resonant
 
 	usleep(1000);	// wait for the PLL FCO to lock as well
 
@@ -203,9 +203,9 @@ int main(int argc, char * argv[]) {
 		        p180_pchg_us,
 		        p180_pchg_refill_us,
 		        p180_us,
-		        p180_dchg_us,   // the discharging length of the current source inductor
+		        p180_dchg_us,	// the discharging length of the current source inductor
 		        p180_dtcl,
-		        echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+		        echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
 		        echotime_us,
 		        samples_per_echo,
 		        echoes_per_scan,
@@ -231,7 +231,7 @@ int main(int argc, char * argv[]) {
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);   // cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 		// calculate echosum
-		sum_buf(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);	// if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
+		sum_buf(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
 
 		// toggle phase cycling
 		if (ph_cycl_en) {

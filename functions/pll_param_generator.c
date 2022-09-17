@@ -36,7 +36,7 @@ uint32_t CNT_READ_ADDR[18] = { 0x28,	// address C00
 0x6C    // address C17
 };
 
-void Set_M(void *addr, uint32_t * pll_param, uint32_t enable_message) {
+void Set_M(volatile unsigned int *addr, uint32_t * pll_param, uint32_t enable_message) {
 	uint32_t high_byte, low_byte, bypass_enable, odd_division;
 
 	high_byte = 0;
@@ -64,7 +64,7 @@ void Set_M(void *addr, uint32_t * pll_param, uint32_t enable_message) {
 	}
 }
 
-void Set_N(void *addr, uint32_t * pll_param, uint32_t enable_message) {
+void Set_N(volatile unsigned int *addr, uint32_t * pll_param, uint32_t enable_message) {
 	uint32_t high_byte, low_byte, bypass_enable, odd_division;
 
 	high_byte = 0;
@@ -92,7 +92,7 @@ void Set_N(void *addr, uint32_t * pll_param, uint32_t enable_message) {
 	}
 }
 
-void Set_C(void *addr, uint32_t * pll_param, uint32_t counter_select, double duty_cycle, uint32_t enable_message) {
+void Set_C(volatile unsigned int *addr, uint32_t * pll_param, uint32_t counter_select, double duty_cycle, uint32_t enable_message) {
 	uint32_t high_byte, low_byte, bypass_enable, odd_division;
 
 	high_byte = 0;
@@ -158,7 +158,7 @@ void Set_C(void *addr, uint32_t * pll_param, uint32_t counter_select, double dut
 	}
 }
 
-void Set_DPS(void *addr, uint32_t counter_select, uint32_t phase, uint32_t enable_message) {   // phase is 0 to 360
+void Set_DPS(volatile unsigned int *addr, uint32_t counter_select, uint32_t phase, uint32_t enable_message) {   // phase is 0 to 360
 	double DPS;
 	double c_counter = Read_C_Counter(addr, counter_select);		// read the current C Counter value
 	uint32_t DPS_direction = 1;
@@ -176,7 +176,7 @@ void Set_DPS(void *addr, uint32_t counter_select, uint32_t phase, uint32_t enabl
 	}
 }
 
-void Set_MFrac(void *addr, uint32_t * pll_param, uint32_t enable_message) {
+void Set_MFrac(volatile unsigned int *addr, uint32_t * pll_param, uint32_t enable_message) {
 	uint32_t MFRAC = * ( pll_param + M_FRAC_ADDR );
 	Reconfig_MFrac(addr, MFRAC);
 	if (enable_message) {
@@ -184,7 +184,7 @@ void Set_MFrac(void *addr, uint32_t * pll_param, uint32_t enable_message) {
 	}
 }
 
-void Set_PLL(void *addr, uint32_t counter_select, double out_freq, double duty_cycle, uint32_t enable_message) {
+void Set_PLL(volatile unsigned int *addr, uint32_t counter_select, double out_freq, double duty_cycle, uint32_t enable_message) {
 	uint32_t pll_param[TOTAL_PLL_PARAM];
 	//printf("\nduty cycle: %f\n",duty_cycle);
 	if (pll_calculator(pll_param, out_freq, INPUT_FREQ)) {   // frequency can be implemented

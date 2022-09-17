@@ -79,7 +79,7 @@ extern volatile unsigned int *h2p_ph_4_to_7_addr;   // the nco phase modulator
 extern volatile unsigned int *h2p_dac_preamp_addr;   // the preamp dac
 
 // gradient driver
-extern volatile unsigned long *h2p_dac_graddrv_addr;
+extern volatile unsigned int *h2p_dac_graddrv_addr;
 
 // physical memory file descriptor
 int fd_dev_mem = 0;

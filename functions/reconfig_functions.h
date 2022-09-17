@@ -41,17 +41,17 @@
 #define C16_COUNTER		0x68
 #define C17_COUNTER		0x6C
 
-void Reconfig_Mode(void * addr, uint32_t val);
-void Reconfig_N(void * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
-void Reconfig_M(void * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
-void Reconfig_C(void * addr, uint32_t counter_select, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
-void Reconfig_DPS(void * addr, uint32_t DPS_select, uint32_t DPS, uint32_t DPS_direction);
-void Reconfig_MFrac(void * addr, uint32_t MFrac);
-void Reconfig_BS(void * addr, uint32_t BS);
-void Reconfig_CPS(void * addr, uint32_t CPS);
-void Reconfig_VCO_DIV(void * addr, uint32_t VCO_DIV);
-void Start_Reconfig(void * addr, uint32_t enable_message);
-void Read_Reconfig_Registers(void * addr);
-uint32_t Read_C_Counter(void * addr, uint32_t counter_select);
-void Reset_PLL(void *ctl_out_reg, uint32_t rst_ofst, uint32_t ctrl_out_signal);
+void Reconfig_Mode(volatile unsigned int * addr, uint32_t val);
+void Reconfig_N(volatile unsigned int * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
+void Reconfig_M(volatile unsigned int * addr, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
+void Reconfig_C(volatile unsigned int * addr, uint32_t counter_select, uint32_t low_count, uint32_t high_count, uint32_t bypass_enable, uint32_t odd_division);
+void Reconfig_DPS(volatile unsigned int * addr, uint32_t DPS_select, uint32_t DPS, uint32_t DPS_direction);
+void Reconfig_MFrac(volatile unsigned int * addr, uint32_t MFrac);
+void Reconfig_BS(volatile unsigned int * addr, uint32_t BS);
+void Reconfig_CPS(volatile unsigned int * addr, uint32_t CPS);
+void Reconfig_VCO_DIV(volatile unsigned int * addr, uint32_t VCO_DIV);
+void Start_Reconfig(volatile unsigned int * addr, uint32_t enable_message);
+void Read_Reconfig_Registers(volatile unsigned int * addr);
+uint32_t Read_C_Counter(volatile unsigned int * addr, uint32_t counter_select);
+void Reset_PLL(volatile unsigned int *ctl_out_reg, uint32_t rst_ofst, uint32_t ctrl_out_signal);
 void Wait_PLL_To_Lock(volatile unsigned int *ctl_in_reg, uint32_t lock_ofst);
