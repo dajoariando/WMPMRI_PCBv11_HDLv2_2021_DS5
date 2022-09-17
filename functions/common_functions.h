@@ -8,7 +8,6 @@
 #ifndef FUNCTIONS_COMMON_FUNCTIONS_H_
 #define FUNCTIONS_COMMON_FUNCTIONS_H_
 
-unsigned int rd_FIFO(volatile unsigned int *FIFO_status_addr, void *FIFO_data_addr, int * buf32);
 void buf32_to_buf16(uint32_t * buf32, uint16_t * buf16, unsigned int length);
 void cut_2MSB_and_2LSB(uint16_t * buf16, unsigned int length);
 void sum_buf(int32_t * buf32, uint16_t * buf16, unsigned int length, unsigned char subtract);

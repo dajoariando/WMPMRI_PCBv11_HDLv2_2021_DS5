@@ -1,9 +1,11 @@
 #include "../functions/adc_ad9276_driver.h"
+#include "../functions/dma.h"
 
 #include <socal/socal.h>
 #include <unistd.h>
 #include <socal/hps.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../variables/adc_ad9276_vars.h"
 #include "../variables/altera_avalon_fifo_regs.h"
@@ -12,9 +14,7 @@
 
 // offset for axi bus address
 extern volatile unsigned int *h2p_adcspi_addr;   // gpio for dac (spi)
-
-// general variables
-extern long i;
+extern volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr;   // chA buffer control
 
 unsigned int write_adc_spi(unsigned int comm) {
 	unsigned int data;
@@ -156,26 +156,20 @@ void adc_wr_testval(uint16_t val1, uint16_t val2) {   // write test value for th
 	usleep(10000);
 }
 
-void read_adc_val(volatile unsigned int *channel_csr_addr, void *channel_data_addr, unsigned int * adc_data) {   //, char *filename) {
+void read_adc_fifo(volatile unsigned int *channel_csr_addr, void *channel_data_addr, unsigned int *rddata, unsigned char en_mesg) {
 	unsigned int fifo_mem_level;
-//fptr = fopen(filename, "w");
-//if (fptr == NULL) {
-//	printf("File does not exists \n");
-//	return;
-//}
+	unsigned int i;
 
-// PRINT # of DATAS in FIFO
+	// PRINT # of DATAS in FIFO
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
-	printf("fifo data before reading: %d ---", fifo_mem_level);
-//
+	if (en_mesg) {
+		printf("fifo data before reading: %d ---", fifo_mem_level);
+	}
 
-// READING DATA FROM FIFO
+	// READING DATA FROM FIFO
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	for (i = 0; fifo_mem_level > 0; i++) {
-		adc_data[i] = alt_read_word(channel_data_addr);
-
-//fprintf(fptr, "%d\n", rddata[i] & 0xFFF);
-//fprintf(fptr, "%d\n", (rddata[i]>>16) & 0xFFF);
+		rddata[i] = alt_read_word(channel_data_addr);
 
 		fifo_mem_level--;
 		if (fifo_mem_level == 0) {
@@ -185,9 +179,50 @@ void read_adc_val(volatile unsigned int *channel_csr_addr, void *channel_data_ad
 	usleep(100);
 
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
-	printf("fifo data after reading: %d\n", fifo_mem_level);
+	if (en_mesg) {
+		printf("fifo data after reading: %d\n", fifo_mem_level);
+	}
 
-//fclose(fptr);
+}
 
+unsigned int flush_adc_fifo(volatile unsigned int *channel_csr_addr, void *channel_data_addr, unsigned char en_mesg) {
+	unsigned int fifo_mem_level;
+	unsigned int rddata;
+	unsigned int i;
+
+	// PRINT # of DATAS in FIFO
+	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
+	if (en_mesg) {
+		printf("fifo data before reading: %d ---", fifo_mem_level);
+	}
+
+	// READING DATA FROM FIFO
+	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
+	for (i = 0; fifo_mem_level > 0; i++) {
+		rddata = alt_read_word(channel_data_addr);
+
+		fifo_mem_level--;
+		if (fifo_mem_level == 0) {
+			fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);
+		}
+	}
+	usleep(100);
+
+	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
+	if (en_mesg) {
+		printf("fifo data after reading: %d\n", fifo_mem_level);
+	}
+
+	return i;
+
+}
+
+void read_adc_dma(volatile unsigned int * dma_addr, volatile unsigned int * sdram_addr, uint32_t DMA_SRC_BASE, uint32_t DMA_DEST_BASE, uint32_t* rddata, uint32_t transfer_length, uint8_t en_mesg) {
+
+	// printf("fifo data before dma transfer: %d\n", alt_read_word(h2p_fifo_sink_ch_a_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG));   // check fifo fill value before dma
+	fifo_to_sdram_dma_trf(dma_addr, DMA_SRC_BASE, DMA_DEST_BASE, transfer_length);
+	// printf("fifo data after dma transfer: %d\n", alt_read_word(h2p_fifo_sink_ch_a_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG));   // // check fifo fill value after dma
+	check_dma(dma_addr, en_mesg);   // wait for the dma operation to complete. POSSIBLE_ISSUES: DEPENDING ON THE LENGTH OF CPMG, THIS SCRIPT MIGHT BREAK IF ENABLE_MESSAGE
+	memcpy(rddata, (int*) sdram_addr, transfer_length * sizeof(int));
 }
 

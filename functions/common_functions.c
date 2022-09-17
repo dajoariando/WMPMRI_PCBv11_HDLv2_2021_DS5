@@ -4,32 +4,6 @@
 
 #include "../variables/altera_avalon_fifo_regs.h"
 
-unsigned int rd_FIFO(volatile unsigned int *FIFO_status_addr, void *FIFO_data_addr, int * buf32) {
-
-	// local variables
-	uint32_t fifo_mem_level;   // the fill level of fifo memory
-	unsigned int i;
-
-	// PRINT # of DATAS in FIFO
-	// fifo_mem_level = alt_read_word(h2p_adc_fifo_status_addr+ALTERA_AVALON_FIFO_LEVEL_REG); // the fill level of FIFO memory
-	// printf("num of data in fifo: %d\n",fifo_mem_level);
-
-	// READING DATA FROM FIFO
-	fifo_mem_level = alt_read_word(FIFO_status_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
-	for (i = 0; fifo_mem_level > 0; i++) {   // this is old comment, the FIFO is now only one 32-bit data per beat:: FIFO is 32-bit, while 1-sample is only 16-bit. FIFO organize this automatically. So, fetch only amount_of_data shifted by 2 to get amount_of_data/2.
-		buf32[i] = alt_read_word(FIFO_data_addr);
-
-		fifo_mem_level--;
-		if (fifo_mem_level == 0) {
-			fifo_mem_level = alt_read_word(FIFO_status_addr + ALTERA_AVALON_FIFO_LEVEL_REG);
-		}
-		//usleep(1);
-	}
-	// usleep(100);
-
-	return i;
-}
-
 void buf32_to_buf16(uint32_t * buf32, uint16_t * buf16, unsigned int length) {
 	unsigned int i, j;
 

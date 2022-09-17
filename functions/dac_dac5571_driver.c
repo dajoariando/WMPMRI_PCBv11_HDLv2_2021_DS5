@@ -42,14 +42,16 @@ void dac5571_i2c_isr_stat(volatile unsigned int * i2c_addr, uint8_t en_mesg) {
 			printf("\t[NORMAL] ACK has been received\n");
 	}
 	if (isr_status & RX_READY_MSK) {
-		printf("\t[WARNING] RX_DATA_FIFO level is equal or more than its threshold\n");
+		if (en_mesg)
+			printf("\t[WARNING] RX_DATA_FIFO level is equal or more than its threshold\n");
 	}
 	else {
 		if (en_mesg)
 			printf("\t[NORMAL] RX_DATA_FIFO level is less than its threshold\n");
 	}
 	if (isr_status & TX_READY_MSK) {
-		printf("\t[WARNING] TFR_CMD level is equal or more than its threshold\n");
+		if (en_mesg)
+			printf("\t[WARNING] TFR_CMD level is equal or more than its threshold\n");
 	}
 	else {
 		if (en_mesg)

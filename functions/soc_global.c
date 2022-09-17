@@ -45,6 +45,9 @@ extern volatile unsigned int *h2p_general_cnt_out_addr;
 // extern void *h2p_pulse_adc_reconfig;
 extern volatile unsigned int *h2p_dac_grad_spi_addr;
 
+extern volatile unsigned int * h2p_dma_addr;   // dma control address
+extern volatile unsigned int *axi_sdram_addr;   // sdram access via axi
+
 // memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
 extern volatile unsigned int *axi_ram_tx_h1;
 extern volatile unsigned int *axi_ram_tx_l1;
@@ -181,6 +184,9 @@ void soc_init() {
 	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
 	axi_ram_gradZ_p = axi_base + GRADZ_P_BASE;
 	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;
+	axi_sdram_addr = axi_base + SDRAM_BASE;
+
+	h2p_dma_addr = h2f_lw_axi_master + DMA_BASE;
 
 	// nco
 	h2p_ph_overlap_addr = h2f_lw_axi_master + NCO_PHASE_PH_OVERLAP_BASE;
@@ -247,4 +253,5 @@ void soc_exit() {
 	h2p_dac_grad_spi_addr = NULL;
 	// h2p_bstream_pll_addr = NULL;
 	h2p_ph_inc_addr = NULL;   // the nco phase increment address
+	h2p_dma_addr = NULL;
 }

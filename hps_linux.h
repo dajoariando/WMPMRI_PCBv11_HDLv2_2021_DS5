@@ -18,11 +18,13 @@
 #include "functions/soc_global.h"
 #include "functions/bstream.h"
 #include "functions/dac_dac5571_driver.h"
+#include "functions/dma.h"
 
 #include "variables/adc_ad9276_vars.h"
 // #include "variables/dac_ad5724r_vars.h"
 #include "variables/dac_ad5722r_vars.h"
 #include "variables/general.h"
+#include "variables/hps_soc_system.h"
 
 #define NCO_PH_RES 8 // the resolution for the NCO phase. Check it at the NCO platform designer
 #define NCO_AMP_RES 16 // the resolution for the NCO output amplitude. Check it at the NCO platform designer
@@ -60,6 +62,8 @@ volatile unsigned int *h2p_init_delay_addr = NULL;
 volatile unsigned int *h2p_general_cnt_in_addr = NULL;
 volatile unsigned int *h2p_general_cnt_out_addr = NULL;
 
+volatile unsigned int *h2p_dma_addr = NULL;   // dma configuration access via lwaxi
+
 // volatile unsigned int *h2p_adc_start_pulselength_addr = NULL;
 // void *h2p_pulse_adc_reconfig = NULL;
 volatile unsigned int *h2p_dac_grad_spi_addr = NULL;
@@ -80,6 +84,8 @@ volatile unsigned int *axi_ram_rx_in_short = NULL;
 volatile unsigned int *axi_ram_gradZ_p = NULL;
 volatile unsigned int *axi_ram_gradZ_n = NULL;
 
+volatile unsigned int *axi_sdram_addr = NULL;   // sdram access via axi
+
 // pll reconfig address for the system clock
 volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reconfig
 
@@ -95,8 +101,7 @@ void init();	// initialize the system with tuned default parameter
 
 // global variables
 FILE *fptr;
-long i;
-long j;
+
 char acq_file[60];
 unsigned int cnt_out_val;
 

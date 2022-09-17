@@ -33,7 +33,7 @@ void bstream__init(bstream_obj *obj, double freq_MHz);
 
 void bstream_rst();
 
-void bstream_start();   // start the bitstream
+void bstream_start(unsigned char wait_til_done);   // start the bitstream
 
 void bstream_wait_for_done();   // wait for done signal from h1
 
@@ -87,7 +87,8 @@ cpmg_obj bstream__cpmg(
         unsigned char p90_ph_sel,
         unsigned int dconv_fact,
         unsigned int echoskip,
-        unsigned int echodrop
+        unsigned int echodrop,
+        unsigned char wait_til_done
         );
 
 cpmg_obj bstream__pgse(
@@ -117,7 +118,8 @@ cpmg_obj bstream__pgse(
         unsigned int echodrop,
         char graddir,   // gradient direction
         double gradlen_us,   // gradient length
-        double gradspac_us   // gradient spacing
+        double gradspac_us,   // gradient spacing
+        unsigned char wait_til_done   // wait for the bitstream to be done (for FIFO read), or don't wait for bitstream to be done (for SDRAM DMA read)
         );
 
 void bstream__noise(

@@ -78,11 +78,19 @@
 // default for output control signal
 #define CNT_OUT_DEFAULT (DAC_GRAD_CLR_msk | DAC_GRAD_LDAC_msk | ADC_AD9276_PWDN_msk | ADC_AD9276_STBY_msk | GRADDRV_3P3_P | GRADDRV_3P3_N)
 
-// general variable
+// general variables
 #define ENABLE_MESSAGE	1
 #define DISABLE_MESSAGE 0
 #define ENABLE 1
 #define DISABLE 0
+
+// data read variables
+#define RD_FIFO 1 // read from FIFO
+#define RD_DMA 0 // read from DMA
+
+// wait variables
+#define WAIT 1 // wait until done
+#define NOWAIT 0 // no wait
 
 // bitstream status
 typedef unsigned int error_code;

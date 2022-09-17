@@ -12,7 +12,7 @@
 bstream_obj bstream_objs[BSTREAM_COUNT];
 
 void init() {
-	printf("START:: EXEC_PGSE_T2_ITER\n");
+	printf("START::EXEC_PGSE_T2_ITER\n");
 
 	soc_init();
 	bstream__init_all_sram();
@@ -50,7 +50,7 @@ void leave() {
 
 	soc_exit();
 
-	printf("STOP:: EXEC_PGSE_T2_ITER\n");
+	printf("STOP::EXEC_PGSE_T2_ITER\n");
 }
 
 int main(int argc, char * argv[]) {
@@ -94,7 +94,15 @@ int main(int argc, char * argv[]) {
 	float gradz_volt = atof(argv[34]);   // gradient z dac positive voltage
 
 	// measurement settings
-	char wr_indv_scan = 1;   // write individual scan to file
+	char wr_indv_scan = 0;   // write individual scan to file
+	unsigned char rd_FIFO_or_DMA = RD_DMA;   // data source : RD_FIFO or RD_DMA
+	unsigned char wait_til_done;   // wait for done signal from the bitstream
+	if (rd_FIFO_or_DMA == RD_DMA) {
+		wait_til_done = NOWAIT;
+	}
+	else if (rd_FIFO_or_DMA == RD_FIFO) {
+		wait_til_done = WAIT;
+	}
 
 	// param defined by Quartus
 	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
@@ -164,8 +172,14 @@ int main(int argc, char * argv[]) {
 	        );
 	usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
+	// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
+	int flushed_data = 0;
+	flushed_data = flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, DISABLE_MESSAGE);
+	if (flushed_data > 0) {
+		printf("\tWARNING! Flushed data = %d\n", flushed_data);
+	}
+
 	clock_t start, end;
-	unsigned enable_message = 1;   // enable message
 	double net_acq_time, net_elapsed_time, net_scan_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
 	unsigned int ii;
@@ -201,18 +215,25 @@ int main(int argc, char * argv[]) {
 		        echodrop,
 		        graddir,
 		        gradlen_us,
-		        gradspac_us
+		        gradspac_us,
+		        wait_til_done
 		        );
 
-		usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
-		read_adc_val(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b);
+		// read data from the ADC into adc_data_32b
+		if (rd_FIFO_or_DMA == RD_FIFO) {
+			usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+			read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
+		}
+		else if (rd_FIFO_or_DMA == RD_DMA) {
+			read_adc_dma(h2p_dma_addr, axi_sdram_addr, DMA_READ_MASTER_FIFO_SINK_CH_A_BASE, DMA_WRITE_MASTER_SDRAM_BASE, adc_data_32b, num_of_samples >> 1, DISABLE_MESSAGE);
+		}
 		buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);   // convert the 32-bit data format to 16-bit.
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);   // cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 		// calculate echosum
 		sum_buf(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);	// if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
 
-		// process phase cycling
+		// toggle phase cycling
 		if (ph_cycl_en) {
 			if (p90_ph_sel == 1) {
 				p90_ph_sel = 3;   // set phase to 270 degrees
@@ -222,6 +243,7 @@ int main(int argc, char * argv[]) {
 			}
 		}
 
+		// write individual scan
 		if (wr_indv_scan) {
 			sprintf(dataname, "data_%03d.txt", ii);   // create a filename
 			wr_File_16b(dataname, num_of_samples, adc_data_16b, SAV_ASCII);   // write the data to the filename
@@ -230,7 +252,7 @@ int main(int argc, char * argv[]) {
 		// measure elapsed time after acquisition
 		end = clock();   // measure time
 		net_acq_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;   // measure time in us
-		if (enable_message) {
+		if (DISABLE_MESSAGE) {
 			printf("\t Elapsed time after data acquisition is %ld us.\n", (unsigned long) net_acq_time);
 		}
 
@@ -243,7 +265,7 @@ int main(int argc, char * argv[]) {
 				net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;   // measure time in us
 			}
 
-			if (enable_message) {
+			if (DISABLE_MESSAGE) {
 				printf("\t Added %0.0f us at the end of the scan to account for scan_spacing_us.\n", net_elapsed_time - net_acq_time);
 			}
 		}
@@ -263,11 +285,11 @@ int main(int argc, char * argv[]) {
 	        );
 	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-	// write the data output
+// write the data output
 	avg_buf(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor
 	wr_File_32b("datasum.txt", num_of_samples, adc_data_sum, SAV_ASCII);   // write the data to the filename
 
-	// print general measurement settings
+// print general measurement settings
 	sprintf(acq_file, "acqu.par");
 	fptr = fopen(acq_file, "w");
 	fprintf(fptr, "b1Freq = %4.3f\n", f_larmor);
@@ -282,8 +304,8 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "p180LengthCnt =  %d @ %4.3f MHz\n", cpmg_params.p180_int, SYSCLK_MHz);
 	fprintf(fptr, "d180LengthRun = %4.3f\n", (double) cpmg_params.d180_int / SYSCLK_MHz);
 	fprintf(fptr, "d180LengthCnt = %d @ %4.3f MHz\n", cpmg_params.d180_int, SYSCLK_MHz);
-	//fprintf(fptr,"p90_dtcl = %4.3f\n", pulse1_dtcl);
-	//fprintf(fptr,"p180_dtcl = %4.3f\n", pulse2_dtcl);
+//fprintf(fptr,"p90_dtcl = %4.3f\n", pulse1_dtcl);
+//fprintf(fptr,"p180_dtcl = %4.3f\n", pulse2_dtcl);
 	fprintf(fptr, "echoTimeGiven = %4.3f\n", echotime_us);
 	fprintf(fptr, "echoTimeRun = %4.3f\n", (double) cpmg_params.echotime_int / SYSCLK_MHz);
 	fprintf(fptr, "ieTime = %lu\n", scanspacing_us / 1000);
