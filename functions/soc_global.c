@@ -51,14 +51,13 @@ extern volatile unsigned int *axi_sdram_addr;   // sdram access via axi
 // memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
 extern volatile unsigned int *axi_ram_tx_h1;
 extern volatile unsigned int *axi_ram_tx_l1;
-extern volatile unsigned int *axi_ram_tx_aux;
+extern volatile unsigned int *axi_ram_tx_clkph;
 extern volatile unsigned int *axi_ram_tx_h2;
 extern volatile unsigned int *axi_ram_tx_l2;
 extern volatile unsigned int *axi_ram_tx_charge;
 extern volatile unsigned int *axi_ram_tx_charge_bs;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_adc_en;
-extern volatile unsigned int *axi_ram_rx_inc_damp;
 extern volatile unsigned int *axi_ram_rx_in_short;
 extern volatile unsigned int *axi_ram_gradZ_p;
 extern volatile unsigned int *axi_ram_gradZ_n;
@@ -178,9 +177,8 @@ void soc_init() {
 	axi_ram_tx_charge_bs = axi_base + TX_CHRG_BS_BASE;
 	// axi_ram_tx_damp = axi_base + TX_DAMP_BASE;
 	axi_ram_tx_dump = axi_base + TX_DUMP_BASE;
-	axi_ram_tx_aux = axi_base + TX_AUX_BASE;
+	axi_ram_tx_clkph = axi_base + TX_CLKPH_BASE;
 	axi_ram_rx_adc_en = axi_base + RX_ADC_EN_BASE;
-	axi_ram_rx_inc_damp = axi_base + RX_INC_DAMP_BASE;
 	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
 	axi_ram_gradZ_p = axi_base + GRADZ_P_BASE;
 	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;

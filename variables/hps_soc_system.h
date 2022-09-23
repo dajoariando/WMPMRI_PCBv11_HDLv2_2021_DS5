@@ -447,17 +447,6 @@
 #define SYS_PLL_RECONFIG_END 0x3ff
 
 /*
- * Macros for device 'rx_inc_DAMP', class 'bstream_new'
- * The macros are prefixed with 'RX_INC_DAMP_'.
- * The prefix is the slave descriptor.
- */
-#define RX_INC_DAMP_COMPONENT_TYPE bstream_new
-#define RX_INC_DAMP_COMPONENT_NAME rx_inc_DAMP
-#define RX_INC_DAMP_BASE 0x400
-#define RX_INC_DAMP_SPAN 512
-#define RX_INC_DAMP_END 0x5ff
-
-/*
  * Macros for device 'tx_CHRG_BS', class 'bstream_new'
  * The macros are prefixed with 'TX_CHRG_BS_'.
  * The prefix is the slave descriptor.
@@ -469,15 +458,15 @@
 #define TX_CHRG_BS_END 0x7ff
 
 /*
- * Macros for device 'tx_AUX', class 'bstream_new'
- * The macros are prefixed with 'TX_AUX_'.
+ * Macros for device 'tx_CLKPH', class 'bstream_new'
+ * The macros are prefixed with 'TX_CLKPH_'.
  * The prefix is the slave descriptor.
  */
-#define TX_AUX_COMPONENT_TYPE bstream_new
-#define TX_AUX_COMPONENT_NAME tx_AUX
-#define TX_AUX_BASE 0x800
-#define TX_AUX_SPAN 512
-#define TX_AUX_END 0x9ff
+#define TX_CLKPH_COMPONENT_TYPE bstream_new
+#define TX_CLKPH_COMPONENT_NAME tx_CLKPH
+#define TX_CLKPH_BASE 0x800
+#define TX_CLKPH_SPAN 512
+#define TX_CLKPH_END 0x9ff
 
 /*
  * Macros for device 'gradZ_N', class 'bstream_new'
@@ -500,6 +489,17 @@
 #define GRADZ_P_BASE 0xc00
 #define GRADZ_P_SPAN 512
 #define GRADZ_P_END 0xdff
+
+/*
+ * Macros for device 'aux', class 'bstream_new'
+ * The macros are prefixed with 'AUX_'.
+ * The prefix is the slave descriptor.
+ */
+#define AUX_COMPONENT_TYPE bstream_new
+#define AUX_COMPONENT_NAME aux
+#define AUX_BASE 0xe00
+#define AUX_SPAN 512
+#define AUX_END 0xfff
 
 /*
  * Macros for device 'tx_DUMP', class 'bstream_new'

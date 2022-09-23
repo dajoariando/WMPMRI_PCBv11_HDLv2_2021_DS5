@@ -15,7 +15,7 @@
 // external memory map peripherals for bitstream
 extern volatile unsigned int *axi_ram_tx_h1;
 extern volatile unsigned int *axi_ram_tx_l1;
-extern volatile unsigned int *axi_ram_tx_aux;
+extern volatile unsigned int *axi_ram_tx_clkph;
 extern volatile unsigned int *axi_ram_tx_h2;
 extern volatile unsigned int *axi_ram_tx_l2;
 extern volatile unsigned int *axi_ram_tx_charge;
@@ -55,7 +55,7 @@ void bstream__init_all_sram() {
 	bstream_objs[tx_damp].sram_addr = axi_ram_tx_damp;
 	bstream_objs[tx_dump].sram_addr = axi_ram_tx_dump;
 	bstream_objs[tx_charge].sram_addr = axi_ram_tx_charge;
-	bstream_objs[tx_aux].sram_addr = axi_ram_tx_aux;
+	bstream_objs[tx_clkph].sram_addr = axi_ram_tx_clkph;
 	bstream_objs[rx_inc_damp].sram_addr = axi_ram_rx_inc_damp;
 	bstream_objs[rx_in_short].sram_addr = axi_ram_rx_in_short;
 
@@ -294,10 +294,10 @@ void bstream__prechrg_n_dump(float clk_MHz, double bstrap_pchg_us, double ind_pc
 	bstream__end_of_seq(&bstream_objs[tx_charge]);
 
 	// AUX
-	bstream__init(&bstream_objs[tx_aux], 0x01, clk_MHz);
-	bstream__all_1s(&bstream_objs[tx_aux], NORMAL, 10);   // generate 10 cycles of 1s
-	bstream__all_0s(&bstream_objs[tx_aux], NORMAL, 10);   // generate 10 cycles of 0s
-	bstream__end_of_seq(&bstream_objs[tx_aux]);
+	bstream__init(&bstream_objs[tx_clkph], 0x01, clk_MHz);
+	bstream__all_1s(&bstream_objs[tx_clkph], NORMAL, 10);   // generate 10 cycles of 1s
+	bstream__all_0s(&bstream_objs[tx_clkph], NORMAL, 10);   // generate 10 cycles of 0s
+	bstream__end_of_seq(&bstream_objs[tx_clkph]);
 
 	bstream_start();
 }
@@ -315,7 +315,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	// 2 is when only right is enabled
 
 	// init all the bitstream
-	bstream__init(&bstream_objs[tx_aux], repetition, clk_MHz);
+	bstream__init(&bstream_objs[tx_clkph], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_h1], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_h2], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_l1], repetition, clk_MHz);
@@ -326,7 +326,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 
 	// precharge the bootstrap
 	double bstrap_pchg_us = 1000;   // precharge the bootstrap for 1ms
-	bstream__all_1s_us(&bstream_objs[tx_aux], NORMAL, bstrap_pchg_us);
+	bstream__all_1s_us(&bstream_objs[tx_clkph], NORMAL, bstrap_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, bstrap_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, bstrap_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_l1], NORMAL, bstrap_pchg_us);
@@ -336,7 +336,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	bstream__all_0s_us(&bstream_objs[tx_charge], NORMAL, bstrap_pchg_us);
 
 	// precharge the inductor
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, ind_pchg_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, ind_pchg_us);
 	if (ind_pchg_mode == 1) {
 		bstream__all_1s_us(&bstream_objs[tx_h1], NORMAL, ind_pchg_us);
 		bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, ind_pchg_us);
@@ -371,7 +371,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 
 	// extend the precharge phase to buy some time to get phase shift
 	unsigned long dly_twk = 100;
-	bstream__all_1s(&bstream_objs[tx_aux], NORMAL, dly_twk);
+	bstream__all_1s(&bstream_objs[tx_clkph], NORMAL, dly_twk);
 	if (mode == 0x01) {
 		bstream__all_1s(&bstream_objs[tx_h1], NORMAL, dly_twk - ( ( RF_Hi - RF_Lo ) >> 1 ));
 		bstream__all_1s(&bstream_objs[tx_h2], NORMAL, dly_twk);
@@ -415,7 +415,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	 */
 
 	// first pulse (tx coil precharging)
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, tx_coil_pchg_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, tx_coil_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, tx_coil_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_h2], NORMAL, tx_coil_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_l1], NORMAL, tx_coil_pchg_us);
@@ -425,7 +425,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	bstream__all_0s_us(&bstream_objs[tx_charge], NORMAL, tx_coil_pchg_us);
 
 	// loop start
-	bstream__all_0s(&bstream_objs[tx_aux], LOOP_STA, RF_Hi);
+	bstream__all_0s(&bstream_objs[tx_clkph], LOOP_STA, RF_Hi);
 	if (mode == 0x01) {
 		bstream__all_1s(&bstream_objs[tx_h1], LOOP_STA, RF_Hi);
 		bstream__all_0s(&bstream_objs[tx_h2], LOOP_STA, RF_Lo);
@@ -449,7 +449,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	bstream__all_0s(&bstream_objs[tx_charge], LOOP_STA, RF_Hi);
 
 	// loop stop
-	bstream__all_0s(&bstream_objs[tx_aux], LOOP_STO, RF_Lo);
+	bstream__all_0s(&bstream_objs[tx_clkph], LOOP_STO, RF_Lo);
 	if (mode == 0x01) {
 		bstream__all_0s(&bstream_objs[tx_h1], LOOP_STO, RF_Lo);
 		bstream__all_1s(&bstream_objs[tx_h2], LOOP_STO, RF_Hi);
@@ -473,7 +473,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	bstream__all_0s(&bstream_objs[tx_charge], LOOP_STO, RF_Lo);
 
 	// recover from the precharge phase shift
-	bstream__all_1s(&bstream_objs[tx_aux], NORMAL, RFclk_period);
+	bstream__all_1s(&bstream_objs[tx_clkph], NORMAL, RFclk_period);
 	bstream__all_0s(&bstream_objs[tx_damp], NORMAL, RFclk_period);
 	bstream__all_0s(&bstream_objs[tx_dump], NORMAL, RFclk_period);
 	bstream__all_0s(&bstream_objs[tx_charge], NORMAL, RFclk_period);
@@ -500,7 +500,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	unsigned int i;
 	for (i = 0; i < dump_repetition; i++) {
 
-		bstream__all_0s(&bstream_objs[tx_aux], NORMAL, RFclk_period);   // this is for the whole RFclk period
+		bstream__all_0s(&bstream_objs[tx_clkph], NORMAL, RFclk_period);   // this is for the whole RFclk period
 		bstream__all_0s(&bstream_objs[tx_damp], NORMAL, RFclk_period);
 		bstream__all_0s(&bstream_objs[tx_dump], NORMAL, RFclk_period);
 		bstream__all_0s(&bstream_objs[tx_charge], NORMAL, RFclk_period);
@@ -542,7 +542,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	}
 
 	// dump all the current
-	bstream__all_1s_us(&bstream_objs[tx_aux], NORMAL, dump_len_us);
+	bstream__all_1s_us(&bstream_objs[tx_clkph], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_l1], NORMAL, dump_len_us);
@@ -553,7 +553,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 
 	// turn-off everything
 	double tail_us = 100;
-	bstream__all_1s_us(&bstream_objs[tx_aux], NORMAL, tail_us);
+	bstream__all_1s_us(&bstream_objs[tx_clkph], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_l1], NORMAL, tail_us);
@@ -563,7 +563,7 @@ void bstream__prechrg_n_rf_n_dump_180(/*char mode, */float clk_MHz, float RFclk_
 	bstream__all_0s_us(&bstream_objs[tx_charge], NORMAL, tail_us);
 
 	// end of sequence
-	bstream__end_of_seq (&bstream_objs[tx_aux]);
+	bstream__end_of_seq (&bstream_objs[tx_clkph]);
 	bstream__end_of_seq(&bstream_objs[tx_h1]);
 	bstream__end_of_seq(&bstream_objs[tx_h2]);
 	bstream__end_of_seq(&bstream_objs[tx_l1]);
@@ -585,7 +585,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	// char mode = 0x03;
 
 	// init all the bitstream
-	bstream__init(&bstream_objs[tx_aux], repetition, clk_MHz);
+	bstream__init(&bstream_objs[tx_clkph], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_h1], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_h2], repetition, clk_MHz);
 	bstream__init(&bstream_objs[tx_l1], repetition, clk_MHz);
@@ -596,7 +596,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 
 	// precharge the bootstrap
 	double bstrap_pchg_us = 1000;   // THIS HAS TO BE 1000. precharge the bootstrap for 1ms to make sure the high-side capacitor has enough charge
-	bstream__all_1s_us(&bstream_objs[tx_aux], NORMAL, bstrap_pchg_us);
+	bstream__all_1s_us(&bstream_objs[tx_clkph], NORMAL, bstrap_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, bstrap_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, bstrap_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_l1], NORMAL, bstrap_pchg_us);
@@ -606,7 +606,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	bstream__all_0s_us(&bstream_objs[tx_charge], NORMAL, bstrap_pchg_us);
 
 	// precharge the inductor
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, ind_pchg_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, ind_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_h1], NORMAL, ind_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_h2], NORMAL, ind_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_l1], NORMAL, ind_pchg_us);
@@ -627,7 +627,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 
 	// extend the precharge phase to buy some time to get phase shift
 	unsigned long dly_twk = 100;
-	bstream__all_1s(&bstream_objs[tx_aux], NORMAL, dly_twk);
+	bstream__all_1s(&bstream_objs[tx_clkph], NORMAL, dly_twk);
 	if (mode == 0x01) {
 		bstream__all_1s(&bstream_objs[tx_h1], NORMAL, dly_twk - ( ( RF_Hi - RF_Lo ) >> 1 ));
 		bstream__all_1s(&bstream_objs[tx_h2], NORMAL, dly_twk);
@@ -656,7 +656,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	}
 
 	/* precharge the tx coil (in order to get higher current at the first cycle)
-	 bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, tx_coil_pchg_us);
+	 bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, tx_coil_pchg_us);
 	 bstream__all_1s_us(&bstream_objs[tx_h1], NORMAL, tx_coil_pchg_us);
 	 bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, tx_coil_pchg_us);
 	 bstream__all_0s_us(&bstream_objs[tx_l1], NORMAL, tx_coil_pchg_us);
@@ -667,7 +667,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	 */
 
 	// first pulse (tx coil precharging)
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, tx_coil_pchg_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, tx_coil_pchg_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, tx_coil_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_h2], NORMAL, tx_coil_pchg_us);
 	bstream__all_1s_us(&bstream_objs[tx_l1], NORMAL, tx_coil_pchg_us);
@@ -678,7 +678,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 
 	// repeating pulse
 	// first half of a period of a pulse
-	bstream__all_1s(&bstream_objs[tx_aux], LOOP_STA, RF_Hi);
+	bstream__all_1s(&bstream_objs[tx_clkph], LOOP_STA, RF_Hi);
 	if (mode == 0x01) {
 		bstream__all_1s(&bstream_objs[tx_h1], LOOP_STA, RF_Hi);
 		bstream__all_0s(&bstream_objs[tx_h2], LOOP_STA, RF_Lo);
@@ -702,7 +702,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	bstream__all_0s(&bstream_objs[tx_charge], LOOP_STA, RF_Hi);
 
 	// second half of a period of a pulse
-	bstream__all_1s(&bstream_objs[tx_aux], LOOP_STO, RF_Lo);
+	bstream__all_1s(&bstream_objs[tx_clkph], LOOP_STO, RF_Lo);
 	if (mode == 0x01) {
 		bstream__all_0s(&bstream_objs[tx_h1], LOOP_STO, RF_Lo);
 		bstream__all_1s(&bstream_objs[tx_h2], LOOP_STO, RF_Hi);
@@ -726,7 +726,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	bstream__all_0s(&bstream_objs[tx_charge], LOOP_STO, RF_Lo);
 
 	// dump all the current
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, dump_len_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, dump_len_us);
 	bstream__all_0s_us(&bstream_objs[tx_l1], NORMAL, dump_len_us);
@@ -737,7 +737,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 
 	// turn-off everything
 	double tail_us = 100;
-	bstream__all_0s_us(&bstream_objs[tx_aux], NORMAL, tail_us);
+	bstream__all_0s_us(&bstream_objs[tx_clkph], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_h1], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_h2], NORMAL, tail_us);
 	bstream__all_0s_us(&bstream_objs[tx_l1], NORMAL, tail_us);
@@ -747,7 +747,7 @@ void bstream__prechrg_n_rf_n_dump(char mode, float clk_MHz, float RFclk_MHz, dou
 	bstream__all_0s_us(&bstream_objs[tx_charge], NORMAL, tail_us);
 
 	// end of sequence
-	bstream__end_of_seq (&bstream_objs[tx_aux]);
+	bstream__end_of_seq (&bstream_objs[tx_clkph]);
 	bstream__end_of_seq(&bstream_objs[tx_h1]);
 	bstream__end_of_seq(&bstream_objs[tx_h2]);
 	bstream__end_of_seq(&bstream_objs[tx_l1]);

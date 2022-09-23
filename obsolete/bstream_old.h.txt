@@ -27,7 +27,7 @@ typedef struct bstream_struct {
 
 // define the variables for the bitstream
 enum bstream_gpio {
-	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_damp, tx_dump, tx_aux, rx_inc_damp, rx_in_short, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
+	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_damp, tx_dump, tx_clkph, rx_inc_damp, rx_in_short, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
 };
 extern bstream_obj bstream_objs[BSTREAM_COUNT];
 

@@ -71,7 +71,7 @@ volatile unsigned int *h2p_dac_grad_spi_addr = NULL;
 // memory map peripherals for bitstream codes. Also connect the bitstream object and ram in function bstream__init_all_sram() inside bstream.c
 volatile unsigned int *axi_ram_tx_h1 = NULL;
 volatile unsigned int *axi_ram_tx_l1 = NULL;
-volatile unsigned int *axi_ram_tx_aux = NULL;
+volatile unsigned int *axi_ram_tx_clkph = NULL;
 volatile unsigned int *axi_ram_tx_h2 = NULL;
 volatile unsigned int *axi_ram_tx_l2 = NULL;
 volatile unsigned int *axi_ram_tx_charge = NULL;
@@ -79,7 +79,6 @@ volatile unsigned int *axi_ram_tx_charge_bs = NULL;
 // volatile unsigned int *axi_ram_tx_damp = NULL;
 volatile unsigned int *axi_ram_tx_dump = NULL;
 volatile unsigned int *axi_ram_rx_adc_en = NULL;
-volatile unsigned int *axi_ram_rx_inc_damp = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
 volatile unsigned int *axi_ram_gradZ_p = NULL;
 volatile unsigned int *axi_ram_gradZ_n = NULL;
