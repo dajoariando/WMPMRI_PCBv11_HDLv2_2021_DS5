@@ -82,6 +82,8 @@ volatile unsigned int *axi_ram_rx_adc_en = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
 volatile unsigned int *axi_ram_gradZ_p = NULL;
 volatile unsigned int *axi_ram_gradZ_n = NULL;
+volatile unsigned int *axi_ram_gradX_p = NULL;
+volatile unsigned int *axi_ram_gradX_n = NULL;
 
 volatile unsigned int *axi_sdram_addr = NULL;   // sdram access via axi
 
@@ -92,7 +94,8 @@ volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reco
 volatile unsigned int *h2p_dac_preamp_addr = NULL;
 
 // gradient driver
-volatile unsigned int *h2p_dac_graddrv_addr = NULL;
+volatile unsigned int *h2p_dac_gradz_addr = NULL;
+volatile unsigned int *h2p_dac_gradx_addr = NULL;
 
 // FUNCTIONS
 void leave();   // terminate the program

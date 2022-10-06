@@ -23,7 +23,7 @@ typedef struct bstream_struct {
 
 // define the variables for the bitstream
 enum bstream_gpio {
-	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradZ_p, gradZ_n, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
+	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradZ_p, gradZ_n, gradX_p, gradX_n, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
 };
 
 void bstream__push(bstream_obj * obj, char pls_pol, char seq_end, char loop_sta, char loop_sto, char mux_sel, unsigned int dataval);
@@ -116,9 +116,12 @@ cpmg_obj bstream__pgse(
         unsigned int dconv_fact,
         unsigned int echoskip,
         unsigned int echodrop,
-        char graddir,   // gradient direction
-        double gradlen_us,   // gradient length
-        double gradspac_us,   // gradient spacing
+        char gradz_dir,   // gradient direction
+        double gradz_len_us,   // gradient length
+        double gradz_spac_us,   // gradient spacing
+        char gradx_dir,
+        double gradx_len_us,
+        double gradx_spac_us,
         unsigned char wait_til_done   // wait for the bitstream to be done (for FIFO read), or don't wait for bitstream to be done (for SDRAM DMA read)
         );
 
@@ -147,10 +150,14 @@ phenc_obj bstream__phenc(
         unsigned int dconv_fact,
         unsigned int echoskip,
         unsigned int echodrop,
-        char graddir,
-        char gradrefocus,
-        double gradlen_us,
+        char gradz_dir,
+        double gradz_len_us,
+        char gradz_refocus,
+        char gradx_dir,
+        double gradx_len_us,
+        char gradx_refocus,
         double enc_tao_us,
+        char p180_xy_angle,
         unsigned char wait_til_done
         );
 

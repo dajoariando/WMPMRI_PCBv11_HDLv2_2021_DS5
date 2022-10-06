@@ -39,7 +39,8 @@ typedef struct phenc_struct {
 		int echoshift_int;
 		int adc_en_window_int;
 		int echotime_int;
-		int gradlen_int;
+		int gradz_len_int;
+		int gradx_len_int;
 		int enc_tao_int;
 } phenc_obj;
 
@@ -85,7 +86,8 @@ phenc_obj phenc_param_calc(
         double echotime_us,   // the length between one echo to the other (equal to p180_us + delay2_us)
         unsigned int echoes_per_scan,   // the number of echoes per scan
         unsigned int samples_per_echo,   // the total adc samples captured in one echo
-        double gradlen_us,   // the gradient pulse length
+        double gradz_len_us,   // the gradient pulse length
+        double gradx_len_us,   // the gradient pulse length
         double enc_tao_us   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
         );
 

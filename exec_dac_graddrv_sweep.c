@@ -44,9 +44,10 @@ int main(int argc, char * argv[]) {
 
 	float sw_volt = 0.0;// sweep voltage (probe using multimeter)
 	for (sw_volt = 0.0; sw_volt < 3.3; sw_volt += 0.1) {
-		dac5571_i2c_wr(h2p_dac_graddrv_addr, sw_volt, sw_volt, DISABLE_MESSAGE);
+		dac5571_i2c_wr(h2p_dac_gradz_addr, sw_volt, sw_volt, ENABLE_MESSAGE);
+		dac5571_i2c_wr(h2p_dac_gradx_addr, sw_volt, sw_volt, ENABLE_MESSAGE);
 		printf("voltage : %0.2f\n", sw_volt);
-		usleep(1000000);
+		usleep(5000000);
 	}
 
 	// exit program

@@ -246,19 +246,34 @@
 #define DMA_WRITE_MASTER_SDRAM_MEMORY_INFO_MEM_INIT_DATA_WIDTH 16
 
 /*
- * Macros for device 'graddrv_i2c', class 'altera_avalon_i2c'
- * The macros are prefixed with 'GRADDRV_I2C_'.
+ * Macros for device 'gradZ_i2c', class 'altera_avalon_i2c'
+ * The macros are prefixed with 'GRADZ_I2C_'.
  * The prefix is the slave descriptor.
  */
-#define GRADDRV_I2C_COMPONENT_TYPE altera_avalon_i2c
-#define GRADDRV_I2C_COMPONENT_NAME graddrv_i2c
-#define GRADDRV_I2C_BASE 0x80
-#define GRADDRV_I2C_SPAN 64
-#define GRADDRV_I2C_END 0xbf
-#define GRADDRV_I2C_IRQ 1
-#define GRADDRV_I2C_FIFO_DEPTH 64
-#define GRADDRV_I2C_FREQ 50000000
-#define GRADDRV_I2C_USE_AV_ST 0
+#define GRADZ_I2C_COMPONENT_TYPE altera_avalon_i2c
+#define GRADZ_I2C_COMPONENT_NAME gradZ_i2c
+#define GRADZ_I2C_BASE 0x80
+#define GRADZ_I2C_SPAN 64
+#define GRADZ_I2C_END 0xbf
+#define GRADZ_I2C_IRQ 1
+#define GRADZ_I2C_FIFO_DEPTH 64
+#define GRADZ_I2C_FREQ 50000000
+#define GRADZ_I2C_USE_AV_ST 0
+
+/*
+ * Macros for device 'gradX_i2c', class 'altera_avalon_i2c'
+ * The macros are prefixed with 'GRADX_I2C_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADX_I2C_COMPONENT_TYPE altera_avalon_i2c
+#define GRADX_I2C_COMPONENT_NAME gradX_i2c
+#define GRADX_I2C_BASE 0xc0
+#define GRADX_I2C_SPAN 64
+#define GRADX_I2C_END 0xff
+#define GRADX_I2C_IRQ 4
+#define GRADX_I2C_FIFO_DEPTH 64
+#define GRADX_I2C_FREQ 50000000
+#define GRADX_I2C_USE_AV_ST 0
 
 /*
  * Macros for device 'fifo_sink_CH_A_in_csr', class 'altera_avalon_fifo'
@@ -447,6 +462,17 @@
 #define SYS_PLL_RECONFIG_END 0x3ff
 
 /*
+ * Macros for device 'gradX_N', class 'bstream_new'
+ * The macros are prefixed with 'GRADX_N_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADX_N_COMPONENT_TYPE bstream_new
+#define GRADX_N_COMPONENT_NAME gradX_N
+#define GRADX_N_BASE 0x400
+#define GRADX_N_SPAN 512
+#define GRADX_N_END 0x5ff
+
+/*
  * Macros for device 'tx_CHRG_BS', class 'bstream_new'
  * The macros are prefixed with 'TX_CHRG_BS_'.
  * The prefix is the slave descriptor.
@@ -500,6 +526,17 @@
 #define AUX_BASE 0xe00
 #define AUX_SPAN 512
 #define AUX_END 0xfff
+
+/*
+ * Macros for device 'gradX_P', class 'bstream_new'
+ * The macros are prefixed with 'GRADX_P_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADX_P_COMPONENT_TYPE bstream_new
+#define GRADX_P_COMPONENT_NAME gradX_P
+#define GRADX_P_BASE 0x1000
+#define GRADX_P_SPAN 512
+#define GRADX_P_END 0x11ff
 
 /*
  * Macros for device 'tx_DUMP', class 'bstream_new'

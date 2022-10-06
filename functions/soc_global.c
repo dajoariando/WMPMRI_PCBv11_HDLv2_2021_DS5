@@ -61,6 +61,8 @@ extern volatile unsigned int *axi_ram_rx_adc_en;
 extern volatile unsigned int *axi_ram_rx_in_short;
 extern volatile unsigned int *axi_ram_gradZ_p;
 extern volatile unsigned int *axi_ram_gradZ_n;
+extern volatile unsigned int *axi_ram_gradX_p;
+extern volatile unsigned int *axi_ram_gradX_n;
 
 // pll reconfig address for the bitstream
 // extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
@@ -78,7 +80,8 @@ extern volatile unsigned int *h2p_ph_4_to_7_addr;   // the nco phase modulator
 extern volatile unsigned int *h2p_dac_preamp_addr;   // the preamp dac
 
 // gradient driver
-extern volatile unsigned int *h2p_dac_graddrv_addr;
+extern volatile unsigned int *h2p_dac_gradz_addr;
+extern volatile unsigned int *h2p_dac_gradx_addr;
 
 // physical memory file descriptor
 int fd_dev_mem = 0;
@@ -182,6 +185,8 @@ void soc_init() {
 	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
 	axi_ram_gradZ_p = axi_base + GRADZ_P_BASE;
 	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;
+	axi_ram_gradX_p = axi_base + GRADX_P_BASE;
+	axi_ram_gradX_n = axi_base + GRADX_N_BASE;
 	axi_sdram_addr = axi_base + SDRAM_BASE;
 
 	h2p_dma_addr = h2f_lw_axi_master + DMA_BASE;
@@ -196,7 +201,8 @@ void soc_init() {
 	h2p_dac_preamp_addr = h2f_lw_axi_master + AD5724_PAMP_SPI_BASE;
 
 	// gradient driver
-	h2p_dac_graddrv_addr = h2f_lw_axi_master + GRADDRV_I2C_BASE;
+	h2p_dac_gradz_addr = h2f_lw_axi_master + GRADZ_I2C_BASE;
+	h2p_dac_gradx_addr = h2f_lw_axi_master + GRADX_I2C_BASE;
 
 }
 

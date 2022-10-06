@@ -188,7 +188,8 @@ phenc_obj phenc_param_calc(
         double echotime_us,   // the length between one echo to the other (equal to p180_us + delay2_us)
         unsigned int echoes_per_scan,   // the number of echoes per scan
         unsigned int samples_per_echo,   // the total adc samples captured in one echo
-        double gradlen_us,   // the gradient pulse length
+        double gradz_len_us,   // the gradient pulse length
+        double gradx_len_us,   // the gradient pulse length
         double enc_tao_us   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
         ) {
 
@@ -211,7 +212,8 @@ phenc_obj phenc_param_calc(
 	int echoshift_int;
 	int adc_en_window_int;
 	int echotime_int;
-	int gradlen_int;
+	int gradz_len_int;
+	int gradx_len_int;
 	int enc_tao_int;
 
 	double SYSCLK_MHz = larmor_clk_fact * f_larmor;
@@ -232,7 +234,8 @@ phenc_obj phenc_param_calc(
 	p180_pchg_refill_int = us_to_digit_synced(p180_pchg_refill_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_int = us_to_digit_synced(p180_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_dchg_int = us_to_digit_synced(p180_dchg_us, larmor_clk_fact, SYSCLK_MHz);
-	gradlen_int = us_to_digit(gradlen_us, SYSCLK_MHz);
+	gradz_len_int = us_to_digit(gradz_len_us, SYSCLK_MHz);
+	gradx_len_int = us_to_digit(gradx_len_us, SYSCLK_MHz);
 	enc_tao_int = us_to_digit(enc_tao_us, SYSCLK_MHz);
 
 	// compute parameters
@@ -262,7 +265,8 @@ phenc_obj phenc_param_calc(
 	output.echoshift_int = echoshift_int;
 	output.adc_en_window_int = adc_en_window_int;
 	output.echotime_int = echotime_int;
-	output.gradlen_int = gradlen_int;
+	output.gradz_len_int = gradz_len_int;
+	output.gradx_len_int = gradx_len_int;
 	output.enc_tao_int = enc_tao_int;
 
 	return output;
@@ -337,8 +341,12 @@ error_code check_phenc_param(phenc_obj obj1) {
 		fprintf(stderr, "\tERROR! adc_en_window_int is larger than the echotime_int!\n");
 		return SEQ_ERROR;
 	}
-	if (obj1.gradlen_int > ( obj1.d90_enc_int + obj1.p180_pchg_int + obj1.p180_pchg_refill_int )) {
-		fprintf(stderr, "\tERROR! gradlen is intersecting with the p180 pulse! Prolong the encoding period or reduce gradlen.\n");
+	if (obj1.gradz_len_int > ( obj1.d90_enc_int + obj1.p180_pchg_int + obj1.p180_pchg_refill_int )) {
+		fprintf(stderr, "\tERROR! gradz_len is intersecting with the p180 pulse! Prolong the encoding period or reduce gradz_len.\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.gradx_len_int > ( obj1.d90_enc_int + obj1.p180_pchg_int + obj1.p180_pchg_refill_int )) {
+		fprintf(stderr, "\tERROR! gradx_len is intersecting with the p180 pulse! Prolong the encoding period or reduce gradx_len.\n");
 		return SEQ_ERROR;
 	}
 
