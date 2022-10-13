@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 
 #include "functions/adc_ad9276_driver.h"
 // #include "functions/dac_ad5724r_driver.h" // careful on having both ad5724 and ad5722 driver

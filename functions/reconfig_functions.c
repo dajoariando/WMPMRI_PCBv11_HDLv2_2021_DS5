@@ -11,24 +11,45 @@
 #include "../variables/hps_soc_system.h"
 
 // counter C read address (write address is different from read address)
-uint32_t COUNTER_READ_ADDR[18] = { 0x28,	// address C00
-0x2C,   // address C01
-0x30,   // address C02
-0x34,   // address C03
-0x38,   // address C04
-0x3C,   // address C05
-0x40,   // address C06
-0x44,   // address C07
-0x48,   // address C08
-0x4C,   // address C09
-0x50,   // address C10
-0x54,   // address C11
-0x58,   // address C12
-0x5C,   // address C13
-0x60,   // address C14
-0x64,   // address C15
-0x68,   // address C16
-0x6C    // address C17
+/*uint32_t COUNTER_READ_ADDR[18] = { \\ BYTE ADDRESSING
+ 0x28,	// address C00
+ 0x2C,   // address C01
+ 0x30,   // address C02
+ 0x34,   // address C03
+ 0x38,   // address C04
+ 0x3C,   // address C05
+ 0x40,   // address C06
+ 0x44,   // address C07
+ 0x48,   // address C08
+ 0x4C,   // address C09
+ 0x50,   // address C10
+ 0x54,   // address C11
+ 0x58,   // address C12
+ 0x5C,   // address C13
+ 0x60,   // address C14
+ 0x64,   // address C15
+ 0x68,   // address C16
+ 0x6C    // address C17
+ }; */
+uint32_t COUNTER_READ_ADDR[18] = {
+        0x0A,	// address C00
+        0x0B,   // address C01
+        0x0C,   // address C02
+        0x0D,   // address C03
+        0x0E,   // address C04
+        0x0F,   // address C05
+        0x10,   // address C06
+        0x11,   // address C07
+        0x12,   // address C08
+        0x13,   // address C09
+        0x14,   // address C10
+        0x15,   // address C11
+        0x16,   // address C12
+        0x17,   // address C13
+        0x18,   // address C14
+        0x19,   // address C15
+        0x1A,   // address C16
+        0x1B    // address C17
 };
 
 void Reconfig_Mode(volatile unsigned int * addr, uint32_t val) {

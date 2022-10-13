@@ -37,7 +37,7 @@ void init() {
 
 	// init the DAC
 	init_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_PAMP_CLR);
-	usleep(100000);
+	usleep(100);
 
 }
 
@@ -93,14 +93,17 @@ int main(int argc, char * argv[]) {
 	// --- gradient length and strength
 	double gradz_len_us = atof(argv[32]);	// gradient length for z gradient
 	float gradz_volt = atof(argv[33]);   // gradient z dac output voltage (can be either polarity, positive or negative)
-	char gradz_refocus = atoi(argv[34]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
-	double gradx_len_us = atof(argv[35]);   // gradient length for x gradient
-	float gradx_volt = atof(argv[36]);   // gradient x dac output voltage (can be either polarity, positive or negative)
-	char gradx_refocus = atoi(argv[37]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
+	double gradx_len_us = atof(argv[34]);   // gradient length for x gradient
+	float gradx_volt = atof(argv[35]);   // gradient x dac output voltage (can be either polarity, positive or negative)
 	// -- encoding period
+	char grad_refocus = atoi(argv[36]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
+	char flip_grad_refocus_sign = atoi(argv[37]);   // flip the gradient refocus sign for phase encoding, and don't flip it for pgse
 	double enc_tao_us = atof(argv[38]);   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
 	// -- p180 pulse x or y
 	char p180_xy_angle = atoi(argv[39]);   // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
+	// enable lcs initial precharging and discharging
+	char en_lcs_pchg = atoi(argv[40]);
+	char en_lcs_dchg = atoi(argv[41]);
 
 	// measurement settings
 	char wr_indv_scan = 0;   // write individual scan to file
@@ -135,15 +138,15 @@ int main(int argc, char * argv[]) {
 	// reset
 	bstream_rst();
 
-	// set the gradient voltage for z
-	gradz_voltp = ( gradz_volt > 0 ) ? gradz_volt : 0;
-	gradz_voltn = ( gradz_volt < 0 ) ? ( -gradz_volt ) : 0;
+	// set gradz voltage
+	gradz_voltp = fabs(gradz_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
+	gradz_voltn = fabs(gradz_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
 	gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
 	dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
 
-	// set the gradient voltage for x
-	gradx_voltp = ( gradx_volt > 0 ) ? gradx_volt : 0;
-	gradx_voltn = ( gradx_volt < 0 ) ? ( -gradx_volt ) : 0;
+	// set gradx voltage
+	gradx_voltp = fabs(gradx_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
+	gradx_voltn = fabs(gradx_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
 	gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
 	dac5571_i2c_wr(h2p_dac_gradx_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
 
@@ -177,22 +180,24 @@ int main(int argc, char * argv[]) {
 	// write the preamp dac
 	wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);	// set -2.5 for 4 MHz resonant
 
-	usleep(1000);	// wait for the PLL FCO to lock as well
+	usleep(100);	// wait for the PLL FCO to lock as well
 
-	bstream__vpc_chg(
-	        SYSCLK_MHz,
-	        bstrap_pchg_us,
-	        lcs_vpc_pchg_us,   // precharging of vpc
-	        lcs_recycledump_us,   // dumping the lcs to the vpc
-	        lcs_vpc_pchg_repeat   // repeat the precharge and dump
-	        );
-	usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+	if (en_lcs_pchg) {
+		bstream__vpc_chg(
+		        SYSCLK_MHz,
+		        bstrap_pchg_us,
+		        lcs_vpc_pchg_us,   // precharging of vpc
+		        lcs_recycledump_us,   // dumping the lcs to the vpc
+		        lcs_vpc_pchg_repeat   // repeat the precharge and dump
+		        );
+		usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-	// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
-	int flushed_data = 0;
-	flushed_data = flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, DISABLE_MESSAGE);
-	if (flushed_data > 0) {
-		printf("\tWARNING! Flushed data = %d\n", flushed_data);
+		// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
+		int flushed_data = 0;
+		flushed_data = flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, DISABLE_MESSAGE);
+		if (flushed_data > 0) {
+			printf("\tWARNING! Flushed data = %d\n", flushed_data);
+		}
 	}
 
 	clock_t start, end;
@@ -232,10 +237,10 @@ int main(int argc, char * argv[]) {
 		        echodrop,
 		        gradz_dir,
 		        gradz_len_us,
-		        gradz_refocus,
 		        gradx_dir,
 		        gradx_len_us,
-		        gradx_refocus,
+		        grad_refocus,
+		        flip_grad_refocus_sign,
 		        enc_tao_us,
 		        p180_xy_angle,
 		        wait_til_done
@@ -298,14 +303,16 @@ int main(int argc, char * argv[]) {
 		}
 	}
 
-	bstream__vpc_wastedump(
-	        SYSCLK_MHz,
-	        bstrap_pchg_us,
-	        lcs_vpc_dchg_us,   // discharging of vpc
-	        lcs_wastedump_us,   // dumping the current into RF
-	        lcs_vpc_dchg_repeat   // repeat the precharge and dump
-	        );
-	usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+	if (en_lcs_dchg) {
+		bstream__vpc_wastedump(
+		        SYSCLK_MHz,
+		        bstrap_pchg_us,
+		        lcs_vpc_dchg_us,   // discharging of vpc
+		        lcs_wastedump_us,   // dumping the current into RF
+		        lcs_vpc_dchg_repeat   // repeat the precharge and dump
+		        );
+		usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+	}
 
 // write the data output
 	avg_buf(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor

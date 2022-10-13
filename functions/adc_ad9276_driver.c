@@ -90,7 +90,7 @@ void init_adc(uint8_t lvds_z, uint8_t lvds_phase, uint32_t adc_mode, uint16_t va
 		adc_wr_testval(val1, val2);
 	}
 
-	usleep(10000);
+	usleep(100);
 }
 
 void read_adc_id() {
@@ -206,7 +206,7 @@ unsigned int flush_adc_fifo(volatile unsigned int *channel_csr_addr, void *chann
 			fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);
 		}
 	}
-	usleep(100);
+	// usleep(100);
 
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	if (en_mesg) {

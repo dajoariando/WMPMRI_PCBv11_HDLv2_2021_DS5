@@ -10,7 +10,7 @@
 void dac5571_i2c_isr_stat(volatile unsigned int * i2c_addr, uint8_t en_mesg) {
 	uint32_t isr_status;
 
-	usleep(300);   // this delay is to wait for the i2c to finish its operation
+	usleep(100);   // this delay is to wait for the i2c to finish its operation
 
 	isr_status = alt_read_word(i2c_addr + ISR_OFST);
 	if (isr_status & RX_OVER_MSK) {

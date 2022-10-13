@@ -1308,10 +1308,10 @@ phenc_obj bstream__phenc(
         unsigned int echodrop,
         char gradz_dir,
         double gradz_len_us,
-        char gradz_refocus,
         char gradx_dir,
         double gradx_len_us,
-        char gradx_refocus,
+        char grad_refocus,
+        char flip_grad_refocus_sign,
         double enc_tao_us,
         char p180_xy_angle,
         unsigned char wait_til_done
@@ -1398,75 +1398,80 @@ phenc_obj bstream__phenc(
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-	if (gradz_dir) {
-		// gradZ_p
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	/////////////
+	/////////////
+	// gradZ_p
+	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	if (gradz_dir)
 		bstream__push(&bstream_objs[gradZ_p], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int /*dataval*/);
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradz_len_int/*dataval*/);
-		if (gradz_refocus)
+	else
+		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int /*dataval*/);
+	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradz_len_int/*dataval*/);
+	if (grad_refocus) {
+		if (flip_grad_refocus_sign ^ gradz_dir)
 			bstream__push(&bstream_objs[gradZ_p], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
 		else
 			bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
-
-		// gradZ_n
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 	}
-	else {
-		// gradZ_p
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	else
+		bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
+	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-		// gradZ_n
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	// gradZ_n
+	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	if (!gradz_dir)
 		bstream__push(&bstream_objs[gradZ_n], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int /*dataval*/);
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradz_len_int/*dataval*/);
-		if (gradz_refocus)
+	else
+		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int /*dataval*/);
+	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradz_len_int/*dataval*/);
+	if (grad_refocus) {
+		if (! ( flip_grad_refocus_sign ^ gradz_dir ))
 			bstream__push(&bstream_objs[gradZ_n], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
 		else
 			bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
-		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 	}
+	else
+		bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
+	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-	if (gradx_dir) {
-		// gradX_p
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	///////////
+	///////////
+	// gradX_p
+	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	if (gradx_dir)
 		bstream__push(&bstream_objs[gradX_p], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int /*dataval*/);
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradx_len_int/*dataval*/);
-		if (gradx_refocus)
+	else
+		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int /*dataval*/);
+	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradx_len_int/*dataval*/);
+	if (grad_refocus) {
+		if (flip_grad_refocus_sign ^ gradx_dir)
 			bstream__push(&bstream_objs[gradX_p], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
 		else
 			bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
-
-		// gradX_n
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 	}
-	else {
-		// gradX_p
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
-
-		// gradX_n
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	else
+		bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
+	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	// gradX_n
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
+	if (!gradx_dir)
 		bstream__push(&bstream_objs[gradX_n], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int /*dataval*/);
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradx_len_int/*dataval*/);
-		if (gradx_refocus)
+	else
+		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int /*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.d90_enc_int + phenc_params.p180_pchg_int + phenc_params.p180_pchg_refill_int + phenc_params.p180_int - phenc_params.gradx_len_int/*dataval*/);
+	if (grad_refocus) {
+		if (! ( flip_grad_refocus_sign ^ gradx_dir ))
 			bstream__push(&bstream_objs[gradX_n], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
 		else
 			bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
-		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 	}
+	else
+		bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradx_len_int/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);

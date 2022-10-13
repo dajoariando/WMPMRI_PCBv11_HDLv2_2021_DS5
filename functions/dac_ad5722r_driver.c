@@ -162,7 +162,7 @@ void wr_dac_ad5722r(volatile unsigned int * dac_addr, unsigned int dac_range, un
 
 		// recursion to make sure it works
 		if ( ( volt_int & 0x0FFF ) != ( dataread >> 4 )) {
-			usleep(500000);
+			usleep(100);
 			wr_dac_ad5722r(dac_addr, dac_id, dac_range, volt, DAC_LDAC_msk, en_mesg);
 		}
 	}

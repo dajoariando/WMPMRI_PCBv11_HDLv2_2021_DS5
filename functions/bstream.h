@@ -152,10 +152,10 @@ phenc_obj bstream__phenc(
         unsigned int echodrop,
         char gradz_dir,
         double gradz_len_us,
-        char gradz_refocus,
         char gradx_dir,
         double gradx_len_us,
-        char gradx_refocus,
+        char grad_refocus,
+        char flip_grad_refocus_sign,
         double enc_tao_us,
         char p180_xy_angle,
         unsigned char wait_til_done
