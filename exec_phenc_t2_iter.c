@@ -13,7 +13,7 @@
 bstream_obj bstream_objs[BSTREAM_COUNT];
 
 void init() {
-	printf("START::EXEC_PHENC_T2_ITER\n");
+	// printf("START::EXEC_PHENC_T2_ITER\n");
 
 	soc_init();
 	bstream__init_all_sram();
@@ -51,7 +51,7 @@ void leave() {
 
 	soc_exit();
 
-	printf("STOP::EXEC_PHENC_T2_ITER\n");
+	// printf("STOP::EXEC_PHENC_T2_ITER\n");
 }
 
 int main(int argc, char * argv[]) {
@@ -316,7 +316,7 @@ int main(int argc, char * argv[]) {
 
 // write the data output
 	avg_buf(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor
-	wr_File_32b("datasum.txt", num_of_samples, adc_data_sum, SAV_ASCII);   // write the data to the filename
+	wr_File_32b("datasum.txt", num_of_samples, adc_data_sum, SAV_BINARY);   // write the data to the filename
 
 	// print general measurement settings
 	sprintf(acq_file, "acqu.par");
