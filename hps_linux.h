@@ -105,7 +105,7 @@ void init();	// initialize the system with tuned default parameter
 // global variables
 FILE *fptr;
 
-char acq_file[60];
+char acq_file[15];
 unsigned int cnt_out_val;
 
 #endif

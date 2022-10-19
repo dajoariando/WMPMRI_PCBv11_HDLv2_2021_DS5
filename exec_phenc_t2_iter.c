@@ -102,8 +102,9 @@ int main(int argc, char * argv[]) {
 	// -- p180 pulse x or y
 	char p180_xy_angle = atoi(argv[39]);   // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
 	// enable lcs initial precharging and discharging
-	char en_lcs_pchg = atoi(argv[40]);
-	char en_lcs_dchg = atoi(argv[41]);
+	char en_lcs_pchg = atoi(argv[40]);   // enable the vpc precharging via lcs prior to cpmg
+	char en_lcs_dchg = atoi(argv[41]);   // enable the vpc discharging via lcs post cpmg
+	unsigned int exp_num = atoi(argv[42]);   // the experiment number
 
 	// measurement settings
 	char wr_indv_scan = 0;   // write individual scan to file
@@ -204,7 +205,8 @@ int main(int argc, char * argv[]) {
 	double net_acq_time, net_elapsed_time, net_scan_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
 	unsigned int ii;
-	char dataname[10];
+	char dataname[15];   // the name container for individual scan data
+	char datasumname[15];   // the name container for sum scan data
 	phenc_obj phenc_params;
 	for (ii = 0; ii < n_iterate; ii++) {
 		// measure the start time
@@ -272,7 +274,7 @@ int main(int argc, char * argv[]) {
 
 		// write individual scan
 		if (wr_indv_scan) {
-			sprintf(dataname, "data_%03d.txt", ii);   // create a filename
+			sprintf(dataname, "dat_%06d_%03d.txt", exp_num, ii);   // create a filename
 			wr_File_16b(dataname, num_of_samples, adc_data_16b, SAV_ASCII);   // write the data to the filename
 		}
 
@@ -314,12 +316,13 @@ int main(int argc, char * argv[]) {
 		usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 	}
 
-// write the data output
+	// write the data output
 	avg_buf(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor
-	wr_File_32b("datasum.txt", num_of_samples, adc_data_sum, SAV_BINARY);   // write the data to the filename
+	sprintf(datasumname, "dsum_%06d.txt", exp_num);   // create a filename
+	wr_File_32b(datasumname, num_of_samples, adc_data_sum, SAV_BINARY);   // write the data to the filename
 
 	// print general measurement settings
-	sprintf(acq_file, "acqu.par");
+	sprintf(acq_file, "acqu_%06d.par", exp_num);
 	fptr = fopen(acq_file, "w");
 	fprintf(fptr, "b1Freq = %4.6f\n", f_larmor);
 	fprintf(fptr, "p90LengthGiven = %4.6f\n", p90_us);
