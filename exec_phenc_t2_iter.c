@@ -169,7 +169,7 @@ int main(int argc, char * argv[]) {
 	alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));   // program phase 4 to phase 7
 
 	// program the clock for the ADC
-	Set_PLL(h2p_sys_pll_reconfig_addr, 0, f_larmor * 4, 0.5, DISABLE_MESSAGE);
+	Set_PLL(h2p_sys_pll_reconfig_addr, 0, f_larmor * adc_clk_fact, 0.5, DISABLE_MESSAGE);
 	Reset_PLL(h2p_general_cnt_out_addr, SYS_PLL_RST_ofst, cnt_out_val);
 	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
 	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
@@ -324,42 +324,43 @@ int main(int argc, char * argv[]) {
 	// print general measurement settings
 	sprintf(acq_file, "acqu_%06d.par", exp_num);
 	fptr = fopen(acq_file, "w");
-	fprintf(fptr, "b1Freq = %4.6f\n", f_larmor);
-	fprintf(fptr, "p90LengthGiven = %4.6f\n", p90_us);
-	fprintf(fptr, "p90LengthRun = %4.6f\n", (double) phenc_params.p90_int / SYSCLK_MHz);
-	fprintf(fptr, "p90LengthCnt = %d @ %4.6f MHz\n", phenc_params.p90_int, SYSCLK_MHz);
-	fprintf(fptr, "d90LengthRun = %4.6f\n", (double) phenc_params.d90_enc_int / SYSCLK_MHz);
-	fprintf(fptr, "d90LengthCnt = %d @ %4.6f MHz\n", phenc_params.d90_enc_int, SYSCLK_MHz);
-	fprintf(fptr, "p180LengthGiven = %4.6f\n", p180_us);
-	fprintf(fptr, "p180LengthRun = %4.6f\n", (double) phenc_params.p180_int / SYSCLK_MHz);
-	fprintf(fptr, "p180LengthCnt =  %d @ %4.6f MHz\n", phenc_params.p180_int, SYSCLK_MHz);
-	fprintf(fptr, "d180LengthRun = %4.6f\n", (double) phenc_params.d180_int / SYSCLK_MHz);
-	fprintf(fptr, "d180LengthCnt = %d @ %4.6f MHz\n", phenc_params.d180_int, SYSCLK_MHz);
+	fprintf(fptr, "b1Freq = %4.12f\n", f_larmor);
+	fprintf(fptr, "p90LengthGiven = %4.12f\n", p90_us);
+	fprintf(fptr, "p90LengthRun = %4.12f\n", (double) phenc_params.p90_int / SYSCLK_MHz);
+	fprintf(fptr, "p90LengthCnt = %d @ %4.12f MHz\n", phenc_params.p90_int, SYSCLK_MHz);
+	fprintf(fptr, "d90LengthRun = %4.12f\n", (double) phenc_params.d90_enc_int / SYSCLK_MHz);
+	fprintf(fptr, "d90LengthCnt = %d @ %4.12f MHz\n", phenc_params.d90_enc_int, SYSCLK_MHz);
+	fprintf(fptr, "p180LengthGiven = %4.12f\n", p180_us);
+	fprintf(fptr, "p180LengthRun = %4.12f\n", (double) phenc_params.p180_int / SYSCLK_MHz);
+	fprintf(fptr, "p180LengthCnt =  %d @ %4.12f MHz\n", phenc_params.p180_int, SYSCLK_MHz);
+	fprintf(fptr, "d180LengthRun = %4.12f\n", (double) phenc_params.d180_int / SYSCLK_MHz);
+	fprintf(fptr, "d180LengthCnt = %d @ %4.12f MHz\n", phenc_params.d180_int, SYSCLK_MHz);
 	//fprintf(fptr,"p90_dtcl = %4.3f\n", pulse1_dtcl);
 	//fprintf(fptr,"p180_dtcl = %4.3f\n", pulse2_dtcl);
-	fprintf(fptr, "echoTimeGiven = %4.6f\n", echotime_us);
-	fprintf(fptr, "echoTimeRun = %4.6f\n", (double) phenc_params.echotime_int / SYSCLK_MHz);
+	fprintf(fptr, "echoTimeGiven = %4.12f\n", echotime_us);
+	fprintf(fptr, "echoTimeRun = %4.12f\n", (double) phenc_params.echotime_int / SYSCLK_MHz);
+	fprintf(fptr, "echoTimeCnt = %d @ %4.12f MHz\n", phenc_params.echotime_int, SYSCLK_MHz);
 	fprintf(fptr, "ieTime = %lu\n", scanspacing_us / 1000);
 	fprintf(fptr, "nrPnts = %d\n", samples_per_echo);
 	fprintf(fptr, "nrEchoes = %d\n", echoes_per_scan);
-	fprintf(fptr, "echoShift = %4.6f\n", echoshift_us);
+	fprintf(fptr, "echoShift = %4.12f\n", echoshift_us);
 	fprintf(fptr, "nrIterations = %d\n", n_iterate);
 	fprintf(fptr, "dummyEchoes = 0\n");
-	fprintf(fptr, "adcFreq = %4.6f\n", ADCCLK_MHz);
+	fprintf(fptr, "adcFreq = %4.12f\n", ADCCLK_MHz);
 	fprintf(fptr, "usePhaseCycle = %d\n", ph_cycl_en);
 	fprintf(fptr, "echoSkipHw = %d\n", 1);
-	fprintf(fptr, "gradZ_Volt = %4.6f\n", gradz_volt);
-	fprintf(fptr, "gradZ_Len = %4.6f\n", phenc_params.gradz_len_int / SYSCLK_MHz);
-	fprintf(fptr, "gradX_Volt = %4.6f\n", gradx_volt);
-	fprintf(fptr, "gradX_Len = %4.6f\n", phenc_params.gradx_len_int / SYSCLK_MHz);
-	fprintf(fptr, "encTao = %4.6f\n", phenc_params.enc_tao_int / SYSCLK_MHz);
+	fprintf(fptr, "gradZ_Volt = %4.12f\n", gradz_volt);
+	fprintf(fptr, "gradZ_Len = %4.12f\n", phenc_params.gradz_len_int / SYSCLK_MHz);
+	fprintf(fptr, "gradX_Volt = %4.12f\n", gradx_volt);
+	fprintf(fptr, "gradX_Len = %4.12f\n", phenc_params.gradx_len_int / SYSCLK_MHz);
+	fprintf(fptr, "encTao = %4.12f\n", phenc_params.enc_tao_int / SYSCLK_MHz);
 #ifdef GET_RAW_DATA
-	fprintf(fptr, "dwellTime = %4.6f\n", 1 / ADCCLK_MHz);
+	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz);
 	fprintf(fptr, "fpgaDconv = 0\n");
 	fprintf(fptr, "dconvFact = 1\n");
 #endif
 #ifdef GET_DCONV_DATA
-	fprintf(fptr, "dwellTime = %4.6f\n", 1 / ADCCLK_MHz*dconv_fact);
+	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz*dconv_fact);
 	fprintf(fptr, "fpgaDconv = 1\n");
 	fprintf(fptr,"dconvFact = %d\n", dconv_fact);
 #endif

@@ -226,7 +226,7 @@ phenc_obj phenc_param_calc(
 	// read the data from the input
 	lcs_pchg_int = us_to_digit_synced(lcs_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	lcs_dump_int = us_to_digit_synced(lcs_dump_us, larmor_clk_fact, SYSCLK_MHz);
-	echotime_int = us_to_digit_synced(echotime_us, 0.5 * larmor_clk_fact, SYSCLK_MHz);		// 0.5 * f_larmor is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
+	echotime_int = us_to_digit_synced(echotime_us, ( larmor_clk_fact << 1 ), SYSCLK_MHz);		// (larmor_clk_fact<<1) or (2*larmor_clk_fact) is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
 	p90_pchg_int = us_to_digit_synced(p90_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	p90_pchg_refill_int = us_to_digit_synced(p90_pchg_refill_us, larmor_clk_fact, SYSCLK_MHz);
 	p90_int = us_to_digit_synced(p90_us, larmor_clk_fact, SYSCLK_MHz);
@@ -235,15 +235,15 @@ phenc_obj phenc_param_calc(
 	p180_pchg_refill_int = us_to_digit_synced(p180_pchg_refill_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_int = us_to_digit_synced(p180_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_dchg_int = us_to_digit_synced(p180_dchg_us, larmor_clk_fact, SYSCLK_MHz);
-	gradz_len_int = us_to_digit(gradz_len_us, SYSCLK_MHz);
-	gradx_len_int = us_to_digit(gradx_len_us, SYSCLK_MHz);
-	enc_tao_int = us_to_digit(enc_tao_us, SYSCLK_MHz);
+	gradz_len_int = us_to_digit_synced(gradz_len_us, larmor_clk_fact, SYSCLK_MHz);
+	gradx_len_int = us_to_digit_synced(gradx_len_us, larmor_clk_fact, SYSCLK_MHz);
+	enc_tao_int = us_to_digit_synced(enc_tao_us, larmor_clk_fact, SYSCLK_MHz);
 
 	// compute parameters
 	d90_enc_int = enc_tao_int - p90_int - p180_pchg_int - p180_pchg_refill_int;
 	d180_enc_int = enc_tao_int + ( echotime_int >> 1 ) - p180_int - p180_pchg_int - p180_pchg_refill_int;
 	d180_int = echotime_int - p180_int - p180_pchg_int - p180_pchg_refill_int;
-	echoshift_int = us_to_digit(echoshift_us, SYSCLK_MHz);
+	echoshift_int = us_to_digit_synced(echoshift_us, larmor_clk_fact, SYSCLK_MHz);
 	adc_en_window_int = samples_per_echo * adc_clk_fact;
 	init_adc_delay_int = ( echotime_int >> 1 ) - ( adc_en_window_int >> 1 ) + echoshift_int;
 
@@ -288,6 +288,7 @@ phenc_obj phenc_param_calc(
 		printf("init_adc_delay_int : %d \n", output.init_adc_delay_int);
 		printf("echoshift_int : %d \n", output.echoshift_int);
 		printf("adc_en_window_int : %d \n", output.adc_en_window_int);
+		printf("echotime_int : %d \n", output.echotime_int);
 		printf("gradz_len_int : %d \n", output.gradz_len_int);
 		printf("gradx_len_int : %d \n", output.gradx_len_int);
 		printf("enc_tao_int : %d \n", output.enc_tao_int);

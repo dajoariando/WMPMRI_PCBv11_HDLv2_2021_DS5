@@ -1365,7 +1365,7 @@ phenc_obj bstream__phenc(
 	        gradz_len_us,		// the gradient pulse length
 	        gradx_len_us,
 	        enc_tao_us,		// the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
-	        ENABLE_MESSAGE   // print out the output data
+	        DISABLE_MESSAGE   // print out the output data
 	        );
 
 	if (check_phenc_param(phenc_params) == SEQ_ERROR) {   // check if the sequence has error
