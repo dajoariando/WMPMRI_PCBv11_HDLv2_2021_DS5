@@ -127,7 +127,7 @@ int main(int argc, char * argv[]) {
 	unsigned int num_of_samples = samples_per_echo * echoes_per_scan;
 	uint32_t adc_data_32b[num_of_samples >> 1];   // data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[num_of_samples];
-	int32_t adc_data_sum[num_of_samples];	// sum of the data
+	float adc_data_sum[num_of_samples];   // sum of the data
 
 	float gradz_voltp, gradz_voltn;   // gradient z voltage to program dac
 	float gradx_voltp, gradx_voltn;   // gradient x voltage to program dac
@@ -260,7 +260,7 @@ int main(int argc, char * argv[]) {
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);   // cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 		// calculate echosum
-		sum_buf(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
+		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
 
 		// toggle phase cycling
 		if (ph_cycl_en) {
@@ -317,9 +317,9 @@ int main(int argc, char * argv[]) {
 	}
 
 	// write the data output
-	avg_buf(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor
+	avg_buf_float(adc_data_sum, num_of_samples, n_iterate);   // divide the sum data by the averaging factor
 	sprintf(datasumname, "dsum_%06d.txt", exp_num);   // create a filename
-	wr_File_32b(datasumname, num_of_samples, adc_data_sum, SAV_BINARY);   // write the data to the filename
+	wr_File_float(datasumname, num_of_samples, adc_data_sum, SAV_BINARY);   // write the data to the filename
 
 	// print general measurement settings
 	sprintf(acq_file, "acqu_%06d.par", exp_num);

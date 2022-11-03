@@ -23,7 +23,7 @@ typedef struct bstream_struct {
 
 // define the variables for the bitstream
 enum bstream_gpio {
-	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradZ_p, gradZ_n, gradX_p, gradX_n, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
+	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradZ_p, gradZ_n, gradX_p, gradX_n, aux, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
 };
 
 void bstream__push(bstream_obj * obj, char pls_pol, char seq_end, char loop_sta, char loop_sto, char mux_sel, unsigned int dataval);

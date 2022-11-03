@@ -36,11 +36,33 @@ void sum_buf(int32_t * buf32, uint16_t * buf16, unsigned int length, unsigned ch
 	}
 }
 
-void avg_buf(int32_t * buf32, unsigned int length, unsigned char div_fact) {
+void sum_buf_to_float(float * buf32, uint16_t * buf16, unsigned int length, unsigned char subtract) {
+	int ii;
+	int32_t temp;   // temporary file to convert uint16_t to int32_t
+
+	for (ii = 0; ii < length; ii++) {
+		temp = 0;
+		temp = temp | buf16[ii];
+		if (subtract)
+			buf32[ii] -= (float) temp;
+		else
+			buf32[ii] += (float) temp;
+	}
+}
+
+void avg_buf(int32_t * buf32, unsigned int length, unsigned int div_fact) {
 	int ii;
 
 	for (ii = 0; ii < length; ii++) {
 		buf32[ii] /= div_fact;
+	}
+}
+
+void avg_buf_float(float * buf32, unsigned int length, unsigned int div_fact) {
+	int ii;
+
+	for (ii = 0; ii < length; ii++) {
+		buf32[ii] /= (float) div_fact;
 	}
 }
 
@@ -91,7 +113,35 @@ void wr_File_32b(char * pathname, unsigned int length, int32_t * buf, char binar
 		long i;
 
 		for (i = 0; i < ( ( length ) ); i++) {
-			fprintf(fptr, "%ld\n", buf[i]);
+			fprintf(fptr, "%d\n", buf[i]);
+		}
+
+	}
+
+	fclose(fptr);
+
+}
+
+void wr_File_float(char * pathname, unsigned int length, float * buf, char binary_OR_ascii) {
+
+	// binary_OR_ascii = 1 save binary output into the text file (1). Otherwise, it'll be ASCII output (0)
+
+	FILE *fptr;
+
+	fptr = fopen(pathname, "w");
+	if (fptr == NULL) {
+		printf("File does not exists \n");
+	}
+
+	if (binary_OR_ascii) {   // binary output
+		fwrite(buf, sizeof(float), length, fptr);
+	}
+
+	else {   // ascii output
+		long i;
+
+		for (i = 0; i < ( ( length ) ); i++) {
+			fprintf(fptr, "%f\n", buf[i]);
 		}
 
 	}
@@ -119,7 +169,7 @@ void wr_File_64b(char * pathname, unsigned int length, long long * buf, char bin
 		long i;
 
 		for (i = 0; i < ( ( length ) ); i++) {
-			fprintf(fptr, "%ll\n", buf[i]);
+			fprintf(fptr, "%lld\n", buf[i]);
 		}
 
 	}

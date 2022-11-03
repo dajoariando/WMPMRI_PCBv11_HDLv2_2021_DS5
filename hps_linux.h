@@ -85,6 +85,7 @@ volatile unsigned int *axi_ram_gradZ_p = NULL;
 volatile unsigned int *axi_ram_gradZ_n = NULL;
 volatile unsigned int *axi_ram_gradX_p = NULL;
 volatile unsigned int *axi_ram_gradX_n = NULL;
+volatile unsigned int *axi_ram_aux = NULL;
 
 volatile unsigned int *axi_sdram_addr = NULL;   // sdram access via axi
 

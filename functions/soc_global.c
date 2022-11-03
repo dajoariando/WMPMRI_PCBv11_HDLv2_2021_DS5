@@ -63,6 +63,7 @@ extern volatile unsigned int *axi_ram_gradZ_p;
 extern volatile unsigned int *axi_ram_gradZ_n;
 extern volatile unsigned int *axi_ram_gradX_p;
 extern volatile unsigned int *axi_ram_gradX_n;
+extern volatile unsigned int *axi_ram_aux;
 
 // pll reconfig address for the bitstream
 // extern volatile unsigned int *h2p_bstream_pll_addr;   // bitstream pll reconfig
@@ -187,6 +188,7 @@ void soc_init() {
 	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;
 	axi_ram_gradX_p = axi_base + GRADX_P_BASE;
 	axi_ram_gradX_n = axi_base + GRADX_N_BASE;
+	axi_ram_aux = axi_base + AUX_BASE;
 	axi_sdram_addr = axi_base + SDRAM_BASE;
 
 	h2p_dma_addr = h2f_lw_axi_master + DMA_BASE;

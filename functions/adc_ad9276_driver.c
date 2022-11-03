@@ -14,7 +14,7 @@
 
 // offset for axi bus address
 extern volatile unsigned int *h2p_adcspi_addr;   // gpio for dac (spi)
-extern volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr;   // chA buffer control
+// extern volatile unsigned int *h2p_fifo_sink_ch_a_csr_addr;   // chA buffer control
 
 unsigned int write_adc_spi(unsigned int comm) {
 	unsigned int data;
@@ -200,6 +200,9 @@ unsigned int flush_adc_fifo(volatile unsigned int *channel_csr_addr, void *chann
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	for (i = 0; fifo_mem_level > 0; i++) {
 		rddata = alt_read_word(channel_data_addr);
+		if (0) {   // dummy code to remove warning for not using "rddata"
+			printf("%d\n", rddata);
+		}
 
 		fifo_mem_level--;
 		if (fifo_mem_level == 0) {

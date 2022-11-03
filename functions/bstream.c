@@ -28,6 +28,7 @@ extern volatile unsigned int *axi_ram_gradZ_p;
 extern volatile unsigned int *axi_ram_gradZ_n;
 extern volatile unsigned int *axi_ram_gradX_p;
 extern volatile unsigned int *axi_ram_gradX_n;
+extern volatile unsigned int *axi_ram_aux;
 
 extern volatile unsigned int *h2p_general_cnt_out_addr;
 extern volatile unsigned int *h2p_general_cnt_in_addr;
@@ -65,6 +66,7 @@ void bstream__init_all_sram() {
 	bstream_objs[gradZ_n].sram_addr = axi_ram_gradZ_n;
 	bstream_objs[gradX_p].sram_addr = axi_ram_gradX_p;
 	bstream_objs[gradX_n].sram_addr = axi_ram_gradX_n;
+	bstream_objs[aux].sram_addr = axi_ram_aux;
 
 }
 
@@ -245,6 +247,7 @@ void bstream__vpc_chg(
 // take a look at the diagram of cpmg in the one note to understand how the values for different parameters are derived to cpmg_params.
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -269,8 +272,14 @@ void bstream__vpc_chg(
 	lcs_pchg_int = us_to_digit_synced(lcs_pchg_us, 1, SYSCLK_MHz);
 	lcs_recycledump_int = us_to_digit_synced(lcs_recycledump_us, 1, SYSCLK_MHz);
 
-// tx_clkph
-	int alltime = repeat * ( lcs_pchg_int + lcs_recycledump_int );
+	// int alltime = repeat * ( lcs_pchg_int + lcs_recycledump_int );
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+
+	// tx_clkph
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
@@ -376,6 +385,7 @@ void bstream__en_adc(
 	unsigned int adc_en_window = num_of_samples * adc_clk_fact;   // as the adc_en_window is referenced to SYSCLK_MHz, it needs to be multiplied by the
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -391,6 +401,11 @@ void bstream__en_adc(
 
 	bstream_rst();
 	usleep(100);
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
@@ -491,6 +506,7 @@ void bstream__vpc_wastedump(
 //
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -514,6 +530,11 @@ void bstream__vpc_wastedump(
 
 	lcs_vpc_pchg_int = us_to_digit_synced(lcs_vpc_dchg_us, 1, SYSCLK_MHz);
 	lcs_wastedump_int = us_to_digit_synced(lcs_wastedump_us, 1, SYSCLK_MHz);
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph
 	int alltime = repeat * ( lcs_vpc_pchg_int + lcs_wastedump_int );
@@ -657,6 +678,7 @@ cpmg_obj bstream__cpmg(
 	double SYSCLK_MHz = f_larmor * larmor_clk_fact;
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -706,6 +728,11 @@ cpmg_obj bstream__cpmg(
 	if (check_cpmg_param(cpmg_params) == SEQ_ERROR) {   // check if the sequence has error
 		exit (EXIT_FAILURE);
 	}
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph ( the mux sel selects phase cycle)
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
@@ -958,6 +985,7 @@ cpmg_obj bstream__pgse(
 	double SYSCLK_MHz = f_larmor * larmor_clk_fact;
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -1034,6 +1062,11 @@ cpmg_obj bstream__pgse(
 		printf("gradlen (%d) or gradspac (%d) is less than 10 clock cycles.", gradz_len_int, gradz_spac_int);
 		exit (EXIT_FAILURE);
 	}
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph ( selects phase cycle of the tx pulse )
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
@@ -1324,6 +1357,7 @@ phenc_obj bstream__phenc(
 	// initialize all bitstream objects with the same clock
 	// bstream__init_all(bstream_objs, SYSCLK_MHz);
 
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -1372,6 +1406,16 @@ phenc_obj bstream__phenc(
 		printf("phenc params have errors.\n");
 		exit (EXIT_FAILURE);
 	}
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_dump_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, p90_ph_sel/*mux_sel*/, phenc_params.p90_pchg_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, p90_ph_sel/*mux_sel*/, phenc_params.p90_pchg_refill_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, p90_ph_sel/*mux_sel*/, phenc_params.p90_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// tx_clkph ( selects phase cycle of the tx pulse )
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
@@ -1702,6 +1746,7 @@ void bstream__noise(
 	double SYSCLK_MHz = f_adc * adc_clk_fact;
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -1721,6 +1766,11 @@ void bstream__noise(
 
 	bstream_rst();
 	usleep(100);
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph ( the mux sel selects phase cycle)
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
@@ -1823,6 +1873,7 @@ void bstream__toggle(
 	double SYSCLK_MHz = f_adc * adc_clk_fact;
 
 // initialize all objects
+	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h2], SYSCLK_MHz);
@@ -1838,6 +1889,11 @@ void bstream__toggle(
 
 	bstream_rst();
 	usleep(100);
+
+	// aux
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // tx_clkph ( the mux sel selects phase cycle)
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
