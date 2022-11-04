@@ -88,7 +88,32 @@ cpmg_obj bstream__cpmg(
         unsigned int dconv_fact,
         unsigned int echoskip,
         unsigned int echodrop,
-        unsigned char tx_mode,   // the mode of the transmit. If set to 0, then the normal mode where Lcs is precharged and discharged for every cycle is used. Otherwise, Lcs will be precharged once at the beginning and discharged once at the end (enabling a continuous current-mode operation at Lcs to shorten tE).
+        unsigned char wait_til_done
+        );
+
+cpmg_obj bstream__cpmg_cmode(
+        double f_larmor,
+        unsigned int larmor_clk_fact,
+        unsigned int adc_clk_fact,
+        double bstrap_pchg_us,
+        double lcs_pchg_us,		// precharging of vpc
+        double lcs_dump_us,		// dumping the lcs to the vpc
+        double p90_pchg_us,
+        double p90_us,
+        double p90_dchg_us,		// the discharging length of the current source inductor
+        double p90_dtcl,
+        double p180_pchg_us,
+        double p180_us,
+        double p180_dchg_us,	// the discharging length of the current source inductor
+        double p180_dtcl,
+        double echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+        double echotime_us,
+        unsigned int samples_per_echo,
+        unsigned int echoes_per_scan,
+        unsigned char p90_ph_sel,
+        unsigned int dconv_fact,
+        unsigned int echoskip,
+        unsigned int echodrop,
         unsigned char wait_til_done
         );
 

@@ -98,7 +98,6 @@ int main(int argc, char * argv[]) {
 	unsigned int exp_num = atoi(argv[36]);   // the experiment number
 
 	// measurement settings
-	unsigned char tx_mode = 1;   // tx_mode. Put to "1" to disable lcs precharging and discharging for every single RF pulse. Instead, it will rely on shorting the lcs during tE blanking period
 	char wr_indv_scan = 0;   // write individual scan to file
 	unsigned char rd_FIFO_or_DMA = RD_DMA;   // data source : RD_FIFO or RD_DMA
 	unsigned char wait_til_done;   // wait for done signal from the bitstream
@@ -193,7 +192,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	clock_t start, end;
-	double net_acq_time, net_elapsed_time, net_scan_time;
+	double net_acq_time, net_elapsed_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
 	unsigned int ii;
 	char dataname[15];   // the name container for individual scan data
@@ -218,9 +217,9 @@ int main(int argc, char * argv[]) {
 		        p180_pchg_us,
 		        p180_pchg_refill_us,
 		        p180_us,
-		        p180_dchg_us,	// the discharging length of the current source inductor
+		        p180_dchg_us,   // the discharging length of the current source inductor
 		        p180_dtcl,
-		        echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+		        echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
 		        echotime_us,
 		        samples_per_echo,
 		        echoes_per_scan,
@@ -228,13 +227,40 @@ int main(int argc, char * argv[]) {
 		        dconv_fact,
 		        echoskip,
 		        echodrop,
-		        tx_mode,
 		        wait_til_done
 		        );
 
+		/*
+		 cpmg_params = bstream__cpmg_cmode(
+		 f_larmor,
+		 larmor_clk_fact,
+		 adc_clk_fact,
+		 bstrap_pchg_us,
+		 lcs_pchg_us,   // precharging of vpc
+		 lcs_dump_us,   // dumping the lcs to the vpc
+		 p90_pchg_us,
+		 p90_us,
+		 p90_dchg_us,   // the discharging length of the current source inductor
+		 p90_dtcl,
+		 p180_pchg_us,
+		 p180_us,
+		 p180_dchg_us,   // the discharging length of the current source inductor
+		 p180_dtcl,
+		 echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+		 echotime_us,
+		 samples_per_echo,
+		 echoes_per_scan,
+		 p90_ph_sel,
+		 dconv_fact,
+		 echoskip,
+		 echodrop,
+		 wait_til_done
+		 );
+		 */
+
 		// read data from the ADC into adc_data_32b
 		if (rd_FIFO_or_DMA == RD_FIFO) {
-			usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+			usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 			read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
 		}
 		else if (rd_FIFO_or_DMA == RD_DMA) {
@@ -350,3 +376,4 @@ int main(int argc, char * argv[]) {
 }
 
 #endif
+

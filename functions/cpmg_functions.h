@@ -68,6 +68,24 @@ cpmg_obj cpmg_param_calc(
         unsigned int samples_per_echo   // the total adc samples captured in one echo
         );
 
+cpmg_obj cpmg_cmode_param_calc(
+        double f_larmor,		// nmr RF cpmg frequency (in MHz)
+        unsigned int larmor_clk_fact,		// system clock frequency / larmor frequency
+        unsigned int adc_clk_fact,   // (system_clock_freq/adc_clock_freq) factor
+        double lcs_pchg_us,   // precharging of vpc
+        double lcs_dump_us,   // dumping the lcs to the vpc
+        double p90_pchg_us,   // the precharging length for the current source inductor
+        double p90_us,   // the length of cpmg 90 deg pulse
+        double p90_dchg_us,   // the discharging length of the current source inductor
+        double p180_pchg_us,   // the precharging length for the current source inductor
+        double p180_us,   // the length of cpmg 180 deg pulse
+        double p180_dchg_us,   // the discharging length of the current source inductor
+        double echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+        double echotime_us,   // the length between one echo to the other (equal to p180_us + delay2_us)
+        unsigned int echoes_per_scan,   // the number of echoes per scan
+        unsigned int samples_per_echo   // the total adc samples captured in one echo
+        );
+
 phenc_obj phenc_param_calc(
         double f_larmor,		// nmr RF cpmg frequency (in MHz)
         unsigned int larmor_clk_fact,		// system clock frequency / larmor frequency
