@@ -88,6 +88,7 @@ cpmg_obj bstream__cpmg(
         unsigned int dconv_fact,
         unsigned int echoskip,
         unsigned int echodrop,
+        unsigned char tx_mode,   // the mode of the transmit. If set to 0, then the normal mode where Lcs is precharged and discharged for every cycle is used. Otherwise, Lcs will be precharged once at the beginning and discharged once at the end (enabling a continuous current-mode operation at Lcs to shorten tE).
         unsigned char wait_til_done
         );
 

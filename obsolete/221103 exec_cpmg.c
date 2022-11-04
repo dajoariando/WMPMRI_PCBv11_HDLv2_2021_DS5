@@ -1,8 +1,8 @@
 // Created on: April 14th, 2022
 // Author: David Ariando
 
-// #define EXEC_CPMG_T2_ITER
-#ifdef EXEC_CPMG_T2_ITER
+// #define EXEC_CPMG
+#ifdef EXEC_CPMG
 
 #define GET_RAW_DATA
 
@@ -92,6 +92,14 @@ int main(int argc, char * argv[]) {
 
 	// measurement settings
 	char wr_indv_scan = 1;// write individual scan to file
+	unsigned char rd_FIFO_or_DMA = RD_DMA;// data source : RD_FIFO or RD_DMA
+	unsigned char wait_til_done;// wait for done signal from the bitstream
+	if (rd_FIFO_or_DMA == RD_DMA) {
+		wait_til_done = NOWAIT;
+	}
+	else if (rd_FIFO_or_DMA == RD_FIFO) {
+		wait_til_done = WAIT;
+	}
 
 	// param defined by Quartus
 	unsigned int adc_clk_fact = 4;// the factor of (system_clk_freq / adc_clk_freq)
@@ -103,7 +111,7 @@ int main(int argc, char * argv[]) {
 	unsigned int num_of_samples = samples_per_echo * echoes_per_scan;
 	uint32_t adc_data_32b[num_of_samples >> 1];// data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[num_of_samples];
-	int32_t adc_data_sum[num_of_samples];// sum of the data
+	float adc_data_sum[num_of_samples];// sum of the data
 
 	// init
 	init();
@@ -186,16 +194,24 @@ int main(int argc, char * argv[]) {
 				p90_ph_sel,
 				dconv_fact,
 				echoskip,
-				echodrop
+				echodrop,
+				wait_til_done
 		);
 
-		usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
-		read_adc_val(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b);
-		buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);// convert the 32-bit data format to 16-bit.
+		// read data from the ADC into adc_data_32b
+		if (rd_FIFO_or_DMA == RD_FIFO) {
+			usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+			read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
+		}
+		else if (rd_FIFO_or_DMA == RD_DMA) {
+			read_adc_dma(h2p_dma_addr, axi_sdram_addr, DMA_READ_MASTER_FIFO_SINK_CH_A_BASE, DMA_WRITE_MASTER_SDRAM_BASE, adc_data_32b, num_of_samples >> 1, DISABLE_MESSAGE);
+		}
+
+		buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);   // convert the 32-bit data format to 16-bit.
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 		// calculate echosum
-		sum_buf(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);// if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
+		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);// if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data..
 
 		// process phase cycling
 		if (ph_cycl_en) {
@@ -207,15 +223,16 @@ int main(int argc, char * argv[]) {
 			}
 		}
 
+		// write individual scan
 		if (wr_indv_scan) {
-			sprintf(dataname, "data_%03d.txt", ii);   // create a filename
+			sprintf(dataname, "dat_%06d_%03d.txt", exp_num, ii);   // create a filename
 			wr_File_16b(dataname, num_of_samples, adc_data_16b, SAV_ASCII);// write the data to the filename
 		}
 
 		// measure elapsed time after acquisition
 		end = clock();// measure time
 		net_acq_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;// measure time in us
-		if (enable_message) {
+		if (DISABLE_MESSAGE) {
 			printf("\t Elapsed time after data acquisition is %ld us.\n", (unsigned long) net_acq_time);
 		}
 
@@ -228,7 +245,7 @@ int main(int argc, char * argv[]) {
 				net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;// measure time in us
 			}
 
-			if (enable_message) {
+			if (DISABLE_MESSAGE) {
 				printf("\t Added %0.0f us at the end of the scan to account for scan_spacing_us.\n", net_elapsed_time - net_acq_time);
 			}
 		}
@@ -237,6 +254,7 @@ int main(int argc, char * argv[]) {
 		{
 			printf("\t[WARNING] One scan duration is longer than scan_spacing_us parameter (%ld us) and is measured to be approx. %ld us\n", scanspacing_us, (unsigned long) net_acq_time);
 		}
+
 	}
 
 	bstream__vpc_wastedump(

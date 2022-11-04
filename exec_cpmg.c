@@ -1,9 +1,8 @@
-// Created on: Sept 20th, 2022
+// Created on: April 14th, 2022
 // Author: David Ariando
-// phase encoding T2 measurements
 
-#define EXEC_PHENC_T2_ITER
-#ifdef EXEC_PHENC_T2_ITER
+#define EXEC_CPMG
+#ifdef EXEC_CPMG
 
 #define GET_RAW_DATA
 
@@ -13,7 +12,7 @@
 bstream_obj bstream_objs[BSTREAM_COUNT];
 
 void init() {
-	// printf("START::EXEC_PHENC_T2_ITER\n");
+	printf("START:: EXEC_CPMG\n");
 
 	soc_init();
 	bstream__init_all_sram();
@@ -51,7 +50,7 @@ void leave() {
 
 	soc_exit();
 
-	// printf("STOP::EXEC_PHENC_T2_ITER\n");
+	printf("STOP:: EXEC_CPMG\n");
 }
 
 int main(int argc, char * argv[]) {
@@ -91,22 +90,15 @@ int main(int argc, char * argv[]) {
 	double lcs_wastedump_us = atof(argv[30]);	// waste/dump the lcs energy into the protection diode
 	double lcs_vpc_dchg_repeat = atof(argv[31]);   // repeat VPC precharging for n times
 	// --- gradient length and strength
-	double gradz_len_us = atof(argv[32]);	// gradient length for z gradient
-	float gradz_volt = atof(argv[33]);   // gradient z dac output voltage (can be either polarity, positive or negative)
-	double gradx_len_us = atof(argv[34]);   // gradient length for x gradient
-	float gradx_volt = atof(argv[35]);   // gradient x dac output voltage (can be either polarity, positive or negative)
-	// -- encoding period
-	char grad_refocus = atoi(argv[36]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
-	char flip_grad_refocus_sign = atoi(argv[37]);   // flip the gradient refocus sign for phase encoding, and don't flip it for pgse
-	double enc_tao_us = atof(argv[38]);   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
-	// -- p180 pulse x or y
-	char p180_xy_angle = atoi(argv[39]);   // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
+	float gradz_volt = atof(argv[32]);   // gradient z dac output voltage (can be either polarity, positive or negative)
+	float gradx_volt = atof(argv[33]);   // gradient x dac output voltage (can be either polarity, positive or negative)
 	// enable lcs initial precharging and discharging
-	char en_lcs_pchg = atoi(argv[40]);   // enable the vpc precharging via lcs prior to cpmg
-	char en_lcs_dchg = atoi(argv[41]);   // enable the vpc discharging via lcs post cpmg
-	unsigned int exp_num = atoi(argv[42]);   // the experiment number
+	char en_lcs_pchg = atoi(argv[34]);   // enable the vpc precharging via lcs prior to cpmg
+	char en_lcs_dchg = atoi(argv[35]);   // enable the vpc discharging via lcs post cpmg
+	unsigned int exp_num = atoi(argv[36]);   // the experiment number
 
 	// measurement settings
+	unsigned char tx_mode = 1;   // tx_mode. Put to "1" to disable lcs precharging and discharging for every single RF pulse. Instead, it will rely on shorting the lcs during tE blanking period
 	char wr_indv_scan = 0;   // write individual scan to file
 	unsigned char rd_FIFO_or_DMA = RD_DMA;   // data source : RD_FIFO or RD_DMA
 	unsigned char wait_til_done;   // wait for done signal from the bitstream
@@ -131,8 +123,7 @@ int main(int argc, char * argv[]) {
 
 	float gradz_voltp, gradz_voltn;   // gradient z voltage to program dac
 	float gradx_voltp, gradx_voltn;   // gradient x voltage to program dac
-	char gradz_dir, gradx_dir;   // the gradient direction
-
+	// char gradz_dir, gradx_dir;   // the gradient direction
 	// init
 	init();
 
@@ -142,13 +133,13 @@ int main(int argc, char * argv[]) {
 	// set gradz voltage
 	gradz_voltp = fabs(gradz_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
 	gradz_voltn = fabs(gradz_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
-	gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
+	//gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
 	dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
 
 	// set gradx voltage
 	gradx_voltp = fabs(gradx_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
 	gradx_voltn = fabs(gradx_volt);   // same for both polarity, but can be enabled or disabled as will in bitstream
-	gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
+	// gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
 	dac5571_i2c_wr(h2p_dac_gradx_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
 
 	// set phase increment
@@ -181,7 +172,7 @@ int main(int argc, char * argv[]) {
 	// write the preamp dac
 	wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);	// set -2.5 for 4 MHz resonant
 
-	usleep(100);	// wait for the PLL FCO to lock as well
+	usleep(100);   // wait for the PLL FCO to lock as well
 
 	if (en_lcs_pchg) {
 		bstream__vpc_chg(
@@ -191,7 +182,7 @@ int main(int argc, char * argv[]) {
 		        lcs_recycledump_us,   // dumping the lcs to the vpc
 		        lcs_vpc_pchg_repeat   // repeat the precharge and dump
 		        );
-		usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+		usleep(T_BLANK / ( SYSCLK_MHz ));   // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
 		// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
 		int flushed_data = 0;
@@ -206,13 +197,13 @@ int main(int argc, char * argv[]) {
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
 	unsigned int ii;
 	char dataname[15];   // the name container for individual scan data
-	char datasumname[15];   // the name container for sum scan data
-	phenc_obj phenc_params;
+	char datasumname[15];	// the name container for sum scan data
+	cpmg_obj cpmg_params;
 	for (ii = 0; ii < n_iterate; ii++) {
 		// measure the start time
 		start = clock();   // measure time
 
-		phenc_params = bstream__phenc(
+		cpmg_params = bstream__cpmg(
 		        f_larmor,
 		        larmor_clk_fact,
 		        adc_clk_fact,
@@ -227,9 +218,9 @@ int main(int argc, char * argv[]) {
 		        p180_pchg_us,
 		        p180_pchg_refill_us,
 		        p180_us,
-		        p180_dchg_us,   // the discharging length of the current source inductor
+		        p180_dchg_us,	// the discharging length of the current source inductor
 		        p180_dtcl,
-		        echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+		        echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
 		        echotime_us,
 		        samples_per_echo,
 		        echoes_per_scan,
@@ -237,14 +228,7 @@ int main(int argc, char * argv[]) {
 		        dconv_fact,
 		        echoskip,
 		        echodrop,
-		        gradz_dir,
-		        gradz_len_us,
-		        gradx_dir,
-		        gradx_len_us,
-		        grad_refocus,
-		        flip_grad_refocus_sign,
-		        enc_tao_us,
-		        p180_xy_angle,
+		        tx_mode,
 		        wait_til_done
 		        );
 
@@ -260,7 +244,7 @@ int main(int argc, char * argv[]) {
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);   // cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 		// calculate echosum
-		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
+		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data..
 
 		// toggle phase cycling
 		if (ph_cycl_en) {
@@ -304,7 +288,6 @@ int main(int argc, char * argv[]) {
 			printf("\t[WARNING] One scan duration is longer than scan_spacing_us parameter (%ld us) and is measured to be approx. %ld us\n", scanspacing_us, (unsigned long) net_acq_time);
 		}
 	}
-
 	if (en_lcs_dchg) {
 		bstream__vpc_wastedump(
 		        SYSCLK_MHz,
@@ -326,20 +309,20 @@ int main(int argc, char * argv[]) {
 	fptr = fopen(acq_file, "w");
 	fprintf(fptr, "b1Freq = %4.12f\n", f_larmor);
 	fprintf(fptr, "p90LengthGiven = %4.12f\n", p90_us);
-	fprintf(fptr, "p90LengthRun = %4.12f\n", (double) phenc_params.p90_int / SYSCLK_MHz);
-	fprintf(fptr, "p90LengthCnt = %d @ %4.12f MHz\n", phenc_params.p90_int, SYSCLK_MHz);
-	fprintf(fptr, "d90LengthRun = %4.12f\n", (double) phenc_params.d90_enc_int / SYSCLK_MHz);
-	fprintf(fptr, "d90LengthCnt = %d @ %4.12f MHz\n", phenc_params.d90_enc_int, SYSCLK_MHz);
+	fprintf(fptr, "p90LengthRun = %4.12f\n", (double) cpmg_params.p90_int / SYSCLK_MHz);
+	fprintf(fptr, "p90LengthCnt = %d @ %4.12f MHz\n", cpmg_params.p90_int, SYSCLK_MHz);
+	fprintf(fptr, "d90LengthRun = %4.12f\n", (double) cpmg_params.d90_int / SYSCLK_MHz);
+	fprintf(fptr, "d90LengthCnt = %d @ %4.12f MHz\n", cpmg_params.d90_int, SYSCLK_MHz);
 	fprintf(fptr, "p180LengthGiven = %4.12f\n", p180_us);
-	fprintf(fptr, "p180LengthRun = %4.12f\n", (double) phenc_params.p180_int / SYSCLK_MHz);
-	fprintf(fptr, "p180LengthCnt =  %d @ %4.12f MHz\n", phenc_params.p180_int, SYSCLK_MHz);
-	fprintf(fptr, "d180LengthRun = %4.12f\n", (double) phenc_params.d180_int / SYSCLK_MHz);
-	fprintf(fptr, "d180LengthCnt = %d @ %4.12f MHz\n", phenc_params.d180_int, SYSCLK_MHz);
+	fprintf(fptr, "p180LengthRun = %4.12f\n", (double) cpmg_params.p180_int / SYSCLK_MHz);
+	fprintf(fptr, "p180LengthCnt =  %d @ %4.12f MHz\n", cpmg_params.p180_int, SYSCLK_MHz);
+	fprintf(fptr, "d180LengthRun = %4.12f\n", (double) cpmg_params.d180_int / SYSCLK_MHz);
+	fprintf(fptr, "d180LengthCnt = %d @ %4.12f MHz\n", cpmg_params.d180_int, SYSCLK_MHz);
 	//fprintf(fptr,"p90_dtcl = %4.3f\n", pulse1_dtcl);
 	//fprintf(fptr,"p180_dtcl = %4.3f\n", pulse2_dtcl);
 	fprintf(fptr, "echoTimeGiven = %4.12f\n", echotime_us);
-	fprintf(fptr, "echoTimeRun = %4.12f\n", (double) phenc_params.echotime_int / SYSCLK_MHz);
-	fprintf(fptr, "echoTimeCnt = %d @ %4.12f MHz\n", phenc_params.echotime_int, SYSCLK_MHz);
+	fprintf(fptr, "echoTimeRun = %4.12f\n", (double) cpmg_params.echotime_int / SYSCLK_MHz);
+	fprintf(fptr, "echoTimeCnt = %d @ %4.12f MHz\n", cpmg_params.echotime_int, SYSCLK_MHz);
 	fprintf(fptr, "ieTime = %lu\n", scanspacing_us / 1000);
 	fprintf(fptr, "nrPnts = %d\n", samples_per_echo);
 	fprintf(fptr, "nrEchoes = %d\n", echoes_per_scan);
@@ -349,11 +332,6 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "adcFreq = %4.12f\n", ADCCLK_MHz);
 	fprintf(fptr, "usePhaseCycle = %d\n", ph_cycl_en);
 	fprintf(fptr, "echoSkipHw = %d\n", 1);
-	fprintf(fptr, "gradZ_Volt = %4.12f\n", gradz_volt);
-	fprintf(fptr, "gradZ_Len = %4.12f\n", phenc_params.gradz_len_int / SYSCLK_MHz);
-	fprintf(fptr, "gradX_Volt = %4.12f\n", gradx_volt);
-	fprintf(fptr, "gradX_Len = %4.12f\n", phenc_params.gradx_len_int / SYSCLK_MHz);
-	fprintf(fptr, "encTao = %4.12f\n", phenc_params.enc_tao_int / SYSCLK_MHz);
 #ifdef GET_RAW_DATA
 	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz);
 	fprintf(fptr, "fpgaDconv = 0\n");
