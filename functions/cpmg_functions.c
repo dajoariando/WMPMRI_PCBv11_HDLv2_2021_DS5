@@ -59,7 +59,7 @@ cpmg_obj cpmg_param_calc(
 	lcs_pchg_int = us_to_digit_synced(lcs_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	lcs_dump_int = us_to_digit_synced(lcs_dump_us, larmor_clk_fact, SYSCLK_MHz);
 
-	echotime_int = us_to_digit_synced(echotime_us, 0.5 * larmor_clk_fact, SYSCLK_MHz);		// 0.5 * f_larmor is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
+	echotime_int = us_to_digit_synced(echotime_us, ( larmor_clk_fact << 1 ), SYSCLK_MHz);		// (larmor_clk_fact<<1) or (2*larmor_clk_fact) is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
 
 	p90_pchg_int = us_to_digit_synced(p90_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	p90_pchg_refill_int = us_to_digit_synced(p90_pchg_refill_us, larmor_clk_fact, SYSCLK_MHz);

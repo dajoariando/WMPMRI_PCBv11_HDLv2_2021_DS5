@@ -193,7 +193,7 @@ int main(int argc, char * argv[]) {
 
 	clock_t start, end;
 	double net_acq_time, net_elapsed_time;
-	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
+	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees (x-pulse)
 	unsigned int ii;
 	char dataname[15];   // the name container for individual scan data
 	char datasumname[15];	// the name container for sum scan data
