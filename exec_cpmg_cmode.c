@@ -1,5 +1,8 @@
-// Created on: April 14th, 2022
+// Created on: November 4th, 2022
 // Author: David Ariando
+// The cpmg_cmode does not discharge the Lcs after RF, but rather short it using both charging and discharging GaNFETs to preserve its current.
+// Ideally, having back to back GaNFETs are necessary to better preserving the current, but more ideally it is better to regulate the current inside the Lcs
+// In the current design, it's impossible to do so. So, I might live without regulating the current.
 
 // #define EXEC_CPMG_CMODE
 #ifdef EXEC_CPMG_CMODE
