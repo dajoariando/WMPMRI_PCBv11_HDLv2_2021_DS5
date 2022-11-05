@@ -43,10 +43,12 @@ void sum_buf_to_float(float * buf32, uint16_t * buf16, unsigned int length, unsi
 	for (ii = 0; ii < length; ii++) {
 		temp = 0;
 		temp = temp | buf16[ii];
+
 		if (subtract)
 			buf32[ii] -= (float) temp;
 		else
 			buf32[ii] += (float) temp;
+
 	}
 }
 

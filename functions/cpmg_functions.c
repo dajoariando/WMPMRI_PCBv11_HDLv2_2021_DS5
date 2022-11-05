@@ -100,7 +100,7 @@ cpmg_obj cpmg_param_calc(
 	return output;
 }
 
-cpmg_obj cpmg_cmode_param_calc(
+cpmg_cmode_obj cpmg_cmode_param_calc(
         double f_larmor,		// nmr RF cpmg frequency (in MHz)
         unsigned int larmor_clk_fact,		// system clock frequency / larmor frequency
         unsigned int adc_clk_fact,		// (system_clock_freq/adc_clock_freq) factor
@@ -109,6 +109,7 @@ cpmg_obj cpmg_cmode_param_calc(
         double p90_pchg_us,		// the precharging length for the current source inductor
         double p90_us,		// the length of cpmg 90 deg pulse
         double p90_dchg_us,		// the discharging length of the current source inductor
+        double p180_1st_pchg_us,   // the first precharging length for the current source inductor
         double p180_pchg_us,		// the precharging length for the current source inductor
         double p180_us,		// the length of cpmg 180 deg pulse
         double p180_dchg_us,		// the discharging length of the current source inductor
@@ -119,13 +120,14 @@ cpmg_obj cpmg_cmode_param_calc(
         ) {
 
 	// output variables
-	cpmg_obj output;
+	cpmg_cmode_obj output;
 	int lcs_pchg_int;
 	int lcs_dump_int;
 	int p90_pchg_int;
 	int p90_int;
 	int p90_dchg_int;
 	int d90_int;
+	int p180_1st_pchg_int;
 	int p180_pchg_int;
 	int p180_int;
 	int p180_dchg_int;
@@ -140,17 +142,18 @@ cpmg_obj cpmg_cmode_param_calc(
 	lcs_pchg_int = us_to_digit_synced(lcs_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	lcs_dump_int = us_to_digit_synced(lcs_dump_us, larmor_clk_fact, SYSCLK_MHz);
 
-	echotime_int = us_to_digit_synced(echotime_us, 0.5 * larmor_clk_fact, SYSCLK_MHz);		// 0.5 * f_larmor is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
+	echotime_int = us_to_digit_synced(echotime_us, ( larmor_clk_fact << 1 ), SYSCLK_MHz);		// (larmor_clk_fact<<1) or (2*larmor_clk_fact) is to make sure that the echotime_int is multiplication of (2*SYSCLK_MHz/f_larmor) instead of (SYSCLK_MHz/f_larmor). This is to ensure that if the echotime_int is divided by two, the number is still multiplication of (SYSCLK_MHz/f_larmor). It does not change the absolute length of the echotime.
 
 	p90_pchg_int = us_to_digit_synced(p90_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	p90_int = us_to_digit_synced(p90_us, larmor_clk_fact, SYSCLK_MHz);
 	p90_dchg_int = us_to_digit_synced(p90_dchg_us, larmor_clk_fact, SYSCLK_MHz);
 
+	p180_1st_pchg_int = us_to_digit_synced(p180_1st_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_pchg_int = us_to_digit_synced(p180_pchg_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_int = us_to_digit_synced(p180_us, larmor_clk_fact, SYSCLK_MHz);
 	p180_dchg_int = us_to_digit_synced(p180_dchg_us, larmor_clk_fact, SYSCLK_MHz);
 
-	d90_int = ( echotime_int >> 1 ) - p90_int - p180_pchg_int;
+	d90_int = ( echotime_int >> 1 ) - p90_int - p180_1st_pchg_int;
 	d180_int = echotime_int - p180_int - p180_pchg_int;
 
 	echoshift_int = us_to_digit(echoshift_us, SYSCLK_MHz);
@@ -161,12 +164,11 @@ cpmg_obj cpmg_cmode_param_calc(
 	output.lcs_pchg_int = lcs_pchg_int;
 	output.lcs_dump_int = lcs_dump_int;
 	output.p90_pchg_int = p90_pchg_int;
-	output.p90_pchg_refill_int = 100;   // put to any number more than 10 to supress error
 	output.p90_int = p90_int;
 	output.p90_dchg_int = p90_dchg_int;
 	output.d90_int = d90_int;
+	output.p180_1st_pchg_int = p180_1st_pchg_int;
 	output.p180_pchg_int = p180_pchg_int;
-	output.p180_pchg_refill_int = 100;   // put to any number more than 10 to supress error
 	output.p180_int = p180_int;
 	output.p180_dchg_int = p180_dchg_int;
 	output.d180_int = d180_int;
@@ -214,6 +216,72 @@ error_code check_cpmg_param(cpmg_obj obj1) {
 	}
 	if (obj1.p180_pchg_refill_int <= 10) {
 		fprintf(stderr, "\tERROR! p180_pchg_refill_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p180_int <= 10) {
+		fprintf(stderr, "\tERROR! p180_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p180_dchg_int <= 10) {
+		fprintf(stderr, "\tERROR! p180_dchg_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.d180_int <= 10) {
+		fprintf(stderr, "\tERROR! d180_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.init_adc_delay_int <= 10) {
+		fprintf(stderr, "\tERROR! init_adc_delay_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.echoes_per_scan_int < 2) {
+		fprintf(stderr, "\tERROR! echoes_per_scan_int is less than 2!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.adc_en_window_int <= 10) {
+		fprintf(stderr, "\tERROR! adc_en_window_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.adc_en_window_int > obj1.echotime_int + obj1.echoshift_int - 10) {   // subtraction factor of 10 is due to the minimum init_adc_delay_int to be valid.
+		fprintf(stderr, "\tERROR! adc_en_window_int is larger than the echotime_int!\n");
+		return SEQ_ERROR;
+	}
+
+	return SEQ_OK;
+
+}
+
+error_code check_cpmg_cmode_param(cpmg_cmode_obj obj1) {
+	if (obj1.lcs_pchg_int <= 10) {
+		fprintf(stderr, "\tERROR! lcs_pchg_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.lcs_dump_int <= 10) {
+		fprintf(stderr, "\tERROR! lcs_dump_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p90_pchg_int <= 10) {
+		fprintf(stderr, "\tERROR! p90_pchg_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p90_int <= 10) {
+		fprintf(stderr, "\tERROR! p90_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p90_dchg_int <= 10) {
+		fprintf(stderr, "\tERROR! p90_dchg_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.d90_int <= 10) {
+		fprintf(stderr, "\tERROR! d90_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p180_1st_pchg_int <= 10) {
+		fprintf(stderr, "\tERROR! p180_1st_pchg_int is less than 10!\n");
+		return SEQ_ERROR;
+	}
+	if (obj1.p180_pchg_int <= 10) {
+		fprintf(stderr, "\tERROR! p180_pchg_int is less than 10!\n");
 		return SEQ_ERROR;
 	}
 	if (obj1.p180_int <= 10) {

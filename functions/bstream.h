@@ -91,7 +91,7 @@ cpmg_obj bstream__cpmg(
         unsigned char wait_til_done
         );
 
-cpmg_obj bstream__cpmg_cmode(
+cpmg_cmode_obj bstream__cpmg_cmode(
         double f_larmor,
         unsigned int larmor_clk_fact,
         unsigned int adc_clk_fact,
@@ -102,7 +102,8 @@ cpmg_obj bstream__cpmg_cmode(
         double p90_us,
         double p90_dchg_us,		// the discharging length of the current source inductor
         double p90_dtcl,
-        double p180_pchg_us,
+        double p180_1st_pchg_us,   // the first p180 precharging time
+        double p180_pchg_us,   // the other p180 precharging time
         double p180_us,
         double p180_dchg_us,	// the discharging length of the current source inductor
         double p180_dtcl,

@@ -90,16 +90,16 @@ int main(int argc, char * argv[]) {
 	double lcs_wastedump_us = atof(argv[30]);	// waste/dump the lcs energy into the protection diode
 	double lcs_vpc_dchg_repeat = atof(argv[31]);   // repeat VPC precharging for n times
 	// --- gradient length and strength
-	float gradz_volt = atof(argv[32]);   // gradient z dac output voltage (can be either polarity, positive or negative)
-	float gradx_volt = atof(argv[33]);   // gradient x dac output voltage (can be either polarity, positive or negative)
+	float gradz_volt = atof(argv[32]);	// gradient z dac output voltage (can be either polarity, positive or negative)
+	float gradx_volt = atof(argv[33]);	// gradient x dac output voltage (can be either polarity, positive or negative)
 	// enable lcs initial precharging and discharging
-	char en_lcs_pchg = atoi(argv[34]);   // enable the vpc precharging via lcs prior to cpmg
-	char en_lcs_dchg = atoi(argv[35]);   // enable the vpc discharging via lcs post cpmg
-	unsigned int exp_num = atoi(argv[36]);   // the experiment number
+	char en_lcs_pchg = atoi(argv[34]);	// enable the vpc precharging via lcs prior to cpmg
+	char en_lcs_dchg = atoi(argv[35]);	// enable the vpc discharging via lcs post cpmg
+	unsigned int exp_num = atoi(argv[36]);	// the experiment number
 
 	// measurement settings
-	char wr_indv_scan = 0;   // write individual scan to file
-	unsigned char rd_FIFO_or_DMA = RD_DMA;   // data source : RD_FIFO or RD_DMA
+	char wr_indv_scan = 0;	// write individual scan to file
+	unsigned char rd_FIFO_or_DMA = RD_DMA;	// data source : RD_FIFO or RD_DMA
 	unsigned char wait_til_done;   // wait for done signal from the bitstream
 	if (rd_FIFO_or_DMA == RD_DMA) {
 		wait_til_done = NOWAIT;
@@ -109,8 +109,8 @@ int main(int argc, char * argv[]) {
 	}
 
 	// param defined by Quartus
-	unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
-	unsigned int larmor_clk_fact = 16;   // the factor of (system_clk_freq / f_larmor)
+	unsigned int adc_clk_fact = 4;	// the factor of (system_clk_freq / adc_clk_freq)
+	unsigned int larmor_clk_fact = 16;	// the factor of (system_clk_freq / f_larmor)
 	double SYSCLK_MHz = larmor_clk_fact * f_larmor;
 	double ADCCLK_MHz = adc_clk_fact * f_larmor;
 
@@ -119,6 +119,12 @@ int main(int argc, char * argv[]) {
 	uint32_t adc_data_32b[num_of_samples >> 1];   // data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[num_of_samples];
 	float adc_data_sum[num_of_samples];   // sum of the data
+
+	// initialize adc_data_sum
+	unsigned int jj;
+	for (jj = 0; jj < num_of_samples; jj++) {
+		adc_data_sum[jj] = 0;
+	}
 
 	float gradz_voltp, gradz_voltn;   // gradient z voltage to program dac
 	float gradx_voltp, gradx_voltn;   // gradient x voltage to program dac
@@ -151,10 +157,10 @@ int main(int argc, char * argv[]) {
 	// calculate phase from the phase resolution of the NCO
 	unsigned int ph_base_num = 4;
 	unsigned int ph0, ph90, ph180, ph270;
-	ph0 = ph_base_num;   // phase 0
+	ph0 = ph_base_num;	// phase 0
 	ph90 = 1 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 90. 1<<(NCO_PH_RES-2) is the bit needs to be changed to get 90 degrees.
-	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 180.
-	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;   // phase 270.
+	ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 180.
+	ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;	// phase 270.
 	alt_write_word( ( h2p_ph_0_to_3_addr ), ( ph0 << 24 ) | ( ph90 << 16 ) | ( ph180 << 8 ) | ( ph270 ));	// program phase 0 to phase 3
 	alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));   // program phase 4 to phase 7
 
@@ -195,7 +201,7 @@ int main(int argc, char * argv[]) {
 	double net_acq_time, net_elapsed_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees (x-pulse)
 	unsigned int ii;
-	char dataname[15];   // the name container for individual scan data
+	char dataname[15];	// the name container for individual scan data
 	char datasumname[15];	// the name container for sum scan data
 	cpmg_obj cpmg_params;
 	for (ii = 0; ii < n_iterate; ii++) {
@@ -217,9 +223,9 @@ int main(int argc, char * argv[]) {
 		        p180_pchg_us,
 		        p180_pchg_refill_us,
 		        p180_us,
-		        p180_dchg_us,   // the discharging length of the current source inductor
+		        p180_dchg_us,	// the discharging length of the current source inductor
 		        p180_dtcl,
-		        echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
+		        echoshift_us,	// shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
 		        echotime_us,
 		        samples_per_echo,
 		        echoes_per_scan,
@@ -229,34 +235,6 @@ int main(int argc, char * argv[]) {
 		        echodrop,
 		        wait_til_done
 		        );
-
-		/*
-		 cpmg_params = bstream__cpmg_cmode(
-		 f_larmor,
-		 larmor_clk_fact,
-		 adc_clk_fact,
-		 bstrap_pchg_us,
-		 lcs_pchg_us,   // precharging of vpc
-		 lcs_dump_us,   // dumping the lcs to the vpc
-		 p90_pchg_us,
-		 p90_us,
-		 p90_dchg_us,   // the discharging length of the current source inductor
-		 p90_dtcl,
-		 p180_pchg_us,
-		 p180_us,
-		 p180_dchg_us,   // the discharging length of the current source inductor
-		 p180_dtcl,
-		 echoshift_us,   // shift the 180 deg data capture relative to the middle of the 180 delay span. This is to compensate shifting because of signal path delay / other factors. This parameter could be negative as well
-		 echotime_us,
-		 samples_per_echo,
-		 echoes_per_scan,
-		 p90_ph_sel,
-		 dconv_fact,
-		 echoskip,
-		 echodrop,
-		 wait_til_done
-		 );
-		 */
 
 		// read data from the ADC into adc_data_32b
 		if (rd_FIFO_or_DMA == RD_FIFO) {
@@ -269,7 +247,7 @@ int main(int argc, char * argv[]) {
 		buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);   // convert the 32-bit data format to 16-bit.
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);   // cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
-		// calculate echosum
+		// calculate scansum
 		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);   // if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data..
 
 		// toggle phase cycling
