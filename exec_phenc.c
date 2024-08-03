@@ -2,7 +2,7 @@
 // Author: David Ariando
 // phase encoding T2 measurements
 
-#define EXEC_PHENC
+//#define EXEC_PHENC
 #ifdef EXEC_PHENC
 
 #define GET_RAW_DATA

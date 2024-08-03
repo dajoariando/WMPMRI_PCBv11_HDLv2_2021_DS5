@@ -170,6 +170,7 @@ void read_adc_fifo(volatile unsigned int *channel_csr_addr, void *channel_data_a
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	for (i = 0; fifo_mem_level > 0; i++) {
 		rddata[i] = alt_read_word(channel_data_addr);
+		// printf("rddata: %x\n", rddata[i]);
 
 		fifo_mem_level--;
 		if (fifo_mem_level == 0) {
@@ -193,7 +194,7 @@ unsigned int flush_adc_fifo(volatile unsigned int *channel_csr_addr, void *chann
 	// PRINT # of DATAS in FIFO
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	if (en_mesg) {
-		printf("fifo data before reading: %d ---", fifo_mem_level);
+		printf("fifo before flush: %5d -", fifo_mem_level);
 	}
 
 	// READING DATA FROM FIFO
@@ -213,7 +214,8 @@ unsigned int flush_adc_fifo(volatile unsigned int *channel_csr_addr, void *chann
 
 	fifo_mem_level = alt_read_word(channel_csr_addr + ALTERA_AVALON_FIFO_LEVEL_REG);   // the fill level of FIFO memory
 	if (en_mesg) {
-		printf("fifo data after reading: %d\n", fifo_mem_level);
+		printf("data captured: %5d -", i);
+		printf("fifo after flush: %5d\n", fifo_mem_level);
 	}
 
 	return i;
