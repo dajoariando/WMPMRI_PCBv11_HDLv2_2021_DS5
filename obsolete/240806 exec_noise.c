@@ -1,8 +1,8 @@
 // Created on: June 10th, 2022
 // Author: David Ariando
 
-#define EXEC_NOISE_DMA
-#ifdef EXEC_NOISE_DMA
+//#define EXEC_NOISE
+#ifdef EXEC_NOISE
 
 #define GET_RAW_DATA
 
@@ -61,7 +61,6 @@ int main(int argc, char * argv[]) {
 	double vvarac = atof(argv[3]);
 
 	// measurement settings
-	char rd_FIFO_or_DMA = RD_DMA;
 
 	// param defined by Quartus
 	unsigned int adc_clk_fact = 4;// the factor of (system_clk_freq / adc_clk_freq)
@@ -69,9 +68,10 @@ int main(int argc, char * argv[]) {
 	double ADCCLK_MHz = f_adc;
 
 	// data container
-	unsigned int samples_captured = samples*8; // multiply by 8 because now there's 8 channels
-	uint32_t adc_data_32b[samples_captured >> 1];// data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
-	uint16_t adc_data_16b[samples_captured];
+	unsigned int num_of_samples = samples;
+	num_of_samples = num_of_samples*8; // multiply by 8 because now there's 8 channels
+	uint32_t adc_data_32b[num_of_samples >> 1];// data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
+	uint16_t adc_data_16b[num_of_samples];
 
 
 
@@ -119,22 +119,12 @@ int main(int argc, char * argv[]) {
 	bstream__noise(f_adc, adc_clk_fact, samples);
 
 	usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
-
-	flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, ENABLE_MESSAGE);
-
-	/* read data from the ADC into adc_data_32b
-	if (rd_FIFO_or_DMA == RD_FIFO) {
-		usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
-		read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
-	}
-	else if (rd_FIFO_or_DMA == RD_DMA) {
-		read_adc_dma(h2p_dma_addr, axi_sdram_addr, DMA_READ_MASTER_FIFO_SINK_CH_A_BASE, DMA_WRITE_MASTER_SDRAM_BASE, adc_data_32b, samples_captured >> 1, DISABLE_MESSAGE);
-	}
-	buf32_to_buf16(adc_data_32b, adc_data_16b, samples_captured >> 1);// convert the 32-bit data format to 16-bit.
-	cut_2MSB_and_2LSB(adc_data_16b, samples_captured);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
+	read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, ENABLE_MESSAGE);
+	buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);// convert the 32-bit data format to 16-bit.
+	cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
 	// write noise acquisition
-	wr_File_16b("noise.txt", samples_captured, adc_data_16b, SAV_ASCII);// write the data to the filename
+	wr_File_16b("noise.txt", num_of_samples, adc_data_16b, SAV_ASCII);// write the data to the filename
 
 	// print general measurement settings
 	sprintf(acq_file, "acqu.par");
@@ -143,7 +133,6 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "samples = %d\n", samples);
 	fprintf(fptr, "vvarac = %4.3f\n", vvarac);
 	fclose (fptr);
-	*/
 
 	leave();
 

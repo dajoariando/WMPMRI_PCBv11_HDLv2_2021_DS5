@@ -1,8 +1,7 @@
-// Created on: August 6th, 2024
+// Created on: April 14th, 2022
 // Author: David Ariando
-// This is the basic CPMG sequence but taking data from multiple channel ADC
 
-#define EXEC_CPMG
+//#define EXEC_CPMG
 #ifdef EXEC_CPMG
 
 #define GET_RAW_DATA
@@ -101,7 +100,6 @@ int main(int argc, char * argv[]) {
 	uint8_t dummy_scan_num = atoi(argv[37]);// the dummy sequence repetition number to make cpmg afterwards consistent (avoiding long T1 wait at the first cpmg measurement).
 
 	// measurement settings
-	char adc_channel = 2; // the number of adc channels being used
 	char wr_indv_scan = 0;// write individual scan to file
 	unsigned char rd_FIFO_or_DMA = RD_DMA;// data source : RD_FIFO or RD_DMA
 	unsigned char wait_til_done;// wait for done signal from the bitstream
@@ -119,7 +117,7 @@ int main(int argc, char * argv[]) {
 	double ADCCLK_MHz = adc_clk_fact * f_larmor;
 
 	// data container
-	unsigned int num_of_samples = samples_per_echo * echoes_per_scan * adc_channel;
+	unsigned int num_of_samples = samples_per_echo * echoes_per_scan;
 	uint32_t adc_data_32b[num_of_samples >> 1];// data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[num_of_samples];
 	float adc_data_sum[num_of_samples];// sum of the data
@@ -417,7 +415,6 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz);
 	fprintf(fptr, "fpgaDconv = 0\n");
 	fprintf(fptr, "dconvFact = 1\n");
-	fprintf(fptr, "adcChannels = %d\n", adc_channel);
 #endif
 #ifdef GET_DCONV_DATA
 	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz*dconv_fact);

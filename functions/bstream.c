@@ -2041,7 +2041,8 @@ phenc_obj bstream__phenc(
 void bstream__noise(
         double f_adc,
         unsigned int adc_clk_fact,
-        unsigned int samples
+        unsigned int samples,
+		char wait_til_done
         ) {
 
 	double SYSCLK_MHz = f_adc * adc_clk_fact;
@@ -2160,7 +2161,7 @@ void bstream__noise(
 // cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 // alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start (WAIT);
+	bstream_start (wait_til_done);
 
 }
 

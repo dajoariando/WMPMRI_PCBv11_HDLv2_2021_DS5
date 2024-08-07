@@ -191,7 +191,8 @@ phenc_obj bstream__phenc(
 void bstream__noise(
         double f_adc,
         unsigned int adc_clk_fact,
-        unsigned int samples
+        unsigned int samples,
+		char wait_til_done
         );
 
 void bstream__toggle(
