@@ -215,6 +215,11 @@
 #define AD9276_FLEX_FILT_HPF_29PCTG_FLP_VAL	(0b0110)
 #define AD9276_FLEX_FILT_HPF_32PCTG_FLP_VAL	(0b0111)
 
-// below this is not completed YET
 #define AD9276_ANA_IN_REG				(0x2C) //default 0x00, LNA active termination/input impedance (global). READ the datasheet
+#define AD9276_LNAN_HIZ					(0x00) // LO-x to LNA- and LOSW-x to high-Z
+#define AD9276_LNAN_LNAN				(0x01) // LO-x to LNA- and LOSW-x to LNA-
+#define AD9276_LNAN_LNAP				(0x10) // LO-x to LNA- and LOSW-x to LNA+
+#define AD9276_HIZ_HIZ					(0x11) // LO-x to high-Z and LOSW-x to high-Z
+
+// below this is not completed YET
 #define AD9276_CW_DOPPL_IQ_REG			(0x2D)

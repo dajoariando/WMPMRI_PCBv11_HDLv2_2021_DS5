@@ -2,10 +2,11 @@
 // Author: David Ariando
 // This is the basic CPMG sequence but taking data from multiple channel ADC
 
-#define EXEC_CPMG
+// #define EXEC_CPMG
 #ifdef EXEC_CPMG
 
 #define GET_RAW_DATA
+#define GET_CPMG_PARAMS
 
 #include "hps_linux.h"
 
@@ -424,6 +425,26 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "fpgaDconv = 1\n");
 	fprintf(fptr,"dconvFact = %d\n", dconv_fact);
 #endif
+#ifdef GET_CPMG_PARAMS
+	fprintf(fptr, "lcs_pchg_int = %d\n",			cpmg_params.lcs_pchg_int);
+	fprintf(fptr, "lcs_dump_int = %d\n",			cpmg_params.lcs_dump_int);
+	fprintf(fptr, "p90_pchg_int = %d\n",			cpmg_params.p90_pchg_int);
+	fprintf(fptr, "p90_pchg_refill_int = %d\n",		cpmg_params.p90_pchg_refill_int);
+	fprintf(fptr, "p90_int = %d\n",					cpmg_params.p90_int);
+	fprintf(fptr, "p90_dchg_int = %d\n",			cpmg_params.p90_dchg_int);
+	fprintf(fptr, "d90_int = %d\n",					cpmg_params.d90_int);
+	fprintf(fptr, "p180_pchg_int = %d\n",			cpmg_params.p180_pchg_int);
+	fprintf(fptr, "p180_pchg_refill_int = %d\n",	cpmg_params.p180_pchg_refill_int);
+	fprintf(fptr, "p180_int = %d\n",				cpmg_params.p180_int);
+	fprintf(fptr, "p180_dchg_int = %d\n",			cpmg_params.p180_dchg_int);
+	fprintf(fptr, "d180_int = %d\n",				cpmg_params.d180_int);
+	fprintf(fptr, "echoes_per_scan_int = %d\n",		cpmg_params.echoes_per_scan_int);
+	fprintf(fptr, "init_adc_delay_int = %d\n",		cpmg_params.init_adc_delay_int);
+	fprintf(fptr, "echoshift_int = %d\n",			cpmg_params.echoshift_int);
+	fprintf(fptr, "adc_en_window_int = %d\n",		cpmg_params.adc_en_window_int);
+	fprintf(fptr, "echotime_int = %d\n",			cpmg_params.echotime_int);
+#endif
+
 	fclose (fptr);
 
 	leave();

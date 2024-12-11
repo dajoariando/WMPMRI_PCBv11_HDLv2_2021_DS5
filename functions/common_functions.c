@@ -52,6 +52,19 @@ void sum_buf_to_float(float * buf32, uint16_t * buf16, unsigned int length, unsi
 	}
 }
 
+void sum_buf_sq_to_float(float * buf32, uint16_t * buf16, unsigned int length) {
+	int ii;
+	int32_t temp;   // temporary file to convert uint16_t to int32_t
+
+	for (ii = 0; ii < length; ii++) {
+		temp = 0;
+		temp = temp | buf16[ii];
+
+		buf32[ii] += (float) temp * (float) temp;
+
+	}
+}
+
 void avg_buf(int32_t * buf32, unsigned int length, unsigned int div_fact) {
 	int ii;
 

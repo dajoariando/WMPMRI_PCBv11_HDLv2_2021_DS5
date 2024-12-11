@@ -3,8 +3,8 @@
 // This sequence takes multichannel ADC data and interleaves it in this order (example with 3 channel):
 // d0_ch0 - d0_ch1 - d0_ch2 - d1_ch0 - d1_ch1 - d1_ch2
 
-#define EXEC_NOISE_MULTCH
-#ifdef EXEC_NOISE_MULTCH
+// #define EXEC_NOISE_MULTCH_TAVG
+#ifdef EXEC_NOISE_MULTCH_TAVG
 
 #define GET_RAW_DATA
 
@@ -60,8 +60,9 @@ int main(int argc, char * argv[]) {
 	// param defined by user
 	double f_adc = atof(argv[1]);
 	unsigned int samples_per_channel = atoi(argv[2]);
-	double vvarac = atof(argv[3]);
-	unsigned int adc_mode = atoi(argv[4]);
+	unsigned int avg_fact = atoi(argv[3]);
+	double vvarac = atof(argv[4]);
+	unsigned int adc_mode = atoi(argv[5]);
 		// OFF_VAL				0
 		// MIDSCL_SHRT_VAL		1
 		// FSP_SHRT_VAL			2
@@ -75,11 +76,11 @@ int main(int argc, char * argv[]) {
 		// 1xSYNC_VAL			10
 		// 1BIT_HIGH_VAL		11
 		// MIX_BITFREQ_VAL		12
-	unsigned int val1 = atoi(argv[5]);
-	unsigned int val2 = atoi(argv[6]);
+	unsigned int val1 = atoi(argv[6]);
+	unsigned int val2 = atoi(argv[7]);
 
 	// measurement settings
-	char rd_FIFO_or_DMA = RD_FIFO; // read data via FIFO or via DMA
+	char rd_FIFO_or_DMA = RD_DMA; // read data via FIFO or via DMA
 	char adc_channel = 2; // the number of ADC channels
 
 	// param defined by Quartus
@@ -91,6 +92,7 @@ int main(int argc, char * argv[]) {
 	unsigned int samples_captured = samples_per_channel*adc_channel; // multiply by 8 because now there's 8 channels
 	uint32_t adc_data_32b[samples_captured>>1]; // data for 1 acquisition. Every transfer has 2 data, so the container is divided by 2
 	uint16_t adc_data_16b[samples_captured];
+	float adc_data_avg[samples_captured];
 
 	// init
 	init();
@@ -134,24 +136,34 @@ int main(int argc, char * argv[]) {
 
 	flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, ENABLE_MESSAGE);
 
-	bstream__noise(f_adc, adc_clk_fact, samples_per_channel, NOWAIT); // use NOWAIT if read data from DMA
+	int i;
+	for (i=0; i<avg_fact; i++) {
+		bstream__noise(f_adc, adc_clk_fact, samples_per_channel, NOWAIT); // use NOWAIT if read data from DMA
 
-	usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+		usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-	// read data from the ADC into adc_data_32b
-	if (rd_FIFO_or_DMA == RD_FIFO) {
-		usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
-		read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
-		// flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, ENABLE_MESSAGE);
+		// read data from the ADC into adc_data_32b
+		if (rd_FIFO_or_DMA == RD_FIFO) {
+			usleep(T_BLANK / ( SYSCLK_MHz ));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+			read_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, adc_data_32b, DISABLE_MESSAGE);
+			// flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, ENABLE_MESSAGE);
+		}
+		else if (rd_FIFO_or_DMA == RD_DMA) {
+			read_adc_dma(h2p_dma_addr, axi_sdram_addr, DMA_READ_MASTER_FIFO_SINK_CH_A_BASE, DMA_WRITE_MASTER_SDRAM_BASE, adc_data_32b, samples_captured >> 1, DISABLE_MESSAGE);
+		}
+		buf32_to_buf16(adc_data_32b, adc_data_16b, samples_captured >> 1);// convert the 32-bit data format to 16-bit.
+		cut_2MSB_and_2LSB(adc_data_16b, samples_captured);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
+
+		// sum_buf_to_float(adc_data_avg, adc_data_16b, samples_captured, 0); // sum the data for the number of averaging
+		sum_buf_sq_to_float(adc_data_avg, adc_data_16b, samples_captured); // sum the squared data for the number of averaging
 	}
-	else if (rd_FIFO_or_DMA == RD_DMA) {
-		read_adc_dma(h2p_dma_addr, axi_sdram_addr, DMA_READ_MASTER_FIFO_SINK_CH_A_BASE, DMA_WRITE_MASTER_SDRAM_BASE, adc_data_32b, samples_captured >> 1, DISABLE_MESSAGE);
-	}
-	buf32_to_buf16(adc_data_32b, adc_data_16b, samples_captured >> 1);// convert the 32-bit data format to 16-bit.
-	cut_2MSB_and_2LSB(adc_data_16b, samples_captured);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
+
+	// average the data
+	avg_buf_float(adc_data_avg, samples_captured, avg_fact);
 
 	// write noise acquisition
-	wr_File_16b("noise.txt", samples_captured, adc_data_16b, SAV_ASCII);// write the data to the filename
+	// wr_File_16b("noise.txt", samples_captured, adc_data_16b, SAV_ASCII);// write the data to the filename
+	wr_File_float("noise.txt", samples_captured, adc_data_avg, SAV_BINARY);// write the data to the filename
 
 	// print general measurement settings
 	sprintf(acq_file, "acqu.par");
