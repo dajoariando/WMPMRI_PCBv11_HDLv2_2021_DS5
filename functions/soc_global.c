@@ -81,8 +81,7 @@ extern volatile unsigned int *h2p_ph_4_to_7_addr;   // the nco phase modulator
 extern volatile unsigned int *h2p_dac_preamp_addr;   // the preamp dac
 
 // gradient driver
-extern volatile unsigned int *h2p_dac_gradz_addr;
-extern volatile unsigned int *h2p_dac_gradx_addr;
+extern volatile unsigned int *h2p_dac_grad_addr;
 
 // physical memory file descriptor
 int fd_dev_mem = 0;
@@ -203,8 +202,7 @@ void soc_init() {
 	h2p_dac_preamp_addr = h2f_lw_axi_master + AD5724_PAMP_SPI_BASE;
 
 	// gradient driver
-	h2p_dac_gradz_addr = h2f_lw_axi_master + GRADZ_I2C_BASE;
-	h2p_dac_gradx_addr = h2f_lw_axi_master + GRADX_I2C_BASE;
+	h2p_dac_grad_addr = h2f_lw_axi_master + GRAD_I2C_BASE;
 
 }
 

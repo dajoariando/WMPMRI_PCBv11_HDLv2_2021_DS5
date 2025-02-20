@@ -36,6 +36,10 @@ void init() {
 	cnt_out_val &= ~ADC_AD9276_PWDN_msk;// turn on the ADC
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
 
+	// turn on the GRAD DAC I2C interface
+	cnt_out_val |= GRAD_OE;
+	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
+
 	// init the DAC
 	init_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_PAMP_CLR);
 	usleep(100);
@@ -47,6 +51,10 @@ void leave() {
 	// turn off the ADC
 	cnt_out_val |= ADC_AD9276_STBY_msk;
 	cnt_out_val |= ADC_AD9276_PWDN_msk;// (CAREFUL! SOMETIMES THE ADC CANNOT WAKE UP AFTER PUT TO PWDN)
+	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
+
+	// turn on the GRAD DAC I2C interface
+	cnt_out_val &= ~GRAD_OE;
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
 	usleep(100);
 
@@ -141,16 +149,18 @@ int main(int argc, char * argv[]) {
 	bstream_rst();
 
 	// set gradz voltage
-	gradz_voltp = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	gradz_voltn = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	//gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
-	dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
+	// gradz_voltp = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
+	// gradz_voltn = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
+	// gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
+	// dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
 
 	// set gradx voltage
 	gradx_voltp = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
 	gradx_voltn = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
 	// gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
-	dac5571_i2c_wr(h2p_dac_gradx_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
+	// dac5571_i2c_wr(h2p_dac_grad_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltp, DAC_Y, CH_DACA, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltn, DAC_Y, CH_DACC, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
 
 	// set phase increment
 	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));

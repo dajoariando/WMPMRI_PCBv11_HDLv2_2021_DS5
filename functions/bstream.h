@@ -202,4 +202,20 @@ void bstream__toggle(
         double toggle_len_us
         );
 
+void bstream__tb_vpc_chg_hbridge_left(
+        double SYSCLK_MHz,
+        double bstrap_pchg_us,
+        double lcs_pchg_us,		// precharging of vpc
+        double lcs_recycledump_us,		// dumping the lcs to the vpc
+        unsigned int repeat		// repeat the precharge and dump
+        );
+
+void bstream__tb_vpc_wastedump(
+        double SYSCLK_MHz,
+        double bstrap_pchg_us,
+        double lcs_vpc_dchg_us,		// discharging of vpc
+        double lcs_wastedump_us,		// dumping the current into RF
+        unsigned int repeat		// repeat the precharge and dump
+        );
+
 #endif /* FUNCTIONS_BSTREAM_H_ */

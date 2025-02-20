@@ -3,7 +3,7 @@
 // This sequence takes multichannel ADC data and interleaves it in this order (example with 3 channel):
 // d0_ch0 - d0_ch1 - d0_ch2 - d1_ch0 - d1_ch1 - d1_ch2
 
-#define EXEC_NOISE_MULTCH
+// #define EXEC_NOISE_MULTCH
 #ifdef EXEC_NOISE_MULTCH
 
 #define GET_RAW_DATA

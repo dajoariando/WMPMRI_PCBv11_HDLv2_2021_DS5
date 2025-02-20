@@ -246,34 +246,19 @@
 #define DMA_WRITE_MASTER_SDRAM_MEMORY_INFO_MEM_INIT_DATA_WIDTH 16
 
 /*
- * Macros for device 'gradZ_i2c', class 'altera_avalon_i2c'
- * The macros are prefixed with 'GRADZ_I2C_'.
+ * Macros for device 'grad_i2c', class 'altera_avalon_i2c'
+ * The macros are prefixed with 'GRAD_I2C_'.
  * The prefix is the slave descriptor.
  */
-#define GRADZ_I2C_COMPONENT_TYPE altera_avalon_i2c
-#define GRADZ_I2C_COMPONENT_NAME gradZ_i2c
-#define GRADZ_I2C_BASE 0x80
-#define GRADZ_I2C_SPAN 64
-#define GRADZ_I2C_END 0xbf
-#define GRADZ_I2C_IRQ 1
-#define GRADZ_I2C_FIFO_DEPTH 64
-#define GRADZ_I2C_FREQ 50000000
-#define GRADZ_I2C_USE_AV_ST 0
-
-/*
- * Macros for device 'gradX_i2c', class 'altera_avalon_i2c'
- * The macros are prefixed with 'GRADX_I2C_'.
- * The prefix is the slave descriptor.
- */
-#define GRADX_I2C_COMPONENT_TYPE altera_avalon_i2c
-#define GRADX_I2C_COMPONENT_NAME gradX_i2c
-#define GRADX_I2C_BASE 0xc0
-#define GRADX_I2C_SPAN 64
-#define GRADX_I2C_END 0xff
-#define GRADX_I2C_IRQ 4
-#define GRADX_I2C_FIFO_DEPTH 64
-#define GRADX_I2C_FREQ 50000000
-#define GRADX_I2C_USE_AV_ST 0
+#define GRAD_I2C_COMPONENT_TYPE altera_avalon_i2c
+#define GRAD_I2C_COMPONENT_NAME grad_i2c
+#define GRAD_I2C_BASE 0xc0
+#define GRAD_I2C_SPAN 64
+#define GRAD_I2C_END 0xff
+#define GRAD_I2C_IRQ 4
+#define GRAD_I2C_FIFO_DEPTH 64
+#define GRAD_I2C_FREQ 50000000
+#define GRAD_I2C_USE_AV_ST 0
 
 /*
  * Macros for device 'fifo_sink_CH_A_in_csr', class 'altera_avalon_fifo'

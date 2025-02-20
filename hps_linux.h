@@ -19,11 +19,13 @@
 #include "functions/soc_global.h"
 #include "functions/bstream.h"
 #include "functions/dac_dac5571_driver.h"
+#include "functions/dac_mcp4728_driver.h"
 #include "functions/dma.h"
 
 #include "variables/adc_ad9276_vars.h"
 // #include "variables/dac_ad5724r_vars.h"
 #include "variables/dac_ad5722r_vars.h"
+#include "variables/dac_mcp4728_vars.h"
 #include "variables/general.h"
 #include "variables/hps_soc_system.h"
 
@@ -96,8 +98,7 @@ volatile unsigned int *h2p_sys_pll_reconfig_addr = NULL;   // bitstream pll reco
 volatile unsigned int *h2p_dac_preamp_addr = NULL;
 
 // gradient driver
-volatile unsigned int *h2p_dac_gradz_addr = NULL;
-volatile unsigned int *h2p_dac_gradx_addr = NULL;
+volatile unsigned int *h2p_dac_grad_addr = NULL;
 
 // FUNCTIONS
 void leave();   // terminate the program
