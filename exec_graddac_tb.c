@@ -2,8 +2,11 @@
 // Author: David Ariando
 // This is a test program for mcp4728 dac
 
-#define EXEC_TB_MCP4728_3
+// #define EXEC_TB_MCP4728_3
 #ifdef EXEC_TB_MCP4728_3
+
+
+
 
 #include "hps_linux.h"
 

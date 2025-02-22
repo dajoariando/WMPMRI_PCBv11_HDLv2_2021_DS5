@@ -360,9 +360,9 @@ void bstream__vpc_chg(
 	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// gradX_n
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 // precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
@@ -505,7 +505,7 @@ void bstream__vpc_wastedump(
 //
 //
 
-// initialize all objects
+	// initialize all objects
 	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
@@ -536,14 +536,14 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_clkph
+	// tx_clkph
 	int alltime = repeat * ( lcs_vpc_pchg_int + lcs_wastedump_int );
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, alltime/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_h1
+	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -551,7 +551,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_h2
+	// tx_h2
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -559,7 +559,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_l1
+	// tx_l1
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -567,7 +567,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_l2
+	// tx_l2
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -575,7 +575,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_dump
+	// tx_dump
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -583,7 +583,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_charge
+	// tx_charge
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 1/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -591,7 +591,7 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_charge_bs
+	// tx_charge_bs
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 1/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, repeat /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, lcs_vpc_pchg_int /*dataval*/);
@@ -599,23 +599,23 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// rx_adc_en
+	// rx_adc_en
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// rx_in_short
+	// rx_in_short
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, alltime/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// gradZ_p
+	// gradZ_p
 	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradZ_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// gradZ_n
+	// gradZ_n
 	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradZ_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
@@ -626,11 +626,11 @@ void bstream__vpc_wastedump(
 	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// gradX_n
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-	bstream__push(&bstream_objs[gradX_p], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[gradX_n], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// precharge the high-side bootstrap circuits
+	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);		// start
 	usleep(bstrap_pchg_us);
@@ -2025,8 +2025,7 @@ phenc_obj bstream__phenc(
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// precharge the high-side bootstrap circuits
-	cnt_out_val
-	|= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
+	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 	usleep(bstrap_pchg_us);
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );

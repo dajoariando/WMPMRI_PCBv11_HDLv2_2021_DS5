@@ -21,6 +21,7 @@
 #include "functions/dac_dac5571_driver.h"
 #include "functions/dac_mcp4728_driver.h"
 #include "functions/dma.h"
+#include "functions/grad_drv.h"
 
 #include "variables/adc_ad9276_vars.h"
 // #include "variables/dac_ad5724r_vars.h"

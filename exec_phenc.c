@@ -1,9 +1,9 @@
-// Created on: August 6th, 2024
+// Created on: Feb 19th, 2025
 // Author: David Ariando
-// This is the basic CPMG sequence but taking data from multiple channel ADC
+// phase encoding T2 measurements
 
-// #define EXEC_CPMG
-#ifdef EXEC_CPMG
+#define EXEC_PHENC
+#ifdef EXEC_PHENC
 
 #define GET_RAW_DATA
 #define GET_CPMG_PARAMS
@@ -14,7 +14,7 @@
 bstream_obj bstream_objs[BSTREAM_COUNT];
 
 void init() {
-	printf("START:: EXEC_CPMG\n");
+	// printf("START::EXEC_PHENC\n");
 
 	soc_init();
 	bstream__init_all_sram();
@@ -51,7 +51,6 @@ void leave() {
 	cnt_out_val |= ADC_AD9276_STBY_msk;
 	cnt_out_val |= ADC_AD9276_PWDN_msk;// (CAREFUL! SOMETIMES THE ADC CANNOT WAKE UP AFTER PUT TO PWDN)
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
-
 	// turn on the GRAD DAC I2C interface
 	cnt_out_val &= ~GRAD_OE;
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
@@ -59,7 +58,7 @@ void leave() {
 
 	soc_exit();
 
-	printf("STOP:: EXEC_CPMG\n");
+	// printf("STOP::EXEC_PHENC\n");
 }
 
 int main(int argc, char * argv[]) {
@@ -99,14 +98,22 @@ int main(int argc, char * argv[]) {
 	double lcs_wastedump_us = atof(argv[30]);// waste/dump the lcs energy into the protection diode
 	double lcs_vpc_dchg_repeat = atof(argv[31]);// repeat VPC precharging for n times
 	// --- gradient length and strength
-	float gradz_volt = atof(argv[32]);// gradient z dac output voltage (can be either polarity, positive or negative)
-	float gradx_volt = atof(argv[33]);// gradient x dac output voltage (can be either polarity, positive or negative)
+	double gradz_len_us = atof(argv[32]);// gradient length for z gradient
+	float gradz_mA = atof(argv[33]);// gradient z dac output current (can be either polarity, positive or negative)
+	double gradx_len_us = atof(argv[34]);	// gradient length for x gradient
+	float gradx_mA = atof(argv[35]);// gradient x dac output current (can be either polarity, positive or negative)
+	// -- encoding period
+	char grad_refocus = atoi(argv[36]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
+	char flip_grad_refocus_sign = atoi(argv[37]);	// flip the gradient refocus sign for phase encoding, and don't flip it for pgse
+	double enc_tao_us = atof(argv[38]);   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
+	// -- p180 pulse x or y
+	char p180_xy_angle = atoi(argv[39]);   // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
 	// enable lcs initial precharging and discharging
-	char en_lcs_pchg = atoi(argv[34]);// enable the vpc precharging via lcs prior to cpmg
-	char en_lcs_dchg = atoi(argv[35]);// enable the vpc discharging via lcs post cpmg
-	unsigned int exp_num = atoi(argv[36]);// the experiment number
+	char en_lcs_pchg = atoi(argv[40]);// enable the vpc precharging via lcs prior to cpmg
+	char en_lcs_dchg = atoi(argv[41]);// enable the vpc discharging via lcs post cpmg
+	unsigned int exp_num = atoi(argv[42]);// the experiment number
 	// enable dummy sequence
-	uint8_t dummy_scan_num = atoi(argv[37]);// the dummy sequence repetition number to make cpmg afterwards consistent (avoiding long T1 wait at the first cpmg measurement).
+	uint8_t dummy_scan_num = atoi(argv[43]);// the dummy sequence repetition number to make cpmg afterwards consistent (avoiding long T1 wait at the first cpmg measurement).
 
 	// measurement settings
 	char adc_channel = 2; // the number of adc channels being used
@@ -137,10 +144,10 @@ int main(int argc, char * argv[]) {
 	for (jj = 0; jj < num_of_samples; jj++) {
 		adc_data_sum[jj] = 0;
 	}
+	float gradz_mA_abs;   // gradient z mA to program dac
+	float gradx_mA_abs;// gradient x mA to program dac
+	char gradz_dir, gradx_dir;   // the gradient direction
 
-	float gradz_voltp, gradz_voltn;   // gradient z voltage to program dac
-	float gradx_voltp, gradx_voltn;// gradient x voltage to program dac
-	// char gradz_dir, gradx_dir;   // the gradient direction
 	// init
 	init();
 
@@ -148,18 +155,17 @@ int main(int argc, char * argv[]) {
 	bstream_rst();
 
 	// set gradz voltage
-	// gradz_voltp = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	// gradz_voltn = fabs(gradz_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	// gradz_dir = ( gradz_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
-	// dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
+	gradz_mA_abs = fabs(gradz_mA);// same for both polarity, but can be enabled or disabled as will in bitstream
+	gradz_dir = ( gradz_mA > 0 ) ? 1 : 0;   // set the direction to positive if gradz_volt > 0
 
 	// set gradx voltage
-	gradx_voltp = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	gradx_voltn = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	// gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
-	// dac5571_i2c_wr(h2p_dac_grad_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltp, DAC_Y, CH_DACA, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltn, DAC_Y, CH_DACC, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	gradx_mA_abs = fabs(gradx_mA);// same for both polarity, but can be enabled or disabled as will in bitstream
+	gradx_dir = ( gradz_mA > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
+
+	// program the dac
+	double ibias = 10; // in mA
+	grad_init_current (ibias, gradx_mA_abs, ibias, gradx_mA_abs, DAC_X); // program the DAC_X
+	grad_init_current (ibias, gradz_mA_abs, ibias, gradz_mA_abs, DAC_Y); // program the DAC_Y
 
 	// set phase increment
 	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));
@@ -212,12 +218,12 @@ int main(int argc, char * argv[]) {
 	}
 
 	clock_t start, end;
-	double net_acq_time, net_elapsed_time;
-	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees (x-pulse)
+	double net_acq_time, net_elapsed_time, net_scan_time;
+	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
 	unsigned int ii;
 	char dataname[15];// the name container for individual scan data
 	char datasumname[15];// the name container for sum scan data
-	cpmg_obj cpmg_params;
+	phenc_obj phenc_params;
 	for (ii = 0; ii < n_iterate; ii++) {
 
 		if (dummy_scan_num > 0 && ii == 0) {   // run the dummy scan at the first iteration but don't save the data
@@ -226,7 +232,7 @@ int main(int argc, char * argv[]) {
 				// measure the start time
 				start = clock();// measure time
 
-				cpmg_params = bstream__cpmg(
+				phenc_params = bstream__phenc(
 					f_larmor,
 					larmor_clk_fact,
 					adc_clk_fact,
@@ -251,6 +257,14 @@ int main(int argc, char * argv[]) {
 					dconv_fact,
 					echoskip,
 					echodrop,
+					gradz_dir,
+					gradz_len_us,
+					gradx_dir,
+					gradx_len_us,
+					grad_refocus,
+					flip_grad_refocus_sign,
+					enc_tao_us,
+					p180_xy_angle,
 					wait_til_done
 				);
 
@@ -276,7 +290,7 @@ int main(int argc, char * argv[]) {
 				if ((unsigned long) net_elapsed_time < scanspacing_us) {
 					while ((unsigned long) net_elapsed_time < scanspacing_us) {
 						end = clock();   // measure time
-						net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;// measure time in us
+						net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;   // measure time in us
 					}
 
 					if (DISABLE_MESSAGE) {
@@ -295,7 +309,7 @@ int main(int argc, char * argv[]) {
 		// measure the start time
 		start = clock();// measure time
 
-		cpmg_params = bstream__cpmg(
+		phenc_params = bstream__phenc(
 			f_larmor,
 			larmor_clk_fact,
 			adc_clk_fact,
@@ -320,6 +334,14 @@ int main(int argc, char * argv[]) {
 			dconv_fact,
 			echoskip,
 			echodrop,
+			gradz_dir,
+			gradz_len_us,
+			gradx_dir,
+			gradx_len_us,
+			grad_refocus,
+			flip_grad_refocus_sign,
+			enc_tao_us,
+			p180_xy_angle,
 			wait_til_done
 		);
 
@@ -334,7 +356,7 @@ int main(int argc, char * argv[]) {
 		buf32_to_buf16(adc_data_32b, adc_data_16b, num_of_samples >> 1);   // convert the 32-bit data format to 16-bit.
 		cut_2MSB_and_2LSB(adc_data_16b, num_of_samples);// cut the 2 MSB and 2 LSB (check signalTap for the details). The data is valid only at bit-2 to bit-13.
 
-		// calculate scansum
+		// calculate echosum
 		sum_buf_to_float(adc_data_sum, adc_data_16b, num_of_samples, p90_ph_sel >> 1);// if p90_ph_sel == 3, subtract the data. If p90_ph_sel = 1, sum the data.
 
 		// toggle phase cycling
@@ -366,7 +388,7 @@ int main(int argc, char * argv[]) {
 		if ((unsigned long) net_elapsed_time < scanspacing_us) {
 			while ((unsigned long) net_elapsed_time < scanspacing_us) {
 				end = clock();   // measure time
-				net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;// measure time in us
+				net_elapsed_time = ( (double) ( end - start ) ) * 1000000 / CLOCKS_PER_SEC;   // measure time in us
 			}
 
 			if (DISABLE_MESSAGE) {
@@ -379,6 +401,7 @@ int main(int argc, char * argv[]) {
 			printf("\t[WARNING] One scan duration is longer than scan_spacing_us parameter (%ld us) and is measured to be approx. %ld us\n", scanspacing_us, (unsigned long) net_acq_time);
 		}
 	}
+
 	if (en_lcs_dchg) {
 		bstream__vpc_wastedump(
 			SYSCLK_MHz,
@@ -400,20 +423,20 @@ int main(int argc, char * argv[]) {
 	fptr = fopen(acq_file, "w");
 	fprintf(fptr, "b1Freq = %4.12f\n", f_larmor);
 	fprintf(fptr, "p90LengthGiven = %4.12f\n", p90_us);
-	fprintf(fptr, "p90LengthRun = %4.12f\n", (double) cpmg_params.p90_int / SYSCLK_MHz);
-	fprintf(fptr, "p90LengthCnt = %d @ %4.12f MHz\n", cpmg_params.p90_int, SYSCLK_MHz);
-	fprintf(fptr, "d90LengthRun = %4.12f\n", (double) cpmg_params.d90_int / SYSCLK_MHz);
-	fprintf(fptr, "d90LengthCnt = %d @ %4.12f MHz\n", cpmg_params.d90_int, SYSCLK_MHz);
+	fprintf(fptr, "p90LengthRun = %4.12f\n", (double) phenc_params.p90_int / SYSCLK_MHz);
+	fprintf(fptr, "p90LengthCnt = %d @ %4.12f MHz\n", phenc_params.p90_int, SYSCLK_MHz);
+	fprintf(fptr, "d90LengthRun = %4.12f\n", (double) phenc_params.d90_enc_int / SYSCLK_MHz);
+	fprintf(fptr, "d90LengthCnt = %d @ %4.12f MHz\n", phenc_params.d90_enc_int, SYSCLK_MHz);
 	fprintf(fptr, "p180LengthGiven = %4.12f\n", p180_us);
-	fprintf(fptr, "p180LengthRun = %4.12f\n", (double) cpmg_params.p180_int / SYSCLK_MHz);
-	fprintf(fptr, "p180LengthCnt =  %d @ %4.12f MHz\n", cpmg_params.p180_int, SYSCLK_MHz);
-	fprintf(fptr, "d180LengthRun = %4.12f\n", (double) cpmg_params.d180_int / SYSCLK_MHz);
-	fprintf(fptr, "d180LengthCnt = %d @ %4.12f MHz\n", cpmg_params.d180_int, SYSCLK_MHz);
+	fprintf(fptr, "p180LengthRun = %4.12f\n", (double) phenc_params.p180_int / SYSCLK_MHz);
+	fprintf(fptr, "p180LengthCnt =  %d @ %4.12f MHz\n", phenc_params.p180_int, SYSCLK_MHz);
+	fprintf(fptr, "d180LengthRun = %4.12f\n", (double) phenc_params.d180_int / SYSCLK_MHz);
+	fprintf(fptr, "d180LengthCnt = %d @ %4.12f MHz\n", phenc_params.d180_int, SYSCLK_MHz);
 	//fprintf(fptr,"p90_dtcl = %4.3f\n", pulse1_dtcl);
 	//fprintf(fptr,"p180_dtcl = %4.3f\n", pulse2_dtcl);
 	fprintf(fptr, "echoTimeGiven = %4.12f\n", echotime_us);
-	fprintf(fptr, "echoTimeRun = %4.12f\n", (double) cpmg_params.echotime_int / SYSCLK_MHz);
-	fprintf(fptr, "echoTimeCnt = %d @ %4.12f MHz\n", cpmg_params.echotime_int, SYSCLK_MHz);
+	fprintf(fptr, "echoTimeRun = %4.12f\n", (double) phenc_params.echotime_int / SYSCLK_MHz);
+	fprintf(fptr, "echoTimeCnt = %d @ %4.12f MHz\n", phenc_params.echotime_int, SYSCLK_MHz);
 	fprintf(fptr, "ieTime = %lu\n", scanspacing_us / 1000);
 	fprintf(fptr, "nrPnts = %d\n", samples_per_echo);
 	fprintf(fptr, "nrEchoes = %d\n", echoes_per_scan);
@@ -423,11 +446,16 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "adcFreq = %4.12f\n", ADCCLK_MHz);
 	fprintf(fptr, "usePhaseCycle = %d\n", ph_cycl_en);
 	fprintf(fptr, "echoSkipHw = %d\n", 1);
+	fprintf(fptr, "gradZ_mA = %4.12f\n", gradz_mA);
+	fprintf(fptr, "gradZ_Len = %4.12f\n", phenc_params.gradz_len_int / SYSCLK_MHz);
+	fprintf(fptr, "gradX_mA = %4.12f\n", gradx_mA);
+	fprintf(fptr, "gradX_Len = %4.12f\n", phenc_params.gradx_len_int / SYSCLK_MHz);
+	fprintf(fptr, "encTao = %4.12f\n", phenc_params.enc_tao_int / SYSCLK_MHz);
 #ifdef GET_RAW_DATA
 	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz);
 	fprintf(fptr, "fpgaDconv = 0\n");
 	fprintf(fptr, "dconvFact = 1\n");
-	fprintf(fptr, "adcChannels = %d\n", adc_channel);
+	fprintf(fptr, "adcChannels = %d\n", adc_channel);											  
 #endif
 #ifdef GET_DCONV_DATA
 	fprintf(fptr, "dwellTime = %4.12f\n", 1 / ADCCLK_MHz*dconv_fact);
@@ -435,25 +463,24 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr,"dconvFact = %d\n", dconv_fact);
 #endif
 #ifdef GET_CPMG_PARAMS
-	fprintf(fptr, "lcs_pchg_int = %d\n",			cpmg_params.lcs_pchg_int);
-	fprintf(fptr, "lcs_dump_int = %d\n",			cpmg_params.lcs_dump_int);
-	fprintf(fptr, "p90_pchg_int = %d\n",			cpmg_params.p90_pchg_int);
-	fprintf(fptr, "p90_pchg_refill_int = %d\n",		cpmg_params.p90_pchg_refill_int);
-	fprintf(fptr, "p90_int = %d\n",					cpmg_params.p90_int);
-	fprintf(fptr, "p90_dchg_int = %d\n",			cpmg_params.p90_dchg_int);
-	fprintf(fptr, "d90_int = %d\n",					cpmg_params.d90_int);
-	fprintf(fptr, "p180_pchg_int = %d\n",			cpmg_params.p180_pchg_int);
-	fprintf(fptr, "p180_pchg_refill_int = %d\n",	cpmg_params.p180_pchg_refill_int);
-	fprintf(fptr, "p180_int = %d\n",				cpmg_params.p180_int);
-	fprintf(fptr, "p180_dchg_int = %d\n",			cpmg_params.p180_dchg_int);
-	fprintf(fptr, "d180_int = %d\n",				cpmg_params.d180_int);
-	fprintf(fptr, "echoes_per_scan_int = %d\n",		cpmg_params.echoes_per_scan_int);
-	fprintf(fptr, "init_adc_delay_int = %d\n",		cpmg_params.init_adc_delay_int);
-	fprintf(fptr, "echoshift_int = %d\n",			cpmg_params.echoshift_int);
-	fprintf(fptr, "adc_en_window_int = %d\n",		cpmg_params.adc_en_window_int);
-	fprintf(fptr, "echotime_int = %d\n",			cpmg_params.echotime_int);
+	fprintf(fptr, "lcs_pchg_int = %d\n",			phenc_params.lcs_pchg_int);
+	fprintf(fptr, "lcs_dump_int = %d\n",			phenc_params.lcs_dump_int);
+	fprintf(fptr, "p90_pchg_int = %d\n",			phenc_params.p90_pchg_int);
+	fprintf(fptr, "p90_pchg_refill_int = %d\n",		phenc_params.p90_pchg_refill_int);
+	fprintf(fptr, "p90_int = %d\n",					phenc_params.p90_int);
+	fprintf(fptr, "p90_dchg_int = %d\n",			phenc_params.p90_dchg_int);
+	fprintf(fptr, "d90_enc_int = %d\n",				phenc_params.d90_enc_int);
+	fprintf(fptr, "p180_pchg_int = %d\n",			phenc_params.p180_pchg_int);
+	fprintf(fptr, "p180_pchg_refill_int = %d\n",	phenc_params.p180_pchg_refill_int);
+	fprintf(fptr, "p180_int = %d\n",				phenc_params.p180_int);
+	fprintf(fptr, "p180_dchg_int = %d\n",			phenc_params.p180_dchg_int);
+	fprintf(fptr, "d180_int = %d\n",				phenc_params.d180_int);
+	fprintf(fptr, "echoes_per_scan_int = %d\n",		phenc_params.echoes_per_scan_int);
+	fprintf(fptr, "init_adc_delay_int = %d\n",		phenc_params.init_adc_delay_int);
+	fprintf(fptr, "echoshift_int = %d\n",			phenc_params.echoshift_int);
+	fprintf(fptr, "adc_en_window_int = %d\n",		phenc_params.adc_en_window_int);
+	fprintf(fptr, "echotime_int = %d\n",			phenc_params.echotime_int);
 #endif
-
 	fclose (fptr);
 
 	leave();
@@ -462,4 +489,3 @@ int main(int argc, char * argv[]) {
 }
 
 #endif
-
