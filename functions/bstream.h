@@ -33,7 +33,7 @@ void bstream__init(bstream_obj *obj, double freq_MHz);
 
 void bstream_rst();
 
-void bstream_start(unsigned char wait_til_done);   // start the bitstream
+void bstream_start(unsigned char wait_til_done, unsigned int last_bstream_len); // start the bitstream
 
 void bstream_wait_for_done();   // wait for done signal from h1
 

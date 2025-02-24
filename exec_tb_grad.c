@@ -1,8 +1,8 @@
 // Created on: Feb 19th, 2025
 // Author: David Ariando
-// this program is to test the gradient output
+// this program is to test the gradient output.
 
-#define EXEC_TB_GRAD
+// #define EXEC_TB_GRAD
 #ifdef EXEC_TB_GRAD
 
 #include "hps_linux.h"
@@ -101,57 +101,42 @@ int main(int argc, char * argv[]) {
 	// program the dac
 	grad_init_current (ibias_x_A, gradx_mA_abs, ibias_x_C, gradx_mA_abs, DAC_X); // program the DAC_X
 	grad_init_current (ibias_y_A, grady_mA_abs, ibias_y_C, grady_mA_abs, DAC_Y); // program the DAC_Y
+	usleep(200000);
 
-	// set phase increment
-	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));
+	//  program the clock for the ADC
+	Set_PLL(h2p_sys_pll_reconfig_addr, 0, SYSCLK_MHz, 0.5, DISABLE_MESSAGE);
+	Reset_PLL(h2p_general_cnt_out_addr, SYS_PLL_RST_ofst, cnt_out_val);
+	Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
+	// Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
+	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, fco_locked_ofst);
 
-		// set phase overlap
-		alt_write_word( ( h2p_ph_overlap_addr ), ( uint16_t )(1 << ( NCO_AMP_RES - 4 )));// set phase overlap which increases duty cycle.
+	// initialize ADC
+	// read_adc_id();
+	init_adc(AD9276_OUT_ADJ_TERM_100OHM_VAL, AD9276_OUT_PHS_180DEG_VAL, AD9276_OUT_TEST_OFF_VAL, 0, 0);
 
-		// set phase base
-		// calculate phase from the phase resolution of the NCO
-		unsigned int ph_base_num = 4;
-		unsigned int ph0, ph90, ph180, ph270;
-		ph0 = ph_base_num;// phase 0
-		ph90 = 1 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;// phase 90. 1<<(NCO_PH_RES-2) is the bit needs to be changed to get 90 degrees.
-		ph180 = 2 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;// phase 180.
-		ph270 = 3 * ( 1 << ( NCO_PH_RES - 2 ) ) + ph_base_num;// phase 270.
-		alt_write_word( ( h2p_ph_0_to_3_addr ), ( ph0 << 24 ) | ( ph90 << 16 ) | ( ph180 << 8 ) | ( ph270 ));// program phase 0 to phase 3
-		alt_write_word( ( h2p_ph_4_to_7_addr ), ( ph0 << 24 ) | ( ph0 << 16 ) | ( ph0 << 8 ) | ( ph0 ));// program phase 4 to phase 7
+	// write the preamp dac
+	// wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);// set -2.5 for 4 MHz resonant
 
-		// program the clock for the ADC
-		Set_PLL(h2p_sys_pll_reconfig_addr, 0, SYSCLK_MHz, 0.5, DISABLE_MESSAGE);
-		Reset_PLL(h2p_general_cnt_out_addr, SYS_PLL_RST_ofst, cnt_out_val);
-		Set_DPS(h2p_sys_pll_reconfig_addr, 0, 0, DISABLE_MESSAGE);
-		Wait_PLL_To_Lock(h2p_general_cnt_in_addr, sys_pll_locked_ofst);
-		// Wait_PLL_To_Lock(h2p_general_cnt_in_addr, fco_locked_ofst);
-
-		// initialize ADC
-		// read_adc_id();
-		init_adc(AD9276_OUT_ADJ_TERM_100OHM_VAL, AD9276_OUT_PHS_180DEG_VAL, AD9276_OUT_TEST_OFF_VAL, 0, 0);
-
-		// write the preamp dac
-		// wr_dac_ad5722r(h2p_dac_preamp_addr, PN50, DAC_B, vvarac, DAC_PAMP_LDAC, DISABLE_MESSAGE);// set -2.5 for 4 MHz resonant
-
-		Wait_PLL_To_Lock(h2p_general_cnt_in_addr, fco_locked_ofst);
-		usleep(100);// wait for the PLL FCO to lock as well
+	Wait_PLL_To_Lock(h2p_general_cnt_in_addr, fco_locked_ofst);
+	usleep(100);	// wait for the PLL FCO to lock as well
 
 
 	bstream__tb_grad(
-		SYSCLK_MHz,			// base clock
-		bstrap_pchg_us,		// bootstrap precharging
-		front_porch_us,		// front porch before gradient
+		SYSCLK_MHz,				// base clock
+			bstrap_pchg_us,			// bootstrap precharging
+			front_porch_us,			// front porch before gradient
 		grad_len_us,			// gradient length (for both output)
-		grad_blanking_us,	// gradient blanking between two gradient output
-		back_tail_us,		// back tail after gradient train
+			grad_blanking_us,	// gradient blanking between two gradient output
+			back_tail_us,			// back tail after gradient train
 		grady_dir,				// gradient z direction
 		gradx_dir,				// gradient x direction
 		grad_refocus,			// gradient refocus
-		flip_grad_refocus_sign// flip gradient refocus
+			flip_grad_refocus_sign	// flip gradient refocus
 	);
 
 	leave();
 
+	/*
 	TX BITSTREAM HAS TO BE THE LAST ONE TO FINISH BECAUSE THE FINISH, OTHERWISE THE BITSTREAM DONE SIGNAL WILL
 	TELL THE WHOLE PROGRAM TO CONTINUE, POSSIBLY ALTERING THE ADC THAT GENERATES THE CLOCK FOR THE ADC, CAUSING CHAOS.
 	THATS THE REASON WHY I HAD T_BLANK AT THE END OF EVERY BITSTREAM SIGNAL, IN ORDER TO MAKE SURE THAT THE FINAL
@@ -161,7 +146,7 @@ int main(int argc, char * argv[]) {
 	ALSO REMEMBER THAT THE "DONE" SIGNAL IS GENERATED BEFORE THE FINAL BITSTREAM CHUNK IS FINISHED. IT ACTUALLY BEING
 	GENERATED WHEN THE FINAL BITSTREAM CHUNK IS STARTED.
 
-	ALSO MAKE SURE TO CLEAN UP PARAMETER SOC_INPUT AND SOC_OUTPUT NAME CAUSE I JUST CHANGED A BUNCH.
+	ALSO MAKE SURE TO CLEAN UP PARAMETER SOC_INPUT AND SOC_OUTPUT NAME CAUSE I JUST CHANGED A BUNCH.*/
 
 	return 0;
 }

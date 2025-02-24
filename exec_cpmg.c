@@ -2,7 +2,7 @@
 // Author: David Ariando
 // This is the basic CPMG sequence but taking data from multiple channel ADC
 
-// #define EXEC_CPMG
+#define EXEC_CPMG
 #ifdef EXEC_CPMG
 
 #define GET_RAW_DATA
@@ -154,12 +154,12 @@ int main(int argc, char * argv[]) {
 	// dac5571_i2c_wr(h2p_dac_gradz_addr, gradz_voltp, gradz_voltn, DISABLE_MESSAGE);
 
 	// set gradx voltage
-	gradx_voltp = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
-	gradx_voltn = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
+	// gradx_voltp = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
+	// gradx_voltn = fabs(gradx_volt);// same for both polarity, but can be enabled or disabled as will in bitstream
 	// gradx_dir = ( gradx_volt > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
 	// dac5571_i2c_wr(h2p_dac_grad_addr, gradx_voltp, gradx_voltn, DISABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltp, DAC_Y, CH_DACA, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltn, DAC_Y, CH_DACC, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	// mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltp, DAC_Y, CH_DACA, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	// mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, gradx_voltn, DAC_Y, CH_DACC, VREF_INTERN, (float)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
 
 	// set phase increment
 	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));

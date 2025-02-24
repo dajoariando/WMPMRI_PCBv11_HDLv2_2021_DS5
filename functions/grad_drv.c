@@ -33,20 +33,20 @@ void grad_init_current (double i_ChA, double i_ChB, double i_ChC, double i_ChD, 
 	// select DAC
 	switch (DAC_SEL) {
 		case DAC_X:
-			grad_cnt_ch = GRADX_CNT_N | GRADX_CNT_P;
-			grad_hi_side_ch = GRADX_HL | GRADX_HR;
+			grad_cnt_ch = GRADX_LO_L_SOC | GRADX_LO_R_SOC;
+			grad_hi_side_ch = GRADX_HI_R_SOC | GRADX_HI_L_SOC;
 			break;
 		case DAC_Y:
-			grad_cnt_ch = GRADY_CNT_N | GRADY_CNT_P;
-			grad_hi_side_ch = GRADY_HL | GRADY_HR;
+			grad_cnt_ch = GRADY_LO_L_SOC | GRADY_LO_R_SOC;
+			grad_hi_side_ch = GRADY_HI_R_SOC | GRADY_HI_L_SOC;
 			break;
 		case DAC_Z:
-			grad_cnt_ch = GRADZ_CNT_N | GRADZ_CNT_P;
-			grad_hi_side_ch = GRADZ_HL | GRADZ_HR;
+			grad_cnt_ch = GRADZ_LO_L_SOC | GRADZ_LO_R_SOC;
+			grad_hi_side_ch = GRADZ_HI_R_SOC | GRADZ_HI_L_SOC;
 			break;
 		case DAC_Z2:
-			grad_cnt_ch = GRADZ2_CNT_N | GRADZ2_CNT_P;
-			grad_hi_side_ch = GRADZ2_HL | GRADZ2_HR;
+			grad_cnt_ch = GRADZ2_LO_L_SOC | GRADZ2_LO_R_SOC;
+			grad_hi_side_ch = GRADZ2_HI_R_SOC | GRADZ2_HI_L_SOC;
 			break;
 		default:
 			grad_cnt_ch = 0;

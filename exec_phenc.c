@@ -207,16 +207,15 @@ int main(int argc, char * argv[]) {
 			lcs_recycledump_us,// dumping the lcs to the vpc
 			lcs_vpc_pchg_repeat// repeat the precharge and dump
 		);
-		usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-		/* flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
+		// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
 		int flushed_data = 0;
 		flushed_data = flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, DISABLE_MESSAGE);
 		if (flushed_data > 0) {
 			printf("\tWARNING! Flushed data = %d\n", flushed_data);
-		}*/
+		}
 	}
-/*
+
 	clock_t start, end;
 	double net_acq_time, net_elapsed_time, net_scan_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
@@ -482,7 +481,7 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "echotime_int = %d\n",			phenc_params.echotime_int);
 #endif
 	fclose (fptr);
-*/
+
 	leave();
 
 	return 0;

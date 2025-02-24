@@ -24,54 +24,54 @@
  */
 
 // OUTPUT
-#define GRAD_AUX_ofst				(29)
-#define GRADX_CNT_N_ofst			(28)
-#define GRADX_CNT_P_ofst			(27)
-#define GRADY_CNT_N_ofst			(26)
-#define GRADY_CNT_P_ofst			(25)
-#define GRADZ_CNT_N_ofst			(24)
-#define GRADZ_CNT_P_ofst			(23)
-#define GRADZ2_CNT_N_ofst			(22)
-#define GRADZ2_CNT_P_ofst			(21)
-#define GRADX_HL_ofst				(20)
-#define GRADX_HR_ofst				(19)
-#define GRADY_HL_ofst				(18)
-#define GRADY_HR_ofst				(17)
-#define GRADZ_HL_ofst				(16)
-#define GRADZ_HR_ofst				(15)
-#define GRADZ2_HL_ofst				(14)
-#define GRADZ2_HR_ofst				(13)
-#define GRAD_OE_ofst				(12)
-#define DAC_PAMP_LDAC_ofst			(11)
-#define DAC_PAMP_CLR_ofst			(10)
-#define CHG_HBRIDGE_ofst			(9)
-#define CHG_BS_ofst					(8)
-#define DCHG_BS_ofst				(7)
-#define SYS_PLL_RST_ofst			(6)
-#define BITSTR_ADV_RST_ofst			(5)
-#define BITSTR_ADV_START_ofst		(4)
-#define ADC_AD9276_PWDN_ofst		(3)
-#define ADC_AD9276_STBY_ofst		(2)
-#define FSM_RESET_ofst				(1)
-#define FSM_START_ofst				(0)
+#define GRAD_AUX_ofst			(29)	// GRAD_AUX_ofst				
+#define GRADX_LO_L_SOC_ofst		(28)	// GRADX_CNT_N_ofst			
+#define GRADX_LO_R_SOC_ofst		(27)	// GRADX_CNT_P_ofst			
+#define GRADY_LO_L_SOC_ofst		(26)	// GRADY_CNT_N_ofst			
+#define GRADY_LO_R_SOC_ofst		(25)	// GRADY_CNT_P_ofst			
+#define GRADZ_LO_L_SOC_ofst		(24)	// GRADZ_CNT_N_ofst			
+#define GRADZ_LO_R_SOC_ofst		(23)	// GRADZ_CNT_P_ofst			
+#define GRADZ2_LO_L_SOC_ofst	(22)	// GRADZ2_CNT_N_ofst			
+#define GRADZ2_LO_R_SOC_ofst	(21)	// GRADZ2_CNT_P_ofst			
+#define GRADX_HI_R_SOC_ofst		(20)	// GRADX_HL_ofst				
+#define GRADX_HI_L_SOC_ofst		(19)	// GRADX_HR_ofst				
+#define GRADY_HI_R_SOC_ofst		(18)	// GRADY_HL_ofst				
+#define GRADY_HI_L_SOC_ofst		(17)	// GRADY_HR_ofst				
+#define GRADZ_HI_R_SOC_ofst		(16)	// GRADZ_HL_ofst				
+#define GRADZ_HI_L_SOC_ofst		(15)	// GRADZ_HR_ofst				
+#define GRADZ2_HI_R_SOC_ofst	(14)	// GRADZ2_HL_ofst				
+#define GRADZ2_HI_L_SOC_ofst	(13)	// GRADZ2_HR_ofst				
+#define GRAD_OE_ofst			(12)	// GRAD_OE_ofst				
+#define DAC_PAMP_LDAC_ofst		(11)	// DAC_PAMP_LDAC_ofst			
+#define DAC_PAMP_CLR_ofst		(10)	// DAC_PAMP_CLR_ofst			
+#define CHG_HBRIDGE_ofst		(9)		// CHG_HBRIDGE_ofst			
+#define CHG_BS_ofst				(8)		// CHG_BS_ofst					
+#define DCHG_BS_ofst			(7)		// DCHG_BS_ofst				
+#define SYS_PLL_RST_ofst		(6)		// SYS_PLL_RST_ofst			
+#define BITSTR_ADV_RST_ofst		(5)		// BITSTR_ADV_RST_ofst			
+#define BITSTR_ADV_START_ofst	(4)		// BITSTR_ADV_START_ofst		
+#define ADC_AD9276_PWDN_ofst	(3)		// ADC_AD9276_PWDN_ofst		
+#define ADC_AD9276_STBY_ofst	(2)		// ADC_AD9276_STBY_ofst		
+#define FSM_RESET_ofst			(1)		// FSM_RESET_ofst				
+#define FSM_START_ofst			(0)		// FSM_START_ofst				
 
 #define GRAD_AUX					(1<<GRAD_AUX_ofst)
-#define GRADX_CNT_N					(1<<GRADX_CNT_N_ofst)
-#define GRADX_CNT_P					(1<<GRADX_CNT_P_ofst)
-#define GRADY_CNT_N					(1<<GRADY_CNT_N_ofst)
-#define GRADY_CNT_P					(1<<GRADY_CNT_P_ofst)
-#define GRADZ_CNT_N					(1<<GRADZ_CNT_N_ofst)
-#define GRADZ_CNT_P					(1<<GRADZ_CNT_P_ofst)
-#define GRADZ2_CNT_N				(1<<GRADZ2_CNT_N_ofst)
-#define GRADZ2_CNT_P				(1<<GRADZ2_CNT_P_ofst)
-#define GRADX_HL					(1<<GRADX_HL_ofst)
-#define GRADX_HR					(1<<GRADX_HR_ofst)
-#define GRADY_HL					(1<<GRADY_HL_ofst)
-#define GRADY_HR					(1<<GRADY_HR_ofst)
-#define GRADZ_HL					(1<<GRADZ_HL_ofst)
-#define GRADZ_HR					(1<<GRADZ_HR_ofst)
-#define GRADZ2_HL					(1<<GRADZ2_HL_ofst)
-#define GRADZ2_HR					(1<<GRADZ2_HR_ofst)
+#define GRADX_LO_L_SOC				(1<<GRADX_LO_L_SOC_ofst)
+#define GRADX_LO_R_SOC				(1<<GRADX_LO_R_SOC_ofst)
+#define GRADY_LO_L_SOC				(1<<GRADY_LO_L_SOC_ofst)
+#define GRADY_LO_R_SOC				(1<<GRADY_LO_R_SOC_ofst)
+#define GRADZ_LO_L_SOC				(1<<GRADZ_LO_L_SOC_ofst)
+#define GRADZ_LO_R_SOC				(1<<GRADZ_LO_R_SOC_ofst)
+#define GRADZ2_LO_L_SOC				(1<<GRADZ2_LO_L_SOC_ofst)
+#define GRADZ2_LO_R_SOC				(1<<GRADZ2_LO_R_SOC_ofst)
+#define GRADX_HI_R_SOC				(1<<GRADX_HI_R_SOC_ofst)
+#define GRADX_HI_L_SOC				(1<<GRADX_HI_L_SOC_ofst)
+#define GRADY_HI_R_SOC				(1<<GRADY_HI_R_SOC_ofst)
+#define GRADY_HI_L_SOC				(1<<GRADY_HI_L_SOC_ofst)
+#define GRADZ_HI_R_SOC				(1<<GRADZ_HI_R_SOC_ofst)
+#define GRADZ_HI_L_SOC				(1<<GRADZ_HI_L_SOC_ofst)
+#define GRADZ2_HI_R_SOC				(1<<GRADZ2_HI_R_SOC_ofst)
+#define GRADZ2_HI_L_SOC				(1<<GRADZ2_HI_L_SOC_ofst)
 #define GRAD_OE						(1<<GRAD_OE_ofst)
 #define DAC_PAMP_LDAC				(1<<DAC_PAMP_LDAC_ofst)
 #define DAC_PAMP_CLR				(1<<DAC_PAMP_CLR_ofst)

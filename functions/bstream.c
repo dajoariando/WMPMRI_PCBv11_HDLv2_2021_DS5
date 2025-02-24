@@ -103,7 +103,7 @@ void bstream_rst() {
 
 }
 
-void bstream_start(unsigned char wait_til_done) {
+void bstream_start(unsigned char wait_til_done, unsigned int last_bstream_len_us) {
 	unsigned char ii;
 	char stop = SEQ_OK;   // do not start the sequence if there's any error
 	for (ii = 0; ii < BSTREAM_COUNT; ii++) {
@@ -121,13 +121,14 @@ void bstream_start(unsigned char wait_til_done) {
 	*h2p_general_cnt_out_addr = cnt_out_val;
 
 	if (wait_til_done == WAIT) {   // wait_til_done is used if the data is taken from FIFO. If the data is taken from DMA, start the DMA immediately without wait_til_done.
-		bstream_wait_for_done();   // wait for the done signal from h1. Remember that the last bitstream chunk is still running when done is asserted.
+		bstream_wait_for_done(); // wait for the done signal from all bitstream modules. Remember that the last bitstream chunk is still running when done is asserted.
+		usleep(last_bstream_len_us); // wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 	}
 
 }
 
 void bstream_wait_for_done() {   // wait for done signal from h1. Remember that the last bitstream chunk is still running when done is asserted.
-	while (! ( alt_read_word(h2p_general_cnt_in_addr) & ( tx_h1_done ) ))
+	while (! ( alt_read_word(h2p_general_cnt_in_addr) & ( bitstr_adv_done ) ))
 		;
 }
 
@@ -270,19 +271,19 @@ void bstream__vpc_chg(
 	bstream__push(&bstream_objs[gradX_Lo_L], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// grad_hside_en
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
-// precharge the high-side bootstrap circuits
+ // precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 	usleep(bstrap_pchg_us);
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -405,7 +406,8 @@ void bstream__en_adc(
 		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
-	bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
+	
 
 }
 
@@ -563,7 +565,7 @@ void bstream__vpc_wastedump(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);		// start
 
-	bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -595,15 +597,15 @@ cpmg_obj bstream__cpmg(
         unsigned char wait_til_done
         ) {
 
-// take a look at the diagram of cpmg in the one note to understand how the values for different parameters are derived to cpmg_params.
+	// take a look at the diagram of cpmg in the one note to understand how the values for different parameters are derived to cpmg_params.
 
-// program the SYSCLK to 16x f_larmor. The maximum frequency for f_larmor is 16x5MHz = 80MHz and it's limited by the ADC acquisition frequency.
-// float SYSCLK_MHz = f_larmor * 16;
-// unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
+	// program the SYSCLK to 16x f_larmor. The maximum frequency for f_larmor is 16x5MHz = 80MHz and it's limited by the ADC acquisition frequency.
+	// float SYSCLK_MHz = f_larmor * 16;
+	// unsigned int adc_clk_fact = 4;   // the factor of (system_clk_freq / adc_clk_freq)
 
 	double SYSCLK_MHz = f_larmor * larmor_clk_fact;
 
-// initialize all objects
+	// initialize all objects
 	bstream__init(&bstream_objs[aux], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_h1], SYSCLK_MHz);
 	bstream__init(&bstream_objs[tx_l1], SYSCLK_MHz);
@@ -624,7 +626,7 @@ cpmg_obj bstream__cpmg(
 	bstream_rst();
 	usleep(100);
 
-// calculate the pulse length
+	// calculate the pulse length
 	cpmg_obj cpmg_params;
 
 	cpmg_params = cpmg_param_calc(
@@ -663,7 +665,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_clkph ( the mux sel selects phase cycle)
+	// tx_clkph ( the mux sel selects phase cycle)
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -683,8 +685,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_h1
-
+	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -704,8 +705,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_h2
-
+	// tx_h2
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -725,8 +725,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_l1
-
+	// tx_l1
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -746,8 +745,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_l2
-
+	// tx_l2
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -767,8 +765,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_l2], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_dump
-
+	// tx_dump
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK + cpmg_params.lcs_pchg_int/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_int + cpmg_params.p90_pchg_refill_int + cpmg_params.p90_int /*dataval*/);
@@ -781,8 +778,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_dump], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_charge
-
+	// tx_charge
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK + cpmg_params.lcs_pchg_int + cpmg_params.lcs_dump_int/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_refill_int /*dataval*/);
@@ -796,7 +792,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// tx_charge_bs
+	// tx_charge_bs
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -816,7 +812,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_charge_bs], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// rx_adc_en
+	// rx_adc_en
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK + cpmg_params.lcs_pchg_int/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.p90_pchg_int + cpmg_params.p90_pchg_refill_int + cpmg_params.p90_int /*dataval*/);
@@ -829,7 +825,7 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_adc_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-// rx_short
+	// rx_short
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK /*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_pchg_int /*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, cpmg_params.lcs_dump_int /*dataval*/);
@@ -865,19 +861,20 @@ cpmg_obj bstream__cpmg(
 	bstream__push(&bstream_objs[gradX_Lo_L], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// grad_hside_en
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
-// precharge the high-side bootstrap circuits
+	// precharge the high-side bootstrap circuits
 	cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 	usleep(bstrap_pchg_us);
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start(wait_til_done);
+	// bstream_start(wait_til_done);
+	bstream_start(wait_til_done, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 	return cpmg_params;
 
@@ -1178,7 +1175,8 @@ cpmg_cmode_obj bstream__cpmg_cmode(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start(wait_til_done);
+	// bstream_start(wait_til_done);
+	bstream_start(wait_til_done, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 	return cpmg_params;
 
@@ -1567,7 +1565,8 @@ cpmg_obj bstream__pgse(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start(wait_til_done);
+	// bstream_start(wait_til_done);
+	bstream_start(wait_til_done, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 	return cpmg_params;
 
@@ -1704,9 +1703,6 @@ phenc_obj bstream__phenc(
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_clkph], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-
-	/////////////
-	/////////////
 	// gradZ_p
 	bstream__push(&bstream_objs[gradY_Lo_R], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradY_Lo_R], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
@@ -1744,8 +1740,6 @@ phenc_obj bstream__phenc(
 		bstream__push(&bstream_objs[gradY_Lo_L], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.gradz_len_int/*dataval*/);
 	bstream__push(&bstream_objs[gradY_Lo_L], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-	///////////
-
 	// grad_hside_en
 	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[grad_hside_en], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int /*dataval*/);
@@ -1756,8 +1750,6 @@ phenc_obj bstream__phenc(
 	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-
-	///////////
 	// gradX_p
 	bstream__push(&bstream_objs[gradX_Lo_R], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[gradX_Lo_R], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, phenc_params.lcs_pchg_int + phenc_params.lcs_dump_int + phenc_params.p90_pchg_int + phenc_params.p90_pchg_refill_int + phenc_params.p90_int /*dataval*/);
@@ -2005,7 +1997,8 @@ phenc_obj bstream__phenc(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start(wait_til_done);
+	// bstream_start(wait_til_done);
+	bstream_start(wait_til_done, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 	return phenc_params;
 
@@ -2141,7 +2134,8 @@ void bstream__noise(
 // cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 // alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start (wait_til_done);
+	// bstream_start (wait_til_done);
+	bstream_start(wait_til_done, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -2312,7 +2306,8 @@ void bstream__toggle(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start (WAIT);
+	// bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -2447,9 +2442,9 @@ void bstream__tb_vpc_chg_hbridge_left(
 	bstream__push(&bstream_objs[gradX_Lo_L], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 	// grad_hside_en
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[grad_hside_en], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
 // precharge the high-side bootstrap circuits
@@ -2459,7 +2454,8 @@ void bstream__tb_vpc_chg_hbridge_left(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-	bstream_start (WAIT);
+	// bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -2618,7 +2614,7 @@ void bstream__tb_vpc_wastedump(
 	cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);		// start
 
-	bstream_start (WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
 }
 
@@ -2672,13 +2668,13 @@ void bstream__tb_grad(
 
 	// aux
 	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, front_porch_int /*dataval*/);
-		bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int /*dataval*/);
-		bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_blanking_int /*dataval*/);
-		bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int/*dataval*/);
-		bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, back_tail_int/*dataval*/);
-		bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-		bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, front_porch_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_blanking_int /*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int/*dataval*/);
+	bstream__push(&bstream_objs[aux], 1/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, back_tail_int/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
+	bstream__push(&bstream_objs[aux], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
 
@@ -2778,11 +2774,6 @@ void bstream__tb_grad(
 
 	// tx_h1
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, front_porch_int /*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int /*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_blanking_int /*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, grad_len_int/*dataval*/);
-	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, back_tail_int/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[tx_h1], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
@@ -2827,16 +2818,11 @@ void bstream__tb_grad(
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
 
-	// precharge the high-side bootstrap circuits
-		cnt_out_val |= ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
-		alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
-		usleep(bstrap_pchg_us); // by setting this delay, effectively build up voltage on the gate capacitor because the high-side FETs on the gradient is not on, but we're expecting some current due to the set bias current on the lower gradient (however, no current can flow due to off high-side FET), causing the voltage at the lower gate builds up.
-		cnt_out_val &= ~ ( CHG_BS | DCHG_BS | CHG_HBRIDGE );
-		alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);   // start
 
-		bstream_start (WAIT);
+	// bstream_start(WAIT);
+	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 
-		usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
+	usleep(T_BLANK / (SYSCLK_MHz));	// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
 
 }
