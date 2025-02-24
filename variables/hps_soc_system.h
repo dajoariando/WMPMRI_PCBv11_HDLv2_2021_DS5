@@ -447,15 +447,15 @@
 #define SYS_PLL_RECONFIG_END 0x3ff
 
 /*
- * Macros for device 'gradX_N', class 'bstream_new'
- * The macros are prefixed with 'GRADX_N_'.
+ * Macros for device 'grad_hSide_en', class 'bstream_new'
+ * The macros are prefixed with 'GRAD_HSIDE_EN_'.
  * The prefix is the slave descriptor.
  */
-#define GRADX_N_COMPONENT_TYPE bstream_new
-#define GRADX_N_COMPONENT_NAME gradX_N
-#define GRADX_N_BASE 0x400
-#define GRADX_N_SPAN 512
-#define GRADX_N_END 0x5ff
+#define GRAD_HSIDE_EN_COMPONENT_TYPE bstream_new
+#define GRAD_HSIDE_EN_COMPONENT_NAME grad_hSide_en
+#define GRAD_HSIDE_EN_BASE 0x400
+#define GRAD_HSIDE_EN_SPAN 512
+#define GRAD_HSIDE_EN_END 0x5ff
 
 /*
  * Macros for device 'tx_CHRG_BS', class 'bstream_new'
@@ -480,26 +480,26 @@
 #define TX_CLKPH_END 0x9ff
 
 /*
- * Macros for device 'gradZ_N', class 'bstream_new'
- * The macros are prefixed with 'GRADZ_N_'.
+ * Macros for device 'gradY_Lo_L', class 'bstream_new'
+ * The macros are prefixed with 'GRADY_LO_L_'.
  * The prefix is the slave descriptor.
  */
-#define GRADZ_N_COMPONENT_TYPE bstream_new
-#define GRADZ_N_COMPONENT_NAME gradZ_N
-#define GRADZ_N_BASE 0xa00
-#define GRADZ_N_SPAN 512
-#define GRADZ_N_END 0xbff
+#define GRADY_LO_L_COMPONENT_TYPE bstream_new
+#define GRADY_LO_L_COMPONENT_NAME gradY_Lo_L
+#define GRADY_LO_L_BASE 0xa00
+#define GRADY_LO_L_SPAN 512
+#define GRADY_LO_L_END 0xbff
 
 /*
- * Macros for device 'gradZ_P', class 'bstream_new'
- * The macros are prefixed with 'GRADZ_P_'.
+ * Macros for device 'gradY_Lo_R', class 'bstream_new'
+ * The macros are prefixed with 'GRADY_LO_R_'.
  * The prefix is the slave descriptor.
  */
-#define GRADZ_P_COMPONENT_TYPE bstream_new
-#define GRADZ_P_COMPONENT_NAME gradZ_P
-#define GRADZ_P_BASE 0xc00
-#define GRADZ_P_SPAN 512
-#define GRADZ_P_END 0xdff
+#define GRADY_LO_R_COMPONENT_TYPE bstream_new
+#define GRADY_LO_R_COMPONENT_NAME gradY_Lo_R
+#define GRADY_LO_R_BASE 0xc00
+#define GRADY_LO_R_SPAN 512
+#define GRADY_LO_R_END 0xdff
 
 /*
  * Macros for device 'aux', class 'bstream_new'
@@ -513,15 +513,26 @@
 #define AUX_END 0xfff
 
 /*
- * Macros for device 'gradX_P', class 'bstream_new'
- * The macros are prefixed with 'GRADX_P_'.
+ * Macros for device 'gradX_Lo_L', class 'bstream_new'
+ * The macros are prefixed with 'GRADX_LO_L_'.
  * The prefix is the slave descriptor.
  */
-#define GRADX_P_COMPONENT_TYPE bstream_new
-#define GRADX_P_COMPONENT_NAME gradX_P
-#define GRADX_P_BASE 0x1000
-#define GRADX_P_SPAN 512
-#define GRADX_P_END 0x11ff
+#define GRADX_LO_L_COMPONENT_TYPE bstream_new
+#define GRADX_LO_L_COMPONENT_NAME gradX_Lo_L
+#define GRADX_LO_L_BASE 0x1000
+#define GRADX_LO_L_SPAN 512
+#define GRADX_LO_L_END 0x11ff
+
+/*
+ * Macros for device 'gradX_Lo_R', class 'bstream_new'
+ * The macros are prefixed with 'GRADX_LO_R_'.
+ * The prefix is the slave descriptor.
+ */
+#define GRADX_LO_R_COMPONENT_TYPE bstream_new
+#define GRADX_LO_R_COMPONENT_NAME gradX_Lo_R
+#define GRADX_LO_R_BASE 0x1200
+#define GRADX_LO_R_SPAN 512
+#define GRADX_LO_R_END 0x13ff
 
 /*
  * Macros for device 'tx_DUMP', class 'bstream_new'

@@ -84,10 +84,11 @@ volatile unsigned int *axi_ram_tx_charge_bs = NULL;
 volatile unsigned int *axi_ram_tx_dump = NULL;
 volatile unsigned int *axi_ram_rx_adc_en = NULL;
 volatile unsigned int *axi_ram_rx_in_short = NULL;
-volatile unsigned int *axi_ram_gradZ_p = NULL;
-volatile unsigned int *axi_ram_gradZ_n = NULL;
-volatile unsigned int *axi_ram_gradX_p = NULL;
-volatile unsigned int *axi_ram_gradX_n = NULL;
+volatile unsigned int *axi_ram_gradY_Lo_R = NULL;
+volatile unsigned int *axi_ram_gradY_Lo_L = NULL;
+volatile unsigned int *axi_ram_gradX_Lo_R = NULL;
+volatile unsigned int *axi_ram_gradX_Lo_L = NULL;
+volatile unsigned int *axi_ram_grad_hside_en = NULL;
 volatile unsigned int *axi_ram_aux = NULL;
 
 volatile unsigned int *axi_sdram_addr = NULL;   // sdram access via axi

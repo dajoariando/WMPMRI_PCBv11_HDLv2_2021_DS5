@@ -2,7 +2,7 @@
 // Author: David Ariando
 // phase encoding T2 measurements
 
-#define EXEC_PHENC
+// #define EXEC_PHENC
 #ifdef EXEC_PHENC
 
 #define GET_RAW_DATA
@@ -144,8 +144,8 @@ int main(int argc, char * argv[]) {
 	for (jj = 0; jj < num_of_samples; jj++) {
 		adc_data_sum[jj] = 0;
 	}
-	float gradz_mA_abs;   // gradient z mA to program dac
-	float gradx_mA_abs;// gradient x mA to program dac
+	double gradz_mA_abs;   // gradient z mA to program dac
+	double gradx_mA_abs;// gradient x mA to program dac
 	char gradz_dir, gradx_dir;   // the gradient direction
 
 	// init
@@ -160,10 +160,10 @@ int main(int argc, char * argv[]) {
 
 	// set gradx voltage
 	gradx_mA_abs = fabs(gradx_mA);// same for both polarity, but can be enabled or disabled as will in bitstream
-	gradx_dir = ( gradz_mA > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
+	gradx_dir = ( gradx_mA > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
 
 	// program the dac
-	double ibias = 10; // in mA
+	double ibias = 100; // off-bias current in mA
 	grad_init_current (ibias, gradx_mA_abs, ibias, gradx_mA_abs, DAC_X); // program the DAC_X
 	grad_init_current (ibias, gradz_mA_abs, ibias, gradz_mA_abs, DAC_Y); // program the DAC_Y
 
@@ -209,14 +209,14 @@ int main(int argc, char * argv[]) {
 		);
 		usleep(T_BLANK / ( SYSCLK_MHz ));// wait for T_BLANK as the last bitstream is not being counted in on bitstream code
 
-		// flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
+		/* flush the adc fifo and check if there's remaining data in the fifo and generate warning message.
 		int flushed_data = 0;
 		flushed_data = flush_adc_fifo(h2p_fifo_sink_ch_a_csr_addr, h2p_fifo_sink_ch_a_data_addr, DISABLE_MESSAGE);
 		if (flushed_data > 0) {
 			printf("\tWARNING! Flushed data = %d\n", flushed_data);
-		}
+		}*/
 	}
-
+/*
 	clock_t start, end;
 	double net_acq_time, net_elapsed_time, net_scan_time;
 	unsigned char p90_ph_sel = 1;	// set phase to 90 degrees
@@ -482,7 +482,7 @@ int main(int argc, char * argv[]) {
 	fprintf(fptr, "echotime_int = %d\n",			phenc_params.echotime_int);
 #endif
 	fclose (fptr);
-
+*/
 	leave();
 
 	return 0;

@@ -23,7 +23,7 @@ typedef struct bstream_struct {
 
 // define the variables for the bitstream
 enum bstream_gpio {
-	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradZ_p, gradZ_n, gradX_p, gradX_n, aux, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
+	tx_h1 = 0, tx_l1, tx_h2, tx_l2, tx_charge, tx_charge_bs, tx_dump, tx_clkph, rx_adc_en, rx_in_short, gradY_Lo_R, gradY_Lo_L, gradX_Lo_R, gradX_Lo_L, grad_hside_en, aux, BSTREAM_COUNT   // BSTREAM_COUNT is a dummy variable to mark the end of the enum
 };
 
 void bstream__push(bstream_obj * obj, char pls_pol, char seq_end, char loop_sta, char loop_sto, char mux_sel, unsigned int dataval);
@@ -39,7 +39,6 @@ void bstream_wait_for_done();   // wait for done signal from h1
 
 char bstream_check(bstream_obj *obj);
 
-void bstream__test(float clk_MHz);
 
 void bstream__en_adc(
         double SYSCLK_MHz,
@@ -216,6 +215,19 @@ void bstream__tb_vpc_wastedump(
         double lcs_vpc_dchg_us,		// discharging of vpc
         double lcs_wastedump_us,		// dumping the current into RF
         unsigned int repeat		// repeat the precharge and dump
+        );
+
+void bstream__tb_grad(
+        double SYSCLK_MHz,			// base clock
+		double bstrap_pchg_us,		// bootstrap precharging
+		double front_porch_us,		// front porch before gradient
+		double grad_len_us,			// gradient length (for both output)
+		double grad_blanking_us,	// gradient blanking between two gradient output
+		double back_tail_us,		// back tail after gradient train
+        char grady_dir,				// gradient z direction
+        char gradx_dir,				// gradient x direction
+        char grad_refocus,			// gradient refocus
+        char flip_grad_refocus_sign// flip gradient refocus
         );
 
 #endif /* FUNCTIONS_BSTREAM_H_ */

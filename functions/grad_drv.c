@@ -59,9 +59,9 @@ void grad_init_current (double i_ChA, double i_ChB, double i_ChC, double i_ChD, 
 	alt_write_word( ( h2p_general_cnt_out_addr ), cnt_out_val);
 
 	// program the DAC
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_A, DAC_SEL, CH_DACA, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, ENABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_B, DAC_SEL, CH_DACB, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, ENABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_C, DAC_SEL, CH_DACC, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, ENABLE_MESSAGE);
-	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_D, DAC_SEL, CH_DACD, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, ENABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_A, DAC_SEL, CH_DACA, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_B, DAC_SEL, CH_DACB, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_C, DAC_SEL, CH_DACC, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_D, DAC_SEL, CH_DACD, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
 
 }

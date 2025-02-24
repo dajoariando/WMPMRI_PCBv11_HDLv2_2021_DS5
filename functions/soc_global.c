@@ -59,10 +59,11 @@ extern volatile unsigned int *axi_ram_tx_charge_bs;
 extern volatile unsigned int *axi_ram_tx_dump;
 extern volatile unsigned int *axi_ram_rx_adc_en;
 extern volatile unsigned int *axi_ram_rx_in_short;
-extern volatile unsigned int *axi_ram_gradZ_p;
-extern volatile unsigned int *axi_ram_gradZ_n;
-extern volatile unsigned int *axi_ram_gradX_p;
-extern volatile unsigned int *axi_ram_gradX_n;
+extern volatile unsigned int *axi_ram_gradY_Lo_R;
+extern volatile unsigned int *axi_ram_gradY_Lo_L;
+extern volatile unsigned int *axi_ram_gradX_Lo_R;
+extern volatile unsigned int *axi_ram_gradX_Lo_L;
+extern volatile unsigned int *axi_ram_grad_hside_en;
 extern volatile unsigned int *axi_ram_aux;
 
 // pll reconfig address for the bitstream
@@ -183,10 +184,11 @@ void soc_init() {
 	axi_ram_tx_clkph = axi_base + TX_CLKPH_BASE;
 	axi_ram_rx_adc_en = axi_base + RX_ADC_EN_BASE;
 	axi_ram_rx_in_short = axi_base + RX_IN_SHORT_BASE;
-	axi_ram_gradZ_p = axi_base + GRADZ_P_BASE;
-	axi_ram_gradZ_n = axi_base + GRADZ_N_BASE;
-	axi_ram_gradX_p = axi_base + GRADX_P_BASE;
-	axi_ram_gradX_n = axi_base + GRADX_N_BASE;
+	axi_ram_gradY_Lo_R = axi_base + GRADY_LO_R_BASE;
+	axi_ram_gradY_Lo_L = axi_base + GRADY_LO_L_BASE;
+	axi_ram_gradX_Lo_R = axi_base + GRADX_LO_R_BASE;
+	axi_ram_gradX_Lo_L = axi_base + GRADX_LO_L_BASE;
+	axi_ram_grad_hside_en = axi_base + GRAD_HSIDE_EN_BASE;
 	axi_ram_aux = axi_base + AUX_BASE;
 	axi_sdram_addr = axi_base + SDRAM_BASE;
 
