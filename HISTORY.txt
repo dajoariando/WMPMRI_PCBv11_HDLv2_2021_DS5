@@ -1,0 +1,3 @@
+For this project, the last update for dissertation system was April 2023.
+And then I tried to enable 2 channels for Signature Resonance with the original hardware up to August 2024.
+After that, starting December 2024, I started to use this codebase to use the new Signature Resonance MRI hardware.
