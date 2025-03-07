@@ -2,7 +2,7 @@
 // Author: David Ariando
 // This is the basic CPMG sequence but taking data from multiple channel ADC
 
-#define EXEC_CPMG
+// #define EXEC_CPMG
 #ifdef EXEC_CPMG
 
 #define GET_RAW_DATA

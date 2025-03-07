@@ -2,8 +2,8 @@
 // Author: David Ariando
 // this program is to test the gradient output.
 
-// #define EXEC_TB_GRAD
-#ifdef EXEC_TB_GRAD
+// #define EXEC_TB_GRAD_CURRENT
+#ifdef EXEC_TB_GRAD_CURRENT
 
 #include "hps_linux.h"
 
@@ -122,7 +122,7 @@ int main(int argc, char * argv[]) {
 
 
 	bstream__tb_grad(
-		SYSCLK_MHz,				// base clock
+			SYSCLK_MHz * 4,	// base clock. *4 is due to the clock being used by bistream is 4x the system clock
 			bstrap_pchg_us,			// bootstrap precharging
 			front_porch_us,			// front porch before gradient
 		grad_len_us,			// gradient length (for both output)

@@ -2,7 +2,7 @@
 // Author: David Ariando
 // phase encoding T2 measurements
 
-// #define EXEC_PHENC
+#define EXEC_PHENC
 #ifdef EXEC_PHENC
 
 #define GET_RAW_DATA
@@ -102,18 +102,26 @@ int main(int argc, char * argv[]) {
 	float gradz_mA = atof(argv[33]);// gradient z dac output current (can be either polarity, positive or negative)
 	double gradx_len_us = atof(argv[34]);	// gradient length for x gradient
 	float gradx_mA = atof(argv[35]);// gradient x dac output current (can be either polarity, positive or negative)
+	double VxA = atof(argv[36]);	// dac voltage for null output current
+	double VxB = atof(argv[37]);	// dac voltage for null output current
+	double VxC = atof(argv[38]);	// dac voltage for null output current
+	double VxD = atof(argv[39]);	// dac voltage for null output current
+	double VyA = atof(argv[40]);	// dac voltage for null output current
+	double VyB = atof(argv[41]);	// dac voltage for null output current
+	double VyC = atof(argv[42]);	// dac voltage for null output current
+	double VyD = atof(argv[43]);	// dac voltage for null output current
 	// -- encoding period
-	char grad_refocus = atoi(argv[36]);   // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
-	char flip_grad_refocus_sign = atoi(argv[37]);	// flip the gradient refocus sign for phase encoding, and don't flip it for pgse
-	double enc_tao_us = atof(argv[38]);   // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
+	char grad_refocus = atoi(argv[44]); // the gradient refocusing enable that's present in PGSE sequence. When it's off, it's purely phase encoding.
+	char flip_grad_refocus_sign = atoi(argv[45]);// flip the gradient refocus sign for phase encoding, and don't flip it for pgse
+	double enc_tao_us = atof(argv[46]); // the encoding time tao. Spacing from p90 to first echo is 2*tao with p180 in the middle of the spacing.
 	// -- p180 pulse x or y
-	char p180_xy_angle = atoi(argv[39]);   // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
+	char p180_xy_angle = atoi(argv[47]); // set p180_xy_angle to 1 for x-pulse and to 2 for y-pulse
 	// enable lcs initial precharging and discharging
-	char en_lcs_pchg = atoi(argv[40]);// enable the vpc precharging via lcs prior to cpmg
-	char en_lcs_dchg = atoi(argv[41]);// enable the vpc discharging via lcs post cpmg
-	unsigned int exp_num = atoi(argv[42]);// the experiment number
+	char en_lcs_pchg = atoi(argv[48]);// enable the vpc precharging via lcs prior to cpmg
+	char en_lcs_dchg = atoi(argv[49]);// enable the vpc discharging via lcs post cpmg
+	unsigned int exp_num = atoi(argv[50]);	// the experiment number
 	// enable dummy sequence
-	uint8_t dummy_scan_num = atoi(argv[43]);// the dummy sequence repetition number to make cpmg afterwards consistent (avoiding long T1 wait at the first cpmg measurement).
+	uint8_t dummy_scan_num = atoi(argv[51]);// the dummy sequence repetition number to make cpmg afterwards consistent (avoiding long T1 wait at the first cpmg measurement).
 
 	// measurement settings
 	char adc_channel = 2; // the number of adc channels being used
@@ -163,9 +171,11 @@ int main(int argc, char * argv[]) {
 	gradx_dir = ( gradx_mA > 0 ) ? 1 : 0;   // set the direction to positive if gradx_volt > 0
 
 	// program the dac
-	double ibias = 100; // off-bias current in mA
-	grad_init_current (ibias, gradx_mA_abs, ibias, gradx_mA_abs, DAC_X); // program the DAC_X
-	grad_init_current (ibias, gradz_mA_abs, ibias, gradz_mA_abs, DAC_Y); // program the DAC_Y
+	double ibias = 20; // off-bias current in mA
+	// grad_init_current (ibias, gradx_mA_abs, ibias, gradx_mA_abs, DAC_X); // program the DAC_X
+	// grad_init_current (ibias, gradz_mA_abs, ibias, gradz_mA_abs, DAC_Y); // program the DAC_Y
+	grad_Iset_with_vBias(gradx_mA_abs, ibias, VxA, VxB, VxC, VxD, DAC_X);
+	grad_Iset_with_vBias(gradz_mA_abs, ibias, VyA, VyB, VyC, VyD, DAC_Y);
 
 	// set phase increment
 	alt_write_word( ( h2p_ph_inc_addr ), 1 << ( NCO_PH_RES - 4 ));

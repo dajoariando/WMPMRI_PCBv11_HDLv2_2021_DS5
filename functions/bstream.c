@@ -2817,8 +2817,6 @@ void bstream__tb_grad(
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 0/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, T_BLANK/*dataval*/);
 	bstream__push(&bstream_objs[rx_in_short], 0/*pls_pol*/, 1/*seq_end*/, 0/*loop_sta*/, 0/*loop_sto*/, 0/*mux_sel*/, 0/*dataval*/);
 
-
-
 	// bstream_start(WAIT);
 	bstream_start(WAIT, (unsigned int) (((double) T_BLANK) / SYSCLK_MHz));
 

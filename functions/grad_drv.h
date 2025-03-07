@@ -9,7 +9,8 @@
 // FETs, and thus, charging the high-side switch capacitor.
 void grad_init_current (double i_ChA, double i_ChB, double i_ChC, double i_ChD, uint8_t DAC_SEL);
 
+void grad_init_voltage(double v_A, double v_B, double v_C, double v_D, uint8_t DAC_SEL);
 
-
+void grad_Iset_with_vBias(double iSet_mA, double iBias_mA, double vNullA, double vNullB, double vNullC, double vNullD, uint8_t DAC_SEL);
 
 #endif

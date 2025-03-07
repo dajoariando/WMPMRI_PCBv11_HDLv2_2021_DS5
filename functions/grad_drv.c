@@ -65,3 +65,97 @@ void grad_init_current (double i_ChA, double i_ChB, double i_ChC, double i_ChD, 
 	mcp4728_i2c_sngl_wr (h2p_dac_grad_addr, v_D, DAC_SEL, CH_DACD, VREF_INTERN, (double)2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
 
 }
+
+void grad_init_voltage(double v_A, double v_B, double v_C, double v_D, uint8_t DAC_SEL) {
+	// i_ChA - i_ChD are in mA
+	// DAC_SEL is DAC_X, DAC_Y, DAC_Z, and DAC_Z2
+
+	unsigned int grad_cnt_ch, grad_hi_side_ch; // variable to select gradient channel
+
+	// select DAC
+	switch (DAC_SEL) {
+		case DAC_X:
+			grad_cnt_ch = GRADX_LO_L_SOC | GRADX_LO_R_SOC;
+			grad_hi_side_ch = GRADX_HI_R_SOC | GRADX_HI_L_SOC;
+			break;
+		case DAC_Y:
+			grad_cnt_ch = GRADY_LO_L_SOC | GRADY_LO_R_SOC;
+			grad_hi_side_ch = GRADY_HI_R_SOC | GRADY_HI_L_SOC;
+			break;
+		case DAC_Z:
+			grad_cnt_ch = GRADZ_LO_L_SOC | GRADZ_LO_R_SOC;
+			grad_hi_side_ch = GRADZ_HI_R_SOC | GRADZ_HI_L_SOC;
+			break;
+		case DAC_Z2:
+			grad_cnt_ch = GRADZ2_LO_L_SOC | GRADZ2_LO_R_SOC;
+			grad_hi_side_ch = GRADZ2_HI_R_SOC | GRADZ2_HI_L_SOC;
+			break;
+		default:
+			grad_cnt_ch = 0;
+			grad_hi_side_ch = 0;
+	}
+
+	// enable the I/O and set gradient to a default state.
+	cnt_out_val |= GRAD_OE;
+	// cnt_out_val &= ~(grad_cnt_ch | grad_hi_side_ch); // turn off all the high-side, and set selected channel to B and D.
+	alt_write_word((h2p_general_cnt_out_addr), cnt_out_val);
+
+	// program the DAC
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_A, DAC_SEL, CH_DACA, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_B, DAC_SEL, CH_DACB, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_C, DAC_SEL, CH_DACC, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_D, DAC_SEL, CH_DACD, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+
+}
+
+void grad_Iset_with_vBias(double iSet_mA, double iBias_mA, double vNullA, double vNullB, double vNullC, double vNullD, uint8_t DAC_SEL) {
+	// Iset is in mA, vBiasx are in volt
+	// DAC_SEL is DAC_X, DAC_Y, DAC_Z, and DAC_Z2
+
+	// conversion from current to voltage
+	double v_A, v_B, v_C, v_D;
+	double conv_i_to_v = 0.2; // 1A is equal to 0.2V.
+	double A_to_mA = 1000; // conversion from A to mA.
+	unsigned int grad_cnt_ch, grad_hi_side_ch; // variable to select gradient channel
+
+	// current to voltage conversion
+	v_A = (iBias_mA / A_to_mA) * conv_i_to_v + vNullA;
+	v_B = (iSet_mA / A_to_mA) * conv_i_to_v + vNullB;
+	v_C = (iBias_mA / A_to_mA) * conv_i_to_v + vNullC;
+	v_D = (iSet_mA / A_to_mA) * conv_i_to_v + vNullD;
+
+	// select DAC
+	switch (DAC_SEL) {
+		case DAC_X:
+			grad_cnt_ch = GRADX_LO_L_SOC | GRADX_LO_R_SOC;
+			grad_hi_side_ch = GRADX_HI_R_SOC | GRADX_HI_L_SOC;
+			break;
+		case DAC_Y:
+			grad_cnt_ch = GRADY_LO_L_SOC | GRADY_LO_R_SOC;
+			grad_hi_side_ch = GRADY_HI_R_SOC | GRADY_HI_L_SOC;
+			break;
+		case DAC_Z:
+			grad_cnt_ch = GRADZ_LO_L_SOC | GRADZ_LO_R_SOC;
+			grad_hi_side_ch = GRADZ_HI_R_SOC | GRADZ_HI_L_SOC;
+			break;
+		case DAC_Z2:
+			grad_cnt_ch = GRADZ2_LO_L_SOC | GRADZ2_LO_R_SOC;
+			grad_hi_side_ch = GRADZ2_HI_R_SOC | GRADZ2_HI_L_SOC;
+			break;
+		default:
+			grad_cnt_ch = 0;
+			grad_hi_side_ch = 0;
+	}
+
+	// enable the I/O and set gradient to a default state.
+	cnt_out_val |= GRAD_OE;
+	cnt_out_val &= ~(grad_cnt_ch | grad_hi_side_ch); // turn off all the high-side, and set selected channel to B and D.
+	alt_write_word((h2p_general_cnt_out_addr), cnt_out_val);
+
+	// program the DAC
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_A, DAC_SEL, CH_DACA, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_B, DAC_SEL, CH_DACB, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_C, DAC_SEL, CH_DACC, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+	mcp4728_i2c_sngl_wr(h2p_dac_grad_addr, v_D, DAC_SEL, CH_DACD, VREF_INTERN, (double) 2.048, UDAC_DO_UPDT, PWR_NORM, GAIN_2X, DISABLE_MESSAGE);
+
+}
